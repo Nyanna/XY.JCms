@@ -27,8 +27,8 @@ import java.util.ArrayList;
 public class MockTranslationConfiguration extends TranslationConfiguration {
 
     protected static TranslationRule[] getRuleList() {
-        final TranslationRule[] con0 = {};
-        con0[0] = new TranslationRule("^du willst wohl zu ([Ringtones|Funsounds])", "du willst wohl zu Ringtones",
+        final TranslationRule[] con0 = new TranslationRule[3];
+        con0[0] = new TranslationRule("^du willst wohl zu (Ringtones|Funsounds)", "du willst wohl zu Ringtones",
                 "contentgroup", new ArrayList<RuleParameter>() {
                     {
                         add(new RuleParameter("contentgroup", 1, " de.jamba.ContentGroupConverter"));

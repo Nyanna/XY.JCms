@@ -43,6 +43,9 @@ public class NavigationAbstractionLayer {
          */
         final private String id;
 
+        /**
+         * holds the parameter list
+         */
         Map<Object, Object> parameters = new HashMap<Object, Object>();
 
         /**
@@ -111,6 +114,11 @@ public class NavigationAbstractionLayer {
          */
         public void setParameters(final Map<Object, Object> parameters) {
             this.parameters = parameters;
+        }
+
+        @Override
+        public String toString() {
+            return "NALKey[ id=" + id + " parameters=" + parameters.toString() + "]";
         }
     }
 

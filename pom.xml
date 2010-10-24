@@ -5,7 +5,6 @@
   <groupId>xy.jcms</groupId>
   <artifactId>core</artifactId>
   <version>SNAPSHOT</version>
-  <packaging>war</packaging>
 
   <name>core</name>
   <description>Core package of JCms</description>

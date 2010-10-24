@@ -20,9 +20,16 @@ import java.io.IOException;
 
 import javax.servlet.ServletOutputStream;
 
+import org.apache.log4j.Logger;
+
+import net.xy.jcms.controller.TranslationConfiguration;
 import net.xy.jcms.shared.OutWriterImplementationAdapter;
 
 public class ServletOutputStreamAdapter extends OutWriterImplementationAdapter {
+    /**
+     * logger
+     */
+    static final Logger LOG = Logger.getLogger(ServletOutputStreamAdapter.class);
 
     private final ServletOutputStream outStream;
 
@@ -31,6 +38,7 @@ public class ServletOutputStreamAdapter extends OutWriterImplementationAdapter {
         try {
             outStream.print(buffer.toString());
         } catch (final IOException e) {
+            LOG.equals(e);
         }
     }
 

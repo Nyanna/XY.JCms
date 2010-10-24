@@ -22,7 +22,10 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
+
 import net.xy.jcms.controller.NavigationAbstractionLayer.NALKey;
+import net.xy.jcms.controller.usecase.ControllerPool;
 import net.xy.jcms.shared.dao.IDataAccessContext;
 
 /**
@@ -32,6 +35,10 @@ import net.xy.jcms.shared.dao.IDataAccessContext;
  * 
  */
 public abstract class TranslationConfiguration {
+    /**
+     * logger
+     */
+    static final Logger LOG = Logger.getLogger(TranslationConfiguration.class);
 
     /**
      * describes an path translation rule to convert human readable pathes in an
@@ -186,8 +193,10 @@ public abstract class TranslationConfiguration {
                 try {
                     return translateKeyWithRule(key, rule);
                 } catch (final GroupCouldNotBeFilled e) {
+                    LOG.error(e);
                     return null;
                 } catch (final InvalidBuildRule e) {
+                    LOG.error(e);
                     return null;
                 }
             }
@@ -243,6 +252,7 @@ public abstract class TranslationConfiguration {
                         }
                     } catch (final IndexOutOfBoundsException e) {
                         // in case group is not defined or found
+                        LOG.error(e);
                         throw new GroupCouldNotBeFilled(
                                 "An mendatory group could not be filled with parameters from key, rule describes an invalid group or group was not found in buildKey");
                     }
@@ -286,7 +296,7 @@ public abstract class TranslationConfiguration {
      * @param struct
      * @return null or the rule
      */
-    public static TranslationRule findRuleForKey(final NALKey struct, final IDataAccessContext dac) {
+    protected static TranslationRule findRuleForKey(final NALKey struct, final IDataAccessContext dac) {
         if (struct == null) {
             return null;
         }

@@ -18,6 +18,8 @@ package net.xy.jcms.controller.configurations;
 
 import java.util.EnumSet;
 
+import org.apache.log4j.Logger;
+
 /**
  * All configuration not dedicated to the clients request instead supplied or
  * retrieved by other sources to name a few options, db, uiconfig, messages,
@@ -27,6 +29,11 @@ import java.util.EnumSet;
  * 
  */
 public abstract class Configuration<CONFIGURATION_OBJECT> {
+
+    /**
+     * logger
+     */
+    static final Logger LOG = Logger.getLogger(Configuration.class);
 
     /**
      * typesation of config this triggers the appropriated parser and config

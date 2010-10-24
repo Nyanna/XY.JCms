@@ -25,6 +25,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
+
 import net.xy.jcms.controller.NavigationAbstractionLayer;
 import net.xy.jcms.controller.NavigationAbstractionLayer.NALKey;
 import net.xy.jcms.controller.UsecaseAgent;
@@ -45,6 +47,10 @@ import net.xy.jcms.shared.dao.IDataAccessContext;
  * 
  */
 public class MockServlet extends HttpServlet {
+    /**
+     * logger
+     */
+    static final Logger LOG = Logger.getLogger(MockServlet.class);
 
     @Override
     public void service(final ServletRequest req, final ServletResponse res) throws ServletException, IOException {
@@ -79,6 +85,7 @@ public class MockServlet extends HttpServlet {
             try {
                 usecase = UsecaseAgent.findUsecaseForStruct(forward, dac);
             } catch (final NoUsecaseFound e) {
+                LOG.error(e);
                 throw new ServletException(e);
             }
 
@@ -90,6 +97,7 @@ public class MockServlet extends HttpServlet {
             try {
                 forward = UsecaseAgent.executeController(usecase, dac);
             } catch (final ClassNotFoundException ex) {
+                LOG.error(ex);
                 throw new ServletException("Couldn't load an Usecase controller");
             }
         } while (forward != null);

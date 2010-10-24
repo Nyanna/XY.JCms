@@ -19,6 +19,10 @@ package net.xy.jcms.controller.usecase;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.xy.jcms.controller.configurations.Configuration;
+
+import org.apache.log4j.Logger;
+
 /**
  * this pool controls danymic controller loading, reloading and singleton
  * instantiation of the controllers
@@ -27,6 +31,11 @@ import java.util.Map;
  * 
  */
 public class ControllerPool {
+    /**
+     * logger
+     */
+    static final Logger LOG = Logger.getLogger(ControllerPool.class);
+
     /**
      * instancelist of the controllers
      */
@@ -49,8 +58,10 @@ public class ControllerPool {
                 try {
                     controllers.put(id, (IController) object.newInstance());
                 } catch (final InstantiationException e) {
+                    LOG.error(e);
                     throw new ClassNotFoundException("Failure on instantiating Controller class " + id);
                 } catch (final IllegalAccessException e) {
+                    LOG.error(e);
                     throw new ClassNotFoundException("Failure on accessing and instantiating Controller class " + id);
                 }
                 return controllers.get(id);
