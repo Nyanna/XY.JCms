@@ -1,0 +1,48 @@
+/**
+ *  This file is part of XY.JCms, Copyright 2010 (C) Xyan Kruse, Xyan@gmx.net, Xyan.kilu.de
+ *
+ *  XY.JCms is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  XY.JCms is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with XY.JCms.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package net.xy.jcms.controller;
+
+import java.util.ArrayList;
+
+/**
+ * Mock translation configuration in lack of an configuration reader
+ * 
+ * @author xyan
+ * 
+ */
+public class MockTranslationConfiguration extends TranslationConfiguration {
+
+    protected static TranslationRule[] getRuleList() {
+        final TranslationRule[] con0 = {};
+        con0[0] = new TranslationRule("^du willst wohl zu ([Ringtones|Funsounds])", "du willst wohl zu Ringtones",
+                "contentgroup", new ArrayList<RuleParameter>() {
+                    {
+                        add(new RuleParameter("contentgroup", 1, " de.jamba.ContentGroupConverter"));
+                    }
+                });
+        con0[1] = new TranslationRule("^Hm du willst dich also Einloggen", "Hm du willst dich also Einloggen", "userLogin",
+                new ArrayList<RuleParameter>());
+        con0[2] = new TranslationRule("^du willst wohl zu ([Ringtones|Funsounds]) zur Unterkategorie ([0-9]+)",
+                "du willst wohl zu Funsounds zur Unterkategorie 1270", "subcategory", new ArrayList<RuleParameter>() {
+                    {
+                        add(new RuleParameter("contentgroup", 1, " de.jamba.ContentGroupConverter"));
+                        add(new RuleParameter("catalogid", 2, "net.xyan.SimpleDataTypeConverter"));
+                    }
+                });
+        return con0;
+    }
+}

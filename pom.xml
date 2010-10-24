@@ -1,0 +1,57 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>xy.jcms</groupId>
+  <artifactId>core</artifactId>
+  <version>SNAPSHOT</version>
+  <packaging>war</packaging>
+
+  <name>core</name>
+  <description>Core package of JCms</description>
+  <url>http://github.com/Nyanna/XY.JCms</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  <developers>
+    <developer>
+      <name>Xyan Kruse</name>
+      <email>xyan@gmx.net</email>
+    </developer>
+  </developers>
+
+  <organization>
+  	<name>XY.X.</name>
+  	<url>http//xyan.kilu.de</url>
+  </organization>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>2.4</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.15</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+    	<groupId>commons-lang</groupId>
+    	<artifactId>commons-lang</artifactId>
+    	<version>2.5</version>
+    	<type>jar</type>
+    	<scope>compile</scope>
+    </dependency>
+  </dependencies>
+  <modules>
+  </modules>
+</project>
