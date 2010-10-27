@@ -204,4 +204,9 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
      */
     @Override
     public abstract boolean equals(Object object);
+
+    @Override
+    public String toString() {
+        return "type=" + getConfigurationType() + " source=" + getConfigurationSource();
+    }
 }

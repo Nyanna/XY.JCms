@@ -34,11 +34,18 @@ public class MockUsecaseConfiguration implements IUsecaseConfigurationAdapter {
      */
     @Override
     public Usecase[] getUsecaseList(final IDataAccessContext dac) {
-        return new Usecase[] { new Usecase("contentgroup", "first test", new Parameter[] { new Parameter("contentgroup",
-                "de.jamba.ContentGroup") }, new Controller[] {
+        return new Usecase[] {
+                new Usecase("contentgroup", "first test", new Parameter[] { new Parameter("contentgroup",
+                        "de.jamba.ContentGroup") }, new Controller[] {
 
-        }, new Configuration[] {
+                }, new Configuration[] {
 
-        }) };
+                }),
+                new Usecase("subcategory", "first test", new Parameter[] { new Parameter("contentgroup",
+                        "de.jamba.ContentGroup") }, new Controller[] {
+
+                }, new Configuration[] {
+
+                }) };
     }
 }

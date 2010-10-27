@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite failures="0" time="0.094" errors="0" skipped="0" tests="8" name="net.xy.jcms.TranslationTest">
+  <properties>
+    <property name="java.vendor" value="Sun Microsystems Inc."/>
+    <property name="env.SESSION_MANAGER" value="local/debian-xkruse:/tmp/.ICE-unix/2925"/>
+    <property name="localRepository" value="/home/xyan/projects/m2-repo"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="sun.management.compiler" value="HotSpot Tiered Compilers"/>
+    <property name="os.name" value="Linux"/>
+    <property name="sun.boot.class.path" value="/home/xyan/jdk1.6.0_17/jre/lib/resources.jar:/home/xyan/jdk1.6.0_17/jre/lib/rt.jar:/home/xyan/jdk1.6.0_17/jre/lib/sunrsasign.jar:/home/xyan/jdk1.6.0_17/jre/lib/jsse.jar:/home/xyan/jdk1.6.0_17/jre/lib/jce.jar:/home/xyan/jdk1.6.0_17/jre/lib/charsets.jar:/home/xyan/jdk1.6.0_17/jre/classes"/>
+    <property name="env.PWD" value="/media/XYX-TRAVEL/Matrice/core"/>
+    <property name="env.LANG" value="de_DE.UTF-8"/>
+    <property name="java.vm.specification.vendor" value="Sun Microsystems Inc."/>
+    <property name="java.runtime.version" value="1.6.0_17-b04"/>
+    <property name="env.DISPLAY" value=":0"/>
+    <property name="user.name" value="xyan"/>
+    <property name="env.USER" value="xyan"/>
+    <property name="env.HISTCONTROL" value="ignoreboth"/>
+    <property name="env.SHELL" value="/bin/bash"/>
+    <property name="env.MOZILLA_FIVE_HOME" value="/usr/lib/xulrunner-addons"/>
+    <property name="env.KDE_MULTIHEAD" value="false"/>
+    <property name="env.DESKTOP_SESSION" value="default"/>
+    <property name="env.NLSPATH" value="/usr/dt/lib/nls/msg/%L/%N.cat"/>
+    <property name="env.PATH" value="/home/xyan/bin:/usr/local/bin:/usr/bin:/bin:/usr/games:/media/XYX-TRAVEL/save/system"/>
+    <property name="user.language" value="de"/>
+    <property name="env.GS_LIB" value="/home/xyan/.fonts"/>
+    <property name="sun.boot.library.path" value="/home/xyan/jdk1.6.0_17/jre/lib/i386"/>
+    <property name="classworlds.conf" value="/usr/share/maven2/bin/m2.conf"/>
+    <property name="env.KDE_SESSION_UID" value="1000"/>
+    <property name="java.version" value="1.6.0_17"/>
+    <property name="env.KDE_FULL_SESSION" value="true"/>
+    <property name="user.timezone" value="Europe/Berlin"/>
+    <property name="env.DBUS_SESSION_BUS_ADDRESS" value="unix:abstract=/tmp/dbus-4iTkuTYEJJ,guid=be1a1248fbbe6f76ca1b73304cc695c7"/>
+    <property name="sun.arch.data.model" value="32"/>
+    <property name="env.SSH_AGENT_PID" value="2878"/>
+    <property name="java.endorsed.dirs" value="/home/xyan/jdk1.6.0_17/jre/lib/endorsed"/>
+    <property name="sun.cpu.isalist" value=""/>
+    <property name="sun.jnu.encoding" value="UTF-8"/>
+    <property name="file.encoding.pkg" value="sun.io"/>
+    <property name="env.SHLVL" value="3"/>
+    <property name="file.separator" value="/"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="env.KONSOLE_DCOP" value="DCOPRef(konsole-23449,konsole)"/>
+    <property name="java.class.version" value="50.0"/>
+    <property name="user.country" value="DE"/>
+    <property name="java.home" value="/home/xyan/jdk1.6.0_17/jre"/>
+    <property name="java.vm.info" value="mixed mode"/>
+    <property name="env.KONSOLE_DCOP_SESSION" value="DCOPRef(konsole-23449,session-1)"/>
+    <property name="env.LOGNAME" value="xyan"/>
+    <property name="os.version" value="2.6.26-2-686"/>
+    <property name="path.separator" value=":"/>
+    <property name="java.vm.version" value="14.3-b01"/>
+    <property name="env.DM_CONTROL" value="/var/run/xdmctl"/>
+    <property name="env.JAVA_HOME" value="/home/xyan/jdk1.6.0_17/"/>
+    <property name="java.awt.printerjob" value="sun.print.PSPrinterJob"/>
+    <property name="env.TERM" value="xterm"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="env.LIBGL_DRIVERS_PATH" value="/usr/lib/dri"/>
+    <property name="env.WITH_DEBUG_PORT" value="8900"/>
+    <property name="user.home" value="/home/xyan"/>
+    <property name="java.specification.vendor" value="Sun Microsystems Inc."/>
+    <property name="env.WINDOWID" value="65011718"/>
+    <property name="java.library.path" value="/home/xyan/jdk1.6.0_17/jre/lib/i386/server:/home/xyan/jdk1.6.0_17/jre/lib/i386:/home/xyan/jdk1.6.0_17/jre/../lib/i386:/media/XYX-TRAVEL/App/eclipse-galileo-lin/jre/jre/lib/i386/client:/media/XYX-TRAVEL/App/eclipse-galileo-lin/jre/jre/lib/i386:/usr/lib/xulrunner-addons:/usr/lib/xulrunner-addons:/usr/java/packages/lib/i386:/lib:/usr/lib"/>
+    <property name="java.vendor.url" value="http://java.sun.com/"/>
+    <property name="java.vm.vendor" value="Sun Microsystems Inc."/>
+    <property name="maven.home" value="/usr/share/maven2"/>
+    <property name="java.runtime.name" value="Java(TM) SE Runtime Environment"/>
+    <property name="java.class.path" value="/usr/share/maven2/boot/classworlds.jar"/>
+    <property name="env.XFILESEARCHPATH" value="/usr/dt/app-defaults/%L/Dt"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="java.vm.specification.version" value="1.0"/>
+    <property name="env.XDM_MANAGED" value="/var/run/xdmctl/xdmctl-:0,maysd,mayfn,sched,rsvd,method=classic"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="sun.os.patch.level" value="unknown"/>
+    <property name="env.HOME" value="/home/xyan"/>
+    <property name="surefire.test.class.path" value="/media/XYX-TRAVEL/Matrice/core/target/test-classes:/media/XYX-TRAVEL/Matrice/core/target/classes:/home/xyan/projects/m2-repo/javax/servlet/servlet-api/2.4/servlet-api-2.4.jar:/home/xyan/projects/m2-repo/log4j/log4j/1.2.15/log4j-1.2.15.jar:/home/xyan/projects/m2-repo/javax/mail/mail/1.4/mail-1.4.jar:/home/xyan/projects/m2-repo/javax/activation/activation/1.1/activation-1.1.jar:/home/xyan/projects/m2-repo/javax/jms/jms/1.1/jms-1.1.jar:/home/xyan/projects/m2-repo/com/sun/jdmk/jmxtools/1.2.1/jmxtools-1.2.1.jar:/home/xyan/projects/m2-repo/com/sun/jmx/jmxri/1.2.1/jmxri-1.2.1.jar:/home/xyan/projects/m2-repo/commons-lang/commons-lang/2.5/commons-lang-2.5.jar:/home/xyan/projects/m2-repo/junit/junit/4.8.2/junit-4.8.2.jar:"/>
+    <property name="java.io.tmpdir" value="/tmp"/>
+    <property name="env.LD_LIBRARY_PATH" value="/home/xyan/jdk1.6.0_17/jre/lib/i386/server:/home/xyan/jdk1.6.0_17/jre/lib/i386:/home/xyan/jdk1.6.0_17/jre/../lib/i386:/media/XYX-TRAVEL/App/eclipse-galileo-lin/jre/jre/lib/i386/client:/media/XYX-TRAVEL/App/eclipse-galileo-lin/jre/jre/lib/i386:/usr/lib/xulrunner-addons:/usr/lib/xulrunner-addons"/>
+    <property name="env.LS_COLORS" value="no=00:fi=00:di=01;34:ln=01;36:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:su=37;41:sg=30;43:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.svgz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.lzma=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.bz2=01;31:*.bz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.rar=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:"/>
+    <property name="java.vendor.url.bug" value="http://java.sun.com/cgi-bin/bugreport.cgi"/>
+    <property name="env.SSH_AUTH_SOCK" value="/tmp/ssh-xaSVGl2846/agent.2846"/>
+    <property name="java.awt.graphicsenv" value="sun.awt.X11GraphicsEnvironment"/>
+    <property name="os.arch" value="i386"/>
+    <property name="java.ext.dirs" value="/home/xyan/jdk1.6.0_17/jre/lib/ext:/usr/java/packages/lib/ext"/>
+    <property name="user.dir" value="/media/XYX-TRAVEL/Matrice/core"/>
+    <property name="line.separator" value="
+"/>
+    <property name="java.vm.name" value="Java HotSpot(TM) Server VM"/>
+    <property name="env.COLORTERM" value=""/>
+    <property name="basedir" value="/media/XYX-TRAVEL/Matrice/core"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.specification.version" value="1.6"/>
+  </properties>
+  <testcase time="0.037" classname="net.xy.jcms.TranslationTest" name="testFind"/>
+  <testcase time="0.001" classname="net.xy.jcms.TranslationTest" name="testFind1"/>
+  <testcase time="0" classname="net.xy.jcms.TranslationTest" name="testFind2"/>
+  <testcase time="0.001" classname="net.xy.jcms.TranslationTest" name="testFindReverse"/>
+  <testcase time="0" classname="net.xy.jcms.TranslationTest" name="testFindReverse1"/>
+  <testcase time="0.002" classname="net.xy.jcms.TranslationTest" name="testFindFailure"/>
+  <testcase time="0.001" classname="net.xy.jcms.TranslationTest" name="testFindFailure1"/>
+  <testcase time="0" classname="net.xy.jcms.TranslationTest" name="testFindFailure2"/>
+</testsuite>

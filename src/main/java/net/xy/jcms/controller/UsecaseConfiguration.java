@@ -179,6 +179,12 @@ public class UsecaseConfiguration {
         public String getDescription() {
             return description;
         }
+
+        @Override
+        public String toString() {
+            return "id=" + getId() + " description=\"" + getDescription() + "\" parameter=" + getParameterList()
+                    + " controller=" + getControllerList() + " configuration=" + getConfigurationList();
+        }
     }
 
     /**
@@ -227,6 +233,11 @@ public class UsecaseConfiguration {
          */
         public String getParameterType() {
             return parameterType;
+        }
+
+        @Override
+        public String toString() {
+            return "key=" + getParameterKey() + " type=" + getParameterType();
         }
     }
 
@@ -288,6 +299,11 @@ public class UsecaseConfiguration {
                 throws ClassNotFoundException {
             final IController controller = ControllerPool.get(getControllerId(), this.getClass().getClassLoader());
             return controller.invoke(dac, configuration);
+        }
+
+        @Override
+        public String toString() {
+            return "id=" + getControllerId() + " configurations=" + getObmitedConfigurations();
         }
     }
 

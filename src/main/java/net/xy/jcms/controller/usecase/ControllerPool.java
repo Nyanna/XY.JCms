@@ -51,20 +51,22 @@ public class ControllerPool {
         if (controllers.containsKey(id)) {
             return controllers.get(id);
         } else {
-            final Class<?> object = loader.loadClass(id);
-            if (IController.class.isInstance(object)) {
-                try {
-                    controllers.put(id, (IController) object.newInstance());
-                } catch (final InstantiationException e) {
-                    LOG.error(e);
-                    throw new ClassNotFoundException("Failure on instantiating Controller class " + id);
-                } catch (final IllegalAccessException e) {
-                    LOG.error(e);
-                    throw new ClassNotFoundException("Failure on accessing and instantiating Controller class " + id);
-                }
+            final Object instance;
+            try {
+                final Class<?> object = loader.loadClass(id);
+                instance = object.newInstance();
+            } catch (final InstantiationException e) {
+                LOG.error(e);
+                throw new ClassNotFoundException("Failure on instantiating Controller class " + id);
+            } catch (final IllegalAccessException e) {
+                LOG.error(e);
+                throw new ClassNotFoundException("Failure on accessing and instantiating Controller class " + id);
+            }
+            if (IController.class.isInstance(instance)) {
+                controllers.put(id, (IController) instance);
                 return controllers.get(id);
             } else {
-                throw new ClassNotFoundException("Controller " + id + "doesn't implement IController interface",
+                throw new ClassNotFoundException("Controller " + id + " doesn't implement IController interface",
                         new ClassCastException());
             }
         }
