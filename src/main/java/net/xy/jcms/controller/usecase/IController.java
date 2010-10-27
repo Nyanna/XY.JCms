@@ -18,7 +18,7 @@ package net.xy.jcms.controller.usecase;
 
 import net.xy.jcms.controller.NavigationAbstractionLayer.NALKey;
 import net.xy.jcms.controller.configurations.Configuration;
-import net.xy.jcms.shared.dao.IDataAccessContext;
+import net.xy.jcms.shared.IDataAccessContext;
 
 /**
  * interface the dynamicly loaded controllers
@@ -35,5 +35,5 @@ public interface IController {
      * @param configuration
      * @return
      */
-    NALKey invoke(final IDataAccessContext dac, final Configuration[] configuration);
+    NALKey invoke(final IDataAccessContext dac, final Configuration<?>[] configuration);
 }

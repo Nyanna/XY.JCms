@@ -23,7 +23,7 @@ import net.xy.jcms.controller.UsecaseConfiguration.Controller;
 import net.xy.jcms.controller.UsecaseConfiguration.Usecase;
 import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
-import net.xy.jcms.shared.dao.IDataAccessContext;
+import net.xy.jcms.shared.IDataAccessContext;
 
 /**
  * Agent determing the usecase from an KeyChain.
@@ -44,6 +44,7 @@ public class UsecaseAgent {
      * 
      */
     public static class NoUsecaseFound extends Exception {
+        private static final long serialVersionUID = -5460169217069698404L;
     }
 
     /**
@@ -81,7 +82,7 @@ public class UsecaseAgent {
         for (final Controller controller : list) {
             final EnumSet<ConfigurationType> types = controller.getObmitedConfigurations().clone();
             types.addAll(ConfigurationType.CONTROLLERAPPLICABLE);
-            final Configuration[] configs = usecase.getConfigurationList(types);
+            final Configuration<?>[] configs = usecase.getConfigurationList(types);
             final NALKey forward = controller.invoke(dac, configs);
             if (forward != null) {
                 return forward;
@@ -97,8 +98,8 @@ public class UsecaseAgent {
      * @param usecase
      * @return null or the cached ouput
      */
-    public static String applyCaching(final Configuration[] configs) {
-        for (final Configuration config : configs) {
+    public static String applyCaching(final Configuration<?>[] configs) {
+        for (final Configuration<?> config : configs) {
             // TODO [LOW] implement ouput caching and configuration hashing
         }
         return null;

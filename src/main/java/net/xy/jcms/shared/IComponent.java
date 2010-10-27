@@ -16,6 +16,8 @@
  */
 package net.xy.jcms.shared;
 
+import net.xy.jcms.controller.configurations.ComponentConfiguration;
+
 /**
  * general component interface
  * 
@@ -27,13 +29,9 @@ public interface IComponent {
     /**
      * returns the components configuration preparing alghorhythms
      * 
-     * @param id
-     *            the obmitted components id
-     * @param parent
-     *            an already existing parent configuration
      * @return an configuration object with proper set parent and childs
      */
-    public ComponentConfiguration getConfiguration(final String id, final ComponentConfiguration parent);
+    public ComponentConfiguration getConfiguration();
 
     /**
      * starts the rendering run
@@ -42,5 +40,5 @@ public interface IComponent {
      * @param config
      * @return
      */
-    public void render(final OutWriterImplementationAdapter out, final ComponentConfiguration config);
+    public void render(final IOutWriter out, final ComponentConfiguration config);
 }

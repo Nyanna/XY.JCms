@@ -35,6 +35,6 @@ public class HttpProtocolResponseAdapter {
      * @param response
      * @param model
      */
-    public static void apply(final HttpServletResponse response, final Configuration[] model) {
+    public static void apply(final HttpServletResponse response, final Configuration<?>[] model) {
     }
 }

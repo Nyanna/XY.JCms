@@ -1,18 +1,14 @@
 /**
- *  This file is part of XY.JCms, Copyright 2010 (C) Xyan Kruse, Xyan@gmx.net, Xyan.kilu.de
- *
- *  XY.JCms is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  XY.JCms is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with XY.JCms.  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of XY.JCms, Copyright 2010 (C) Xyan Kruse, Xyan@gmx.net, Xyan.kilu.de
+ * 
+ * XY.JCms is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * 
+ * XY.JCms is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with XY.JCms. If not, see
+ * <http://www.gnu.org/licenses/>.
  */
 package net.xy.jcms;
 
@@ -33,20 +29,26 @@ import net.xy.jcms.controller.UsecaseAgent;
 import net.xy.jcms.controller.UsecaseAgent.NoUsecaseFound;
 import net.xy.jcms.controller.UsecaseConfiguration.Usecase;
 import net.xy.jcms.controller.ViewRunner;
+import net.xy.jcms.controller.configurations.ComponentConfiguration;
 import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
-import net.xy.jcms.shared.ComponentConfiguration;
+import net.xy.jcms.shared.IDataAccessContext;
 import net.xy.jcms.shared.adapter.HttpProtocolRequestAdapter;
 import net.xy.jcms.shared.adapter.HttpProtocolResponseAdapter;
 import net.xy.jcms.shared.adapter.HttpRequestDataAccessContext;
 import net.xy.jcms.shared.adapter.ServletOutputStreamAdapter;
-import net.xy.jcms.shared.dao.IDataAccessContext;
 
 /**
+ * The following injections have to be made: ITranslationConfigurationAdapter -
+ * to get translations based on dac, IUsecaseConfigurationAdapter - to get the
+ * usecases based on dac
+ * 
  * @author xyan
  * 
  */
 public class MockServlet extends HttpServlet {
+    private static final long serialVersionUID = 8620296669723265576L;
+
     /**
      * logger
      */
@@ -120,7 +122,7 @@ public class MockServlet extends HttpServlet {
              * get the configurationtree for the usecase from an empty run
              * through the componenttree
              */
-            final Configuration[] viewConfig = usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE);
+            final Configuration<?>[] viewConfig = usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE);
             final ComponentConfiguration confTree = ViewRunner.runConfiguration(viewConfig);
 
             /**

@@ -16,6 +16,8 @@
  */
 package net.xy.jcms.shared;
 
+import net.xy.jcms.controller.configurations.FragmentConfiguration;
+
 /**
  * general fragment interface
  * 
@@ -26,15 +28,12 @@ public interface IFragment extends IComponent {
 
     /**
      * returns the fragments configuration preparing alghorhythms
-     * 
      * @param name
      *            the fragments name
-     * @param parent
-     *            an already existing parent configuration
      * @return an configuration object with proper set parent and childs
      */
     @Override
-    public FragmentConfiguration getConfiguration(final String name, final ComponentConfiguration parent);
+    public FragmentConfiguration getConfiguration();
 
     /**
      * starts the rendering run
@@ -43,5 +42,5 @@ public interface IFragment extends IComponent {
      * @param config
      * @return
      */
-    public void render(final OutWriterImplementationAdapter out, final FragmentConfiguration config);
+    public void render(final IOutWriter out, final FragmentConfiguration config);
 }

@@ -19,8 +19,6 @@ package net.xy.jcms.shared.adapter;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
-
-import net.xy.jcms.controller.NavigationAbstractionLayer;
 import net.xy.jcms.controller.NavigationAbstractionLayer.NALKey;
 
 /**

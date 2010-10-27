@@ -1,18 +1,14 @@
 /**
- *  This file is part of XY.JCms, Copyright 2010 (C) Xyan Kruse, Xyan@gmx.net, Xyan.kilu.de
- *
- *  XY.JCms is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  XY.JCms is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with XY.JCms.  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of XY.JCms, Copyright 2010 (C) Xyan Kruse, Xyan@gmx.net, Xyan.kilu.de
+ * 
+ * XY.JCms is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * 
+ * XY.JCms is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with XY.JCms. If not, see
+ * <http://www.gnu.org/licenses/>.
  */
 package net.xy.jcms.controller;
 
@@ -25,9 +21,10 @@ import java.util.Map;
 import net.xy.jcms.controller.NavigationAbstractionLayer.NALKey;
 import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
+import net.xy.jcms.controller.configurations.IUsecaseConfigurationAdapter;
 import net.xy.jcms.controller.usecase.ControllerPool;
 import net.xy.jcms.controller.usecase.IController;
-import net.xy.jcms.shared.dao.IDataAccessContext;
+import net.xy.jcms.shared.IDataAccessContext;
 
 /**
  * Configuration object describing the usecases
@@ -43,7 +40,7 @@ public class UsecaseConfiguration {
      * @author Xyan
      * 
      */
-    public static class Usecase {
+    final public static class Usecase {
         /**
          * id for the usecase
          */
@@ -70,7 +67,7 @@ public class UsecaseConfiguration {
          * and only configuration no other configuration would be delivered to
          * all involved code.
          */
-        private final Configuration[] configurationList;
+        private final Configuration<?>[] configurationList;
 
         /**
          * default constructor
@@ -82,7 +79,7 @@ public class UsecaseConfiguration {
          * @param configurationList
          */
         public Usecase(final String id, final String description, final Parameter[] parameterList,
-                final Controller[] controllerList, final Configuration[] configurationList) {
+                final Controller[] controllerList, final Configuration<?>[] configurationList) {
             this.parameterList = parameterList;
             this.controllerList = controllerList;
             this.configurationList = mergeConfigurations(configurationList);
@@ -97,8 +94,9 @@ public class UsecaseConfiguration {
          * @param mergeList
          * @return
          */
-        private static Configuration[] mergeConfigurations(final Configuration[] mergeList) {
-            final Map<ConfigurationType, Configuration> returnedConfig = new HashMap<ConfigurationType, Configuration>();
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+        private static Configuration<?>[] mergeConfigurations(final Configuration<?>[] mergeList) {
+            final Map<ConfigurationType, Configuration<?>> returnedConfig = new HashMap<ConfigurationType, Configuration<?>>();
             for (final Configuration config : mergeList) {
                 if (returnedConfig.containsKey(config.getConfigurationType())) {
                     // merge
@@ -143,7 +141,7 @@ public class UsecaseConfiguration {
          * 
          * @return
          */
-        public Configuration[] getConfigurationList() {
+        public Configuration<?>[] getConfigurationList() {
             return configurationList;
         }
 
@@ -153,9 +151,9 @@ public class UsecaseConfiguration {
          * @param types
          * @return
          */
-        public Configuration[] getConfigurationList(final EnumSet<ConfigurationType> types) {
-            final List<Configuration> returnedConfig = new ArrayList<Configuration>();
-            for (final Configuration config : configurationList) {
+        public Configuration<?>[] getConfigurationList(final EnumSet<ConfigurationType> types) {
+            final List<Configuration<?>> returnedConfig = new ArrayList<Configuration<?>>();
+            for (final Configuration<?> config : configurationList) {
                 if (types.contains(config.getConfigurationType())) {
                     returnedConfig.add(config);
                 }
@@ -169,7 +167,7 @@ public class UsecaseConfiguration {
          * @param types
          * @return
          */
-        public Configuration getConfigurationList(final ConfigurationType type) {
+        public Configuration<?> getConfigurationList(final ConfigurationType type) {
             return getConfigurationList(EnumSet.of(type))[0];
         }
 
@@ -189,7 +187,7 @@ public class UsecaseConfiguration {
      * @author Xyan
      * 
      */
-    public static class Parameter {
+    final public static class Parameter {
         /**
          * id or key of the parameter
          */
@@ -238,7 +236,7 @@ public class UsecaseConfiguration {
      * @author Xyan
      * 
      */
-    public static class Controller {
+    final public static class Controller {
         /**
          * an controler id
          */
@@ -265,7 +263,7 @@ public class UsecaseConfiguration {
          * 
          * @return
          */
-        public String getControllerId() {
+        final public String getControllerId() {
             return controllerId;
         }
 
@@ -286,7 +284,7 @@ public class UsecaseConfiguration {
          * @return
          * @throws ClassNotFoundException
          */
-        public NALKey invoke(final IDataAccessContext dac, final Configuration[] configuration)
+        public NALKey invoke(final IDataAccessContext dac, final Configuration<?>[] configuration)
                 throws ClassNotFoundException {
             final IController controller = ControllerPool.get(getControllerId(), this.getClass().getClassLoader());
             return controller.invoke(dac, configuration);
@@ -320,7 +318,24 @@ public class UsecaseConfiguration {
      * @return
      */
     private static Usecase[] getUsecaseList(final IDataAccessContext dac) {
-        return MockUsecaseConfiguration.getUsecaseList();
+        if (adapter == null) {
+            throw new IllegalArgumentException("Usecase configuration adapter was not injected");
+        }
+        return adapter.getUsecaseList(dac);
+    }
+
+    /**
+     * stores the usecase configuration adapter
+     */
+    private static IUsecaseConfigurationAdapter adapter;
+
+    /**
+     * sets the usecase configuration adapter
+     * 
+     * @param adapter
+     */
+    public static void setUsecaseAdapter(final IUsecaseConfigurationAdapter adapter) {
+        UsecaseConfiguration.adapter = adapter;
     }
 
     /**

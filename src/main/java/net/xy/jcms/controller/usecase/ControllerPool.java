@@ -19,8 +19,6 @@ package net.xy.jcms.controller.usecase;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.xy.jcms.controller.configurations.Configuration;
-
 import org.apache.log4j.Logger;
 
 /**
@@ -53,7 +51,7 @@ public class ControllerPool {
         if (controllers.containsKey(id)) {
             return controllers.get(id);
         } else {
-            final Class object = loader.loadClass(id);
+            final Class<?> object = loader.loadClass(id);
             if (IController.class.isInstance(object)) {
                 try {
                     controllers.put(id, (IController) object.newInstance());

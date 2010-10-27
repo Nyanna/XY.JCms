@@ -1,18 +1,14 @@
 /**
- *  This file is part of XY.JCms, Copyright 2010 (C) Xyan Kruse, Xyan@gmx.net, Xyan.kilu.de
- *
- *  XY.JCms is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  XY.JCms is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with XY.JCms.  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of XY.JCms, Copyright 2010 (C) Xyan Kruse, Xyan@gmx.net, Xyan.kilu.de
+ * 
+ * XY.JCms is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * 
+ * XY.JCms is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with XY.JCms. If not, see
+ * <http://www.gnu.org/licenses/>.
  */
 package net.xy.jcms.controller;
 
@@ -25,8 +21,8 @@ import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 
 import net.xy.jcms.controller.NavigationAbstractionLayer.NALKey;
-import net.xy.jcms.controller.usecase.ControllerPool;
-import net.xy.jcms.shared.dao.IDataAccessContext;
+import net.xy.jcms.controller.configurations.ITranslationConfigurationAdapter;
+import net.xy.jcms.shared.IDataAccessContext;
 
 /**
  * describes the configuration used to translate pathes in KeyChains
@@ -47,7 +43,7 @@ public abstract class TranslationConfiguration {
      * @author xyan
      * 
      */
-    protected static class TranslationRule {
+    final public static class TranslationRule {
         /**
          * holds the pattern
          */
@@ -121,7 +117,7 @@ public abstract class TranslationConfiguration {
         }
     }
 
-    protected static class RuleParameter {
+    final public static class RuleParameter {
         /**
          * holds the name of the parameter applied for
          */
@@ -276,6 +272,8 @@ public abstract class TranslationConfiguration {
      * 
      */
     public static class GroupCouldNotBeFilled extends Exception {
+        private static final long serialVersionUID = 203300011416376084L;
+
         public GroupCouldNotBeFilled(final String string) {
             super(string);
         }
@@ -288,6 +286,7 @@ public abstract class TranslationConfiguration {
      * 
      */
     public static class InvalidBuildRule extends Exception {
+        private static final long serialVersionUID = -6749410543654961955L;
     }
 
     /**
@@ -413,6 +412,23 @@ public abstract class TranslationConfiguration {
      * @return
      */
     protected static TranslationRule[] getRuleList(final IDataAccessContext dac) {
-        return MockTranslationConfiguration.getRuleList();
+        if (adapter == null) {
+            throw new IllegalArgumentException("Translation configuration adapter was not injected");
+        }
+        return adapter.getRuleList(dac);
+    }
+
+    /**
+     * hold the configuration retrieval adapter
+     */
+    private static ITranslationConfigurationAdapter adapter;
+
+    /**
+     * injects the translation configuration adapter
+     * 
+     * @param adapter
+     */
+    public static void setTranslationAdapter(final ITranslationConfigurationAdapter adapter) {
+        TranslationConfiguration.adapter = adapter;
     }
 }

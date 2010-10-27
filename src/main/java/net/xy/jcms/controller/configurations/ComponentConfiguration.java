@@ -1,30 +1,25 @@
 /**
- *  This file is part of XY.JCms, Copyright 2010 (C) Xyan Kruse, Xyan@gmx.net, Xyan.kilu.de
- *
- *  XY.JCms is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  XY.JCms is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with XY.JCms.  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of XY.JCms, Copyright 2010 (C) Xyan Kruse, Xyan@gmx.net, Xyan.kilu.de
+ * 
+ * XY.JCms is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * 
+ * XY.JCms is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with XY.JCms. If not, see
+ * <http://www.gnu.org/licenses/>.
  */
-package net.xy.jcms.shared;
+package net.xy.jcms.controller.configurations;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
-import net.xy.jcms.controller.configurations.ContentRepository;
-import net.xy.jcms.controller.configurations.MessageConfiguration;
-import net.xy.jcms.controller.configurations.RenderKitConfiguration;
-import net.xy.jcms.controller.configurations.TemplateConfiguration;
-import net.xy.jcms.controller.configurations.UIConfiguration;
 import net.xy.jcms.controller.configurations.UIConfiguration.UI;
+import net.xy.jcms.shared.IComponent;
+import net.xy.jcms.shared.IOutWriter;
+import net.xy.jcms.shared.IRenderer;
 
 /**
  * an basic component configuration object containg all the main functionality
@@ -39,9 +34,10 @@ public abstract class ComponentConfiguration {
     public final static String COMPONENT_PATH_SEPARATOR = ".";
 
     /**
-     * holds the mendatory component id
+     * holds the mendatory component id. On every added component id got set on
+     * every fragment not.
      */
-    private final String id;
+    private String id = "";
 
     /**
      * holds an id stacked component path
@@ -67,20 +63,12 @@ public abstract class ComponentConfiguration {
      * @param parent
      *            the parent configuration object
      */
-    public ComponentConfiguration(final String id, final IComponent compInstance, final ComponentConfiguration parent) {
+    public ComponentConfiguration(final IComponent compInstance) {
         if (compInstance == null) {
             throw new IllegalArgumentException(
                     "Can't instantiate an component configuration without an appropriated component instance");
         }
-        this.id = id;
         this.compInstance = compInstance;
-        setParent(parent);
-        if (parent != null) {
-            componentPath = parent.getComponentPath() + COMPONENT_PATH_SEPARATOR + id;
-            parent.addChildren(this);
-        } else {
-            componentPath = id;
-        }
     }
 
     /**
@@ -102,6 +90,7 @@ public abstract class ComponentConfiguration {
             final TemplateConfiguration tmplConf, final UIConfiguration uiConf, final MessageConfiguration messConf,
             final RenderKitConfiguration renderConf) {
         cmpConfig.initConfiguration(tmplConf, repository);
+        cmpConfig.initConfiguration(repository);
         cmpConfig.initConfiguration(uiConf);
         cmpConfig.initConfiguration(messConf);
         cmpConfig.initConfiguration(renderConf);
@@ -119,7 +108,7 @@ public abstract class ComponentConfiguration {
      * 
      * @return
      */
-    final public String getComponentPath() {
+    final protected String getComponentPath() {
         return componentPath;
     }
 
@@ -130,6 +119,16 @@ public abstract class ComponentConfiguration {
      */
     final public String getId() {
         return id;
+    }
+
+    /**
+     * private setter for internally setting id
+     * 
+     * @param id
+     */
+    private void setId(final String id) {
+        this.id = id;
+        updateComponentPath();
     }
 
     /**
@@ -146,7 +145,7 @@ public abstract class ComponentConfiguration {
      * 
      * @return
      */
-    final public ComponentConfiguration getParent() {
+    final protected ComponentConfiguration getParent() {
         return parent;
     }
 
@@ -157,6 +156,13 @@ public abstract class ComponentConfiguration {
      */
     final private void setParent(final ComponentConfiguration parent) {
         this.parent = parent;
+        updateComponentPath();
+    }
+
+    /**
+     * triggers an component path update
+     */
+    final protected void updateComponentPath() {
         if (parent != null) {
             componentPath = parent.getComponentPath() + COMPONENT_PATH_SEPARATOR + id;
         } else {
@@ -166,12 +172,17 @@ public abstract class ComponentConfiguration {
         for (final ComponentConfiguration child : getChildren().values()) {
             child.setParent(this);
         }
+        for (final FragmentConfiguration fragment : getTemplates().values()) {
+            fragment.updateComponentPath();
+        }
     }
 
     /**
+     * ####################
      * 
      * Child management
      * 
+     * ####################
      */
 
     /**
@@ -194,9 +205,10 @@ public abstract class ComponentConfiguration {
      * @param id
      * @param config
      */
-    final protected void addChildren(final ComponentConfiguration child) {
+    final protected void addChildren(final String id, final ComponentConfiguration child) {
         child.setParent(this);
-        children.put(child.getId(), child);
+        child.setId(id);
+        children.put(id, child);
     }
 
     /**
@@ -207,8 +219,9 @@ public abstract class ComponentConfiguration {
      * @return
      */
     public ComponentConfiguration addComponent(final String id, final IComponent component) {
-        final ComponentConfiguration config = component.getConfiguration(id, this);
-        addChildren(config);
+        final ComponentConfiguration config = component.getConfiguration();
+        config.setId(id);
+        config.addChildren(id, config);
         return config;
     }
 
@@ -219,7 +232,7 @@ public abstract class ComponentConfiguration {
         final ComponentConfiguration[] childs = prepareChildren(repository);
         if (childs != null) {
             for (final ComponentConfiguration child : childs) {
-                addChildren(child);
+                addChildren(id, child);
             }
         }
     }
@@ -251,7 +264,7 @@ public abstract class ComponentConfiguration {
      * @param id
      * @param out
      */
-    public void renderChild(final String id, final OutWriterImplementationAdapter out) {
+    public void renderChild(final String id, final IOutWriter out) {
         final ComponentConfiguration child = getChild(id);
         renderChild(child, out);
     }
@@ -262,7 +275,7 @@ public abstract class ComponentConfiguration {
      * @param child
      * @param out
      */
-    private void renderChild(final ComponentConfiguration child, final OutWriterImplementationAdapter out) {
+    private void renderChild(final ComponentConfiguration child, final IOutWriter out) {
         child.getCompInstance().render(out, child);
     }
 
@@ -271,14 +284,18 @@ public abstract class ComponentConfiguration {
      * 
      * @param out
      */
-    public void renderChilds(final OutWriterImplementationAdapter out) {
+    public void renderChilds(final IOutWriter out) {
         for (final ComponentConfiguration child : getChildren().values()) {
             renderChild(child, out);
         }
     }
 
     /**
+     * ####################
+     * 
      * Messages configuration proccessing
+     * 
+     * ####################
      */
     private final Map<String, String> messages = new HashMap<String, String>();
 
@@ -290,7 +307,7 @@ public abstract class ComponentConfiguration {
                     if (config == null) {
                         throw new IllegalArgumentException("An requiered configuration was missing");
                     }
-                    messages.put(key, config.getMessage(key));
+                    messages.put(key, config.getMessage(key, this));
                 }
             }
         }
@@ -307,15 +324,18 @@ public abstract class ComponentConfiguration {
     }
 
     /**
+     * ####################
+     * 
      * UIConfiguration processing
+     * 
+     * ####################
      */
     private final Map<String, Object> uiconfig = new HashMap<String, Object>();
 
-    @SuppressWarnings("rawtypes")
     private void initConfiguration(final UIConfiguration config) {
-        final UI[] prepare = prepareUIConfig();
+        final UI<?>[] prepare = prepareUIConfig();
         if (prepare != null) {
-            for (final UI ui : prepare) {
+            for (final UI<?> ui : prepare) {
                 if (!uiconfig.containsKey(ui.getKey())) {
                     if (config == null) {
                         throw new IllegalArgumentException("An requiered configuration was missing");
@@ -330,8 +350,7 @@ public abstract class ComponentConfiguration {
         }
     }
 
-    @SuppressWarnings("rawtypes")
-    protected abstract UI[] prepareUIConfig();
+    protected abstract UI<?>[] prepareUIConfig();
 
     public Object getUIConfig(final String key) {
         final Object config = uiconfig.get(key);
@@ -342,7 +361,22 @@ public abstract class ComponentConfiguration {
     }
 
     /**
+     * method to configure childs ui config aggregation. Only usefull in the
+     * aggregation phase.
+     * 
+     * @param key
+     * @param value
+     */
+    public void setUIConfig(final String key, final Object value) {
+        uiconfig.put(key, value);
+    }
+
+    /**
+     * ####################
+     * 
      * Renderconfiguration proccessing
+     * 
+     * ####################
      */
     private final Map<Class<? extends IRenderer>, IRenderer> renderers = new HashMap<Class<? extends IRenderer>, IRenderer>();
 
@@ -354,7 +388,7 @@ public abstract class ComponentConfiguration {
                     if (config == null) {
                         throw new IllegalArgumentException("An requiered configuration was missing");
                     }
-                    renderers.put(iface, config.get(iface));
+                    renderers.put(iface, config.get(iface, this));
                 }
             }
         }
@@ -371,7 +405,11 @@ public abstract class ComponentConfiguration {
     }
 
     /**
+     * ####################
+     * 
      * Template configuration proccessing
+     * 
+     * ####################
      */
     private final Map<String, FragmentConfiguration> templates = new HashMap<String, FragmentConfiguration>();
 
@@ -383,7 +421,8 @@ public abstract class ComponentConfiguration {
                     if (config == null) {
                         throw new IllegalArgumentException("An requiered configuration was missing");
                     }
-                    templates.put(name, config.get(name).getConfiguration(name, this));
+                    final FragmentConfiguration tmplConfig = config.get(name, this).getConfiguration();
+                    templates.put(name, tmplConfig);
                 }
             }
         }
@@ -391,12 +430,22 @@ public abstract class ComponentConfiguration {
 
     protected abstract String[] prepareTemplates(final ContentRepository repository);
 
-    public FragmentConfiguration getTemplate(final String name) {
+    private FragmentConfiguration getTemplate(final String name) {
         final FragmentConfiguration tmpl = templates.get(name);
         if (tmpl == null) {
             throw new IllegalArgumentException("An not configured template requested!");
         }
         return tmpl;
+    }
+
+    /**
+     * renders an prior retrieved template with its config.
+     * 
+     * @param name
+     * @param out
+     */
+    public void renderTemplate(final String name, final IOutWriter out) {
+        getTemplate(id).render(out);
     }
 
     /**
@@ -407,4 +456,50 @@ public abstract class ComponentConfiguration {
     private Map<String, FragmentConfiguration> getTemplates() {
         return templates;
     }
+
+    /**
+     * ####################
+     * 
+     * content repositoryconfiguration
+     * 
+     * ####################
+     */
+    private final Map<String, Object> content = new HashMap<String, Object>();
+
+    /**
+     * initializes content preparation
+     * 
+     * @param config
+     */
+    private void initConfiguration(final ContentRepository config) {
+        final Map<String, Class<?>> prepare = prepareContent();
+        if (prepare != null) {
+            for (final Entry<String, Class<?>> entry : prepare.entrySet()) {
+                if (!content.containsKey(entry.getKey())) {
+                    if (config == null) {
+                        throw new IllegalArgumentException("An requiered configuration was missing");
+                    }
+                    final Object got = config.getContent(entry.getKey(), entry.getValue(), this);
+                    content.put(entry.getKey(), got);
+                }
+            }
+        }
+    }
+
+    protected abstract Map<String, Class<?>> prepareContent();
+
+    /**
+     * returns an prepared content object
+     * 
+     * @param key
+     * @return
+     */
+    public Object getContent(final String key) {
+        final Object contentObj = content.get(key);
+        if (contentObj == null) {
+            throw new IllegalArgumentException("An not configured ui configuration were requested!");
+        }
+        return contentObj;
+    }
+
 }

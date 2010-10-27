@@ -19,7 +19,7 @@ package net.xy.jcms.controller;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.xy.jcms.shared.dao.IDataAccessContext;
+import net.xy.jcms.shared.IDataAccessContext;
 
 /**
  * Abstraction Layer for Navigation<->Usecase<->Requests<->URL's $Path - is an

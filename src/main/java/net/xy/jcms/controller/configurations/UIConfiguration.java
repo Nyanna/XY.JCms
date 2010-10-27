@@ -1,26 +1,20 @@
 /**
- *  This file is part of XY.JCms, Copyright 2010 (C) Xyan Kruse, Xyan@gmx.net, Xyan.kilu.de
- *
- *  XY.JCms is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  XY.JCms is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with XY.JCms.  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of XY.JCms, Copyright 2010 (C) Xyan Kruse, Xyan@gmx.net, Xyan.kilu.de
+ * 
+ * XY.JCms is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * 
+ * XY.JCms is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with XY.JCms. If not, see
+ * <http://www.gnu.org/licenses/>.
  */
 package net.xy.jcms.controller.configurations;
 
 import java.util.Map.Entry;
 import java.util.Properties;
-
-import net.xy.jcms.shared.ComponentConfiguration;
-
+import net.xy.jcms.controller.configurations.ConfigurationIterationStrategy.ClimbUp;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -31,6 +25,11 @@ import org.apache.commons.lang.StringUtils;
  */
 public class UIConfiguration extends Configuration<Properties> {
 
+    /**
+     * default constructor
+     * 
+     * @param configurationValue
+     */
     public UIConfiguration(final Properties configurationValue) {
         super(ConfigurationType.UIConfiguration, configurationValue);
     }
@@ -48,33 +47,19 @@ public class UIConfiguration extends Configuration<Properties> {
      * @param key
      * @return
      */
-    public Object getConfig(final UI ui, final ComponentConfiguration config) {
-        Object value;
+    public Object getConfig(final UI<?> ui, final ComponentConfiguration config) {
+        Object value = null;
         if (ui.isIterate()) {
-            // gets complete pas comp1.comp2.comp3.key
-            ComponentConfiguration actualLvl = config;
-            do {
-                value = getConfigurationValue().get(
-                        actualLvl.getComponentPath() + ComponentConfiguration.COMPONENT_PATH_SEPARATOR + ui.getKey());
-                if (value == null) {
-                    actualLvl = actualLvl.getParent();
+            final ClimbUp strategy = new ClimbUp(config, ui.getKey());
+            for (final String pathKey : strategy) {
+                value = getConfigurationValue().getProperty(pathKey);
+                if (value != null) {
+                    // type check basedon class parameter
+                    break;
                 }
-                // TODO [LOW] type check based on class parameter
-            } while (value == null && actualLvl != null);
-
-            // gets comp3.key, comp2.key, comp1.key
-            actualLvl = config;
-            do {
-                // gets complete pas comp1.comp2.comp3.key
-                value = getConfigurationValue().get(
-                        actualLvl.getId() + ComponentConfiguration.COMPONENT_PATH_SEPARATOR + ui.getKey());
-                if (value == null) {
-                    actualLvl = actualLvl.getParent();
-                }
-                // type check based on class parameter
-            } while (value == null && actualLvl != null);
+            }
         } else {
-            value = getConfigurationValue().get(ui.getKey());
+            value = getConfigurationValue().get(ConfigurationIterationStrategy.fullPath(config, ui.getKey()));
             // type check basedon class parameter
         }
         if (value != null) {

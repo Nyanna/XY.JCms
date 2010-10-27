@@ -18,7 +18,7 @@ package net.xy.jcms.shared.adapter;
 
 import javax.servlet.http.HttpServletRequest;
 
-import net.xy.jcms.shared.dao.IDataAccessContext;
+import net.xy.jcms.shared.IDataAccessContext;
 
 /**
  * http protocol adapter for DataAccessContext

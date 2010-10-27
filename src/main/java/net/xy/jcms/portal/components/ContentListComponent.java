@@ -16,20 +16,20 @@
  */
 package net.xy.jcms.portal.components;
 
-import net.xy.jcms.shared.ComponentConfiguration;
+import net.xy.jcms.controller.configurations.ComponentConfiguration;
 import net.xy.jcms.shared.IComponent;
-import net.xy.jcms.shared.OutWriterImplementationAdapter;
+import net.xy.jcms.shared.IOutWriter;
 
 public class ContentListComponent implements IComponent {
 
     @Override
-    public ComponentConfiguration getConfiguration(final String id, final ComponentConfiguration parent) {
+    public ComponentConfiguration getConfiguration() {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public void render(final OutWriterImplementationAdapter out, final ComponentConfiguration config) {
+    public void render(final IOutWriter out, final ComponentConfiguration config) {
         // TODO Auto-generated method stub
 
     }

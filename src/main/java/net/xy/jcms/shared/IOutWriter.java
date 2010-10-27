@@ -10,32 +10,20 @@
  * You should have received a copy of the GNU General Public License along with XY.JCms. If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package net.xy.jcms.shared.adapter;
+package net.xy.jcms.shared;
 
-import java.io.IOException;
-import javax.servlet.ServletOutputStream;
-import org.apache.log4j.Logger;
-import net.xy.jcms.shared.IOutWriter;
+/**
+ * the adapter is an abstractionlayer to different output methods unifieing them
+ * 
+ * @author xyan
+ * 
+ */
+public abstract class IOutWriter {
 
-public class ServletOutputStreamAdapter extends IOutWriter {
     /**
-     * logger
+     * appends an rendered output string to the output
+     * 
+     * @param buffer
      */
-    static final Logger LOG = Logger.getLogger(ServletOutputStreamAdapter.class);
-
-    private final ServletOutputStream outStream;
-
-    @Override
-    public void append(final StringBuilder buffer) {
-        try {
-            outStream.print(buffer.toString());
-        } catch (final IOException e) {
-            LOG.equals(e);
-        }
-    }
-
-    public ServletOutputStreamAdapter(final ServletOutputStream outStream) {
-        this.outStream = outStream;
-    }
-
+    public abstract void append(final StringBuilder buffer);
 }
