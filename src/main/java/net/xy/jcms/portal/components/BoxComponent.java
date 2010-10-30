@@ -76,6 +76,7 @@ public class BoxComponent extends AbstractComponent {
     }
 
     private BoxComponent() {
+        super(true);
     }
 
     private final static BoxComponent INSTANCE = new BoxComponent();

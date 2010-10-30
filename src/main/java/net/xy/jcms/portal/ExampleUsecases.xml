@@ -14,7 +14,7 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with XY.JCms.  If not, see <http://www.gnu.org/licenses/>.
- */ 
+ */
  -->
 <?xml version="1.0" encoding="UTF-8"?>
 <root>
@@ -49,10 +49,13 @@
         </configuration>
 
         <configuration type="templateconfiguration">
-            <component id="pagetitle" comp="pageTitleComponent"/>
-            <component id="body" comp="bodyComponent">
-                <component id="contentboxXYZ" comp="contentListComponent"/>
-            </component>
+        	root = de.jamba.frontend.templates.Mainlayout
+			root.header = de.jamba.frontend.fragments.CatalogHeader
+			root.content = de.jamba.frontend.layouts.NavigationAndSidebar
+			root.content.navigation = de.jamba.frontend.fragments.DefaultNavigation
+			root.content.sidebar = de.jamba.frontend.fragments.GroupPagesSidebar
+			root.content.maincontent = de.jamba.frontend.fragments.TwoContentListsWithTeaser
+			root.footer = de.jamba.frontend.fragments.CatalogFooter
         </configuration>
     </usecase>
 

@@ -4,7 +4,6 @@ import java.util.Iterator;
 
 import org.apache.commons.lang.StringUtils;
 
-
 /**
  * provides helper methods for iterating ofer component configuration tree's
  * 
@@ -62,9 +61,12 @@ public class ConfigurationIterationStrategy {
             } else {
                 actual = actual.getParent();
             }
-            final String key = actual.getComponentPath() + ComponentConfiguration.COMPONENT_PATH_SEPARATOR
-                    + requestedKey;
-            return key;
+            final StringBuilder key = new StringBuilder(actual.getComponentPath());
+            if (StringUtils.isNotEmpty(key.toString())) {
+                key.append(ComponentConfiguration.COMPONENT_PATH_SEPARATOR);
+            }
+            key.append(requestedKey);
+            return key.toString();
         }
 
         @Override
@@ -135,7 +137,12 @@ public class ConfigurationIterationStrategy {
                     actual = actual.getParent();
                 }
             }
-            return actual.getComponentPath() + ComponentConfiguration.COMPONENT_PATH_SEPARATOR + requestedKey;
+            final StringBuilder key = new StringBuilder(actual.getComponentPath());
+            if (StringUtils.isNotEmpty(key.toString())) {
+                key.append(ComponentConfiguration.COMPONENT_PATH_SEPARATOR);
+            }
+            key.append(requestedKey);
+            return key.toString();
         }
 
         @Override

@@ -18,7 +18,7 @@ package net.xy.jcms.shared;
  * @author xyan
  * 
  */
-public abstract class IOutWriter {
+public interface IOutWriter {
 
     /**
      * appends an rendered output string to the output

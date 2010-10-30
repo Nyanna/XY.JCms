@@ -26,6 +26,11 @@ import net.xy.jcms.shared.IFragment;
  */
 public class TemplateConfiguration extends Configuration<Map<String, IFragment>> {
 
+    /**
+     * default constructor
+     * 
+     * @param configurationValue
+     */
     public TemplateConfiguration(final Map<String, IFragment> configurationValue) {
         super(ConfigurationType.templateconfiguration, configurationValue);
     }

@@ -16,7 +16,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang.StringUtils;
+
 import net.xy.jcms.controller.configurations.UIConfiguration.UI;
+import net.xy.jcms.shared.DebugUtils;
 import net.xy.jcms.shared.IComponent;
 import net.xy.jcms.shared.IOutWriter;
 import net.xy.jcms.shared.IRenderer;
@@ -34,15 +37,14 @@ public abstract class ComponentConfiguration {
     public final static String COMPONENT_PATH_SEPARATOR = ".";
 
     /**
-     * holds the mendatory component id. On every added component id got set on
-     * every fragment not.
+     * holds the mendatory component id. On every added component id got set on every fragment not.
      */
     private String id = "";
 
     /**
-     * holds an id stacked component path
+     * holds an id stacked component path. On every added component path got set on every fragment not.
      */
-    private String componentPath;
+    private String componentPath = "";
 
     /**
      * holds the reference to the parent
@@ -50,8 +52,7 @@ public abstract class ComponentConfiguration {
     private ComponentConfiguration parent = null;
 
     /**
-     * holds the appropriated components instance, which requests and renders
-     * these configuration
+     * holds the appropriated components instance, which requests and renders these configuration
      */
     private final IComponent compInstance;
 
@@ -72,8 +73,7 @@ public abstract class ComponentConfiguration {
     }
 
     /**
-     * initializes the complete component configuration in case of an
-     * missconfiguration it throws an exception
+     * initializes the complete component configuration in case of an missconfiguration it throws an exception
      * 
      * @param cmpConfig
      *            ComponentConfiguration to be initialized
@@ -101,6 +101,16 @@ public abstract class ComponentConfiguration {
         for (final FragmentConfiguration fragment : cmpConfig.getTemplates().values()) {
             ComponentConfiguration.initialize(fragment, repository, tmplConf, uiConf, messConf, renderConf);
         }
+    }
+
+    /**
+     * initializes tree rendering
+     * 
+     * @param out
+     * @param cmpConfig
+     */
+    public static void render(final IOutWriter out, final ComponentConfiguration cmpConfig) {
+        cmpConfig.getCompInstance().render(out, cmpConfig);
     }
 
     /**
@@ -164,7 +174,12 @@ public abstract class ComponentConfiguration {
      */
     final protected void updateComponentPath() {
         if (parent != null) {
-            componentPath = parent.getComponentPath() + COMPONENT_PATH_SEPARATOR + id;
+            final StringBuilder key = new StringBuilder(parent.getComponentPath());
+            if (StringUtils.isNotEmpty(key.toString())) {
+                key.append(COMPONENT_PATH_SEPARATOR);
+            }
+            key.append(id);
+            componentPath = key.toString();
         } else {
             componentPath = id;
         }
@@ -220,8 +235,7 @@ public abstract class ComponentConfiguration {
      */
     public ComponentConfiguration addComponent(final String id, final IComponent component) {
         final ComponentConfiguration config = component.getConfiguration();
-        config.setId(id);
-        config.addChildren(id, config);
+        addChildren(id, config);
         return config;
     }
 
@@ -232,7 +246,8 @@ public abstract class ComponentConfiguration {
         final ComponentConfiguration[] childs = prepareChildren(repository);
         if (childs != null) {
             for (final ComponentConfiguration child : childs) {
-                addChildren(id, child);
+                // TODO remove or change to mapp
+                // addChildren(id, child);
             }
         }
     }
@@ -318,7 +333,8 @@ public abstract class ComponentConfiguration {
     public String getMessage(final String key) {
         final String message = messages.get(key);
         if (message == null) {
-            throw new IllegalArgumentException("An not configured message key were requested!");
+            throw new IllegalArgumentException("An not configured message key were requested! "
+                    + DebugUtils.printFields(key));
         }
         return message;
     }
@@ -342,9 +358,6 @@ public abstract class ComponentConfiguration {
                     }
                     uiconfig.put(ui.getKey(), config.getConfig(ui, this));
                     // TODO [LOW] add type safty through separate get boolean
-                    // get
-                    // integer
-                    // methods
                 }
             }
         }
@@ -361,8 +374,7 @@ public abstract class ComponentConfiguration {
     }
 
     /**
-     * method to configure childs ui config aggregation. Only usefull in the
-     * aggregation phase.
+     * method to configure childs ui config aggregation. Only usefull in the aggregation phase.
      * 
      * @param key
      * @param value
@@ -386,7 +398,8 @@ public abstract class ComponentConfiguration {
             for (final Class<? extends IRenderer> iface : prepare) {
                 if (!renderers.containsKey(iface)) {
                     if (config == null) {
-                        throw new IllegalArgumentException("An requiered configuration was missing");
+                        throw new IllegalArgumentException("An requiered renderer was missing. "
+                                + DebugUtils.printFields(iface));
                     }
                     renderers.put(iface, config.get(iface, this));
                 }

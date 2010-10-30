@@ -12,23 +12,24 @@
  */
 package net.xy.jcms.controller.configurations;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import net.xy.jcms.controller.configurations.ConfigurationIterationStrategy.ClimbUp;
+import net.xy.jcms.shared.DebugUtils;
 import net.xy.jcms.shared.IRenderer;
 
 /**
- * is like the baserenderfactory an configuration delivering renderer instances
- * described by an interface
+ * is like the baserenderfactory an configuration delivering renderer instances described by an interface
  * 
  * @author Xyan
  * 
  */
-public class RenderKitConfiguration extends Configuration<Map<Class<IRenderer>, IRenderer>> {
+public class RenderKitConfiguration extends Configuration<Map<?, IRenderer>> {
 
-    public RenderKitConfiguration(final ConfigurationType configurationType,
-            final Map<Class<IRenderer>, IRenderer> configurationValue) {
-        super(ConfigurationType.renderKitConfiguration, configurationValue);
+    public RenderKitConfiguration(final Map<Class<? extends IRenderer>, IRenderer> configurationValue) {
+        super(ConfigurationType.renderKitConfiguration, convert(configurationValue));
     }
 
     /**
@@ -39,20 +40,25 @@ public class RenderKitConfiguration extends Configuration<Map<Class<IRenderer>, 
      */
     public IRenderer get(final Class<? extends IRenderer> rInterface, final ComponentConfiguration config) {
         IRenderer value = null;
-        final ClimbUp strategy = new ClimbUp(config, rInterface.getSimpleName());
+        final ClimbUp strategy = new ClimbUp(config, rInterface.getName());
         for (final String pathKey : strategy) {
             value = getConfigurationValue().get(pathKey);
+            if (value != null) {
+                break;
+            }
         }
         if (value != null) {
             return value;
         } else {
-            throw new IllegalArgumentException("An mendatory message configuration was missing!");
+            throw new IllegalArgumentException("An mendatory renderer was missing! "
+                    + DebugUtils.printFields(rInterface));
         }
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
-    public void mergeConfiguration(final Configuration<Map<Class<IRenderer>, IRenderer>> otherConfig) {
-        getConfigurationValue().putAll(otherConfig.getConfigurationValue());
+    public void mergeConfiguration(final Configuration<Map<?, IRenderer>> otherConfig) {
+        getConfigurationValue().putAll((Map) otherConfig.getConfigurationValue());
     }
 
     @Override
@@ -63,5 +69,23 @@ public class RenderKitConfiguration extends Configuration<Map<Class<IRenderer>, 
     @Override
     public boolean equals(final Object object) {
         return getConfigurationValue().equals(object);
+    }
+
+    /**
+     * converts an incoming config to simple class names
+     * 
+     * @param config
+     * @return
+     */
+    private static Map<String, IRenderer> convert(final Map<?, IRenderer> config) {
+        final Map<String, IRenderer> result = new HashMap<String, IRenderer>();
+        for (final Entry<?, IRenderer> entry : config.entrySet()) {
+            if (entry.getKey() instanceof Class<?>) {
+                result.put(((Class<?>) entry.getKey()).getName(), entry.getValue());
+            } else {
+                result.put((String) entry.getKey(), entry.getValue());
+            }
+        }
+        return result;
     }
 }

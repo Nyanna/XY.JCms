@@ -53,22 +53,49 @@ public class UIConfiguration extends Configuration<Properties> {
             final ClimbUp strategy = new ClimbUp(config, ui.getKey());
             for (final String pathKey : strategy) {
                 value = getConfigurationValue().getProperty(pathKey);
-                if (value != null) {
-                    // type check basedon class parameter
+                if (rightType(ui, value)) {
+                    // type check based on class parameter
                     break;
+                }
+                if (value != null) {
+                    throw new IllegalArgumentException("An vital ui configuration is not the right object type!");
                 }
             }
         } else {
             value = getConfigurationValue().get(ConfigurationIterationStrategy.fullPath(config, ui.getKey()));
-            // type check basedon class parameter
+            // type check based on class parameter
+            if (value != null && !rightType(ui, value)) {
+                throw new IllegalArgumentException("An vital ui configuration is not the right object type!");
+            }
         }
         if (value != null) {
             return value;
-        } else if (value == null && ui.getDefaultValue() != null) {
+        } else if (value == null && ui.getDefaultValue() != null && !(ui.getDefaultValue() instanceof Class<?>)) {
             return ui.getDefaultValue();
         } else {
             throw new IllegalArgumentException("An vital ui configuration is missing, check the configuration!");
         }
+    }
+
+    /**
+     * checks the type of the retrieved value
+     * 
+     * @param ui
+     * @param value
+     * @return
+     */
+    private boolean rightType(final UI<?> ui, final Object value) {
+        if (value != null) {
+            if (ui.getDefaultValue() != null && ui.getDefaultValue() instanceof Class<?>
+                    && ((Class<?>) ui.getDefaultValue()).isInstance(value)) {
+                return true;
+            } else if (ui.getDefaultValue() != null && ui.getDefaultValue().getClass().isInstance(value)) {
+                return true;
+            } else if (ui.getDefaultValue() == null) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -99,9 +126,8 @@ public class UIConfiguration extends Configuration<Properties> {
         private final V defaultValue;
 
         /**
-         * should the value retrieved using component path iteration as example
-         * in case auf styleClass it should not so that it finds only exact
-         * matching keys
+         * should the value retrieved using component path iteration as example in case auf styleClass it should not so
+         * that it finds only exact matching keys
          */
         private final boolean iterate;
 

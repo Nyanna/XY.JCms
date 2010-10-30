@@ -17,6 +17,15 @@ import net.xy.jcms.controller.configurations.FragmentConfiguration;
 
 public abstract class AbstractFragment extends AbstractComponent implements IFragment {
 
+    /**
+     * must be called to ensure that no default constructor will be used
+     * 
+     * @param skip
+     */
+    protected AbstractFragment(final boolean skip) {
+        super(skip);
+    }
+
     @Override
     public abstract FragmentConfiguration getConfiguration();
 
@@ -24,6 +33,7 @@ public abstract class AbstractFragment extends AbstractComponent implements IFra
     public void render(final IOutWriter out, final ComponentConfiguration config) {
         if (config instanceof FragmentConfiguration) {
             render(out, (FragmentConfiguration) config);
+            return;
         }
         throw new IllegalArgumentException("Fragment was called with an wrong configuration type");
     }

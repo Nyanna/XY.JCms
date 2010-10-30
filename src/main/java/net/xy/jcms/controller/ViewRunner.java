@@ -93,7 +93,7 @@ public class ViewRunner {
      * @param configuration
      */
     public static void runView(final IOutWriter out, final ComponentConfiguration configuration) {
-
+        ComponentConfiguration.render(out, configuration);
     }
 
 }

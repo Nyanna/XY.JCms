@@ -69,6 +69,7 @@ public class TextComponent extends AbstractComponent {
     }
 
     private TextComponent() {
+        super(true);
     }
 
     private final static TextComponent INSTANCE = new TextComponent();

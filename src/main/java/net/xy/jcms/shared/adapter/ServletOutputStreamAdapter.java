@@ -17,7 +17,7 @@ import javax.servlet.ServletOutputStream;
 import org.apache.log4j.Logger;
 import net.xy.jcms.shared.IOutWriter;
 
-public class ServletOutputStreamAdapter extends IOutWriter {
+public class ServletOutputStreamAdapter implements IOutWriter {
     /**
      * logger
      */
