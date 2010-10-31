@@ -17,6 +17,7 @@
 package net.xy.jcms.controller;
 
 import java.util.EnumSet;
+import java.util.Map;
 
 import net.xy.jcms.controller.NavigationAbstractionLayer.NALKey;
 import net.xy.jcms.controller.UsecaseConfiguration.Controller;
@@ -76,16 +77,18 @@ public class UsecaseAgent {
      *         redirect
      * @throws ClassNotFoundException
      */
-    public static NALKey executeController(final Usecase usecase, final IDataAccessContext dac)
-            throws ClassNotFoundException {
+    public static NALKey executeController(final Usecase usecase, final IDataAccessContext dac,
+            final Map<Object, Object> parameters) throws ClassNotFoundException {
         final Controller[] list = usecase.getControllerList();
         for (final Controller controller : list) {
             final EnumSet<ConfigurationType> types = controller.getObmitedConfigurations().clone();
             types.addAll(ConfigurationType.CONTROLLERAPPLICABLE);
             final Configuration<?>[] configs = usecase.getConfigurationList(types);
-            final NALKey forward = controller.invoke(dac, configs);
-            if (forward != null) {
-                return forward;
+            if (types.contains(ConfigurationType.parameters)) {
+                // obmit parameters if configured
+                return controller.invoke(dac, configs, parameters);
+            } else {
+                return controller.invoke(dac, configs, null);
             }
         }
         return null;

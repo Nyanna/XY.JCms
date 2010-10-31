@@ -297,8 +297,26 @@ public class UsecaseConfiguration {
          */
         public NALKey invoke(final IDataAccessContext dac, final Configuration<?>[] configuration)
                 throws ClassNotFoundException {
+            return invoke(dac, configuration, null);
+        }
+
+        /**
+         * calls an controller with given parameterset
+         * 
+         * @param dac
+         * @param configuration
+         * @param parameters
+         * @return
+         * @throws ClassNotFoundException
+         */
+        public NALKey invoke(final IDataAccessContext dac, final Configuration<?>[] configuration,
+                final Map<Object, Object> parameters) throws ClassNotFoundException {
             final IController controller = ControllerPool.get(getControllerId(), this.getClass().getClassLoader());
-            return controller.invoke(dac, configuration);
+            if (parameters != null) {
+                return controller.invoke(dac, configuration, parameters);
+            } else {
+                return controller.invoke(dac, configuration);
+            }
         }
 
         @Override

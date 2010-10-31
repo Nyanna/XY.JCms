@@ -16,7 +16,9 @@
  */
 package net.xy.jcms.controller.configurations;
 
+import java.io.InputStream;
 import java.util.EnumSet;
+import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 
@@ -89,7 +91,11 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
          * usually an renderfactory which provides the renderer for the
          * component configuration
          */
-        renderKitConfiguration;
+        renderKitConfiguration,
+        /**
+         * just an triger to obmit usecase parameters to the handler
+         */
+        parameters;
 
         /**
          * these configuration are obmittedt to the view and therefore will be
@@ -208,5 +214,35 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
     @Override
     public String toString() {
         return "type=" + getConfigurationType() + " source=" + getConfigurationSource();
+    }
+
+    /**
+     * initialises an configuration with an string. only for specific types
+     * available.
+     * 
+     * @param type
+     * @param in
+     * @return
+     */
+    public static Configuration<?> initByString(final ConfigurationType type, final String in) {
+        switch (type) {
+
+        }
+        return new TemplateConfiguration(new HashMap());
+    }
+
+    /**
+     * initializes an configuration with an input stream resource. only for
+     * certain configuration available.
+     * 
+     * @param type
+     * @param stream
+     * @return
+     */
+    public static Configuration<?> initByStream(final ConfigurationType type, final InputStream stream) {
+        switch (type) {
+
+        }
+        return new TemplateConfiguration(new HashMap());
     }
 }

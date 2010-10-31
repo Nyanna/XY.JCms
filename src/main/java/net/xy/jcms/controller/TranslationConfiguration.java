@@ -22,6 +22,7 @@ import org.apache.log4j.Logger;
 
 import net.xy.jcms.controller.NavigationAbstractionLayer.NALKey;
 import net.xy.jcms.controller.configurations.ITranslationConfigurationAdapter;
+import net.xy.jcms.shared.DebugUtils;
 import net.xy.jcms.shared.IDataAccessContext;
 
 /**
@@ -75,6 +76,11 @@ public abstract class TranslationConfiguration {
         public TranslationRule(final String reactOn, final String buildOff, final String usecase,
                 final List<RuleParameter> parameters) {
             this.reactOn = Pattern.compile(reactOn);
+            if (!this.reactOn.matcher(buildOff).matches()) {
+                throw new IllegalArgumentException(
+                        "BuildOff rules doesn't match on reactsOn! Check Translation rule configuration. "
+                                + DebugUtils.printFields(reactOn, buildOff));
+            }
             this.buildOff = buildOff;
             this.usecase = usecase;
             this.parameters = parameters;

@@ -61,7 +61,7 @@ public class UsecaseConfigurationTest {
             public Usecase[] getUsecaseList(final IDataAccessContext dac) {
                 return new Usecase[] {
                         new Usecase("contentgroup", "first test", new Parameter[] { new Parameter("contentgroup",
-                                "de.jamba.ContentGroup") }, new Controller[] { new Controller("net.xy.jcms.TestController",
+                                "de.jamba.ContentGroup") }, new Controller[] { new Controller("net.xy.jcms.MockController",
                                 EnumSet.of(ConfigurationType.messageConfiguration))
 
                         }, new Configuration[] { new MessageConfiguration(new Properties() {
@@ -86,7 +86,7 @@ public class UsecaseConfigurationTest {
         });
         Assert.assertNotNull(uCase);
         final NALKey forward = UsecaseAgent.executeController(uCase, new IDataAccessContext() {
-        });
+        }, null);
         Assert.assertNotNull(forward);
         System.out.append(forward.toString());
     }

@@ -40,7 +40,7 @@ public class MockTranslationConfiguration implements ITranslationConfigurationAd
                 });
         con0[1] = new TranslationRule("^Hm du willst dich also Einloggen", "Hm du willst dich also Einloggen", "userLogin",
                 new ArrayList<RuleParameter>());
-        con0[2] = new TranslationRule("^du willst wohl zu ([Ringtones|Funsounds]) zur Unterkategorie ([0-9]+)",
+        con0[2] = new TranslationRule("^du willst wohl zu (Ringtones|Funsounds) zur Unterkategorie ([0-9]+)",
                 "du willst wohl zu Funsounds zur Unterkategorie 1270", "subcategory", new ArrayList<RuleParameter>() {
                     private static final long serialVersionUID = -5034726752873057109L;
 

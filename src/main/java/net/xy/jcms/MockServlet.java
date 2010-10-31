@@ -97,7 +97,7 @@ public class MockServlet extends HttpServlet {
              * use client caching feature.
              */
             try {
-                forward = UsecaseAgent.executeController(usecase, dac);
+                forward = UsecaseAgent.executeController(usecase, dac, forward.getParameters());
             } catch (final ClassNotFoundException ex) {
                 LOG.error(ex);
                 throw new ServletException("Couldn't load an Usecase controller");

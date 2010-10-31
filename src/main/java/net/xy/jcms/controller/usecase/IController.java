@@ -16,6 +16,8 @@
  */
 package net.xy.jcms.controller.usecase;
 
+import java.util.Map;
+
 import net.xy.jcms.controller.NavigationAbstractionLayer.NALKey;
 import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.shared.IDataAccessContext;
@@ -36,4 +38,15 @@ public interface IController {
      * @return
      */
     NALKey invoke(final IDataAccessContext dac, final Configuration<?>[] configuration);
+
+    /**
+     * if obmited configuration parameters are specified in the usecase config
+     * this method will be called
+     * 
+     * @param dac
+     * @param configuration
+     * @param parameters
+     * @return
+     */
+    NALKey invoke(final IDataAccessContext dac, final Configuration<?>[] configuration, Map<Object, Object> parameters);
 }
