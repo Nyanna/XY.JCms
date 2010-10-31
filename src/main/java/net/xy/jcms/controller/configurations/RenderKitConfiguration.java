@@ -12,23 +12,33 @@
  */
 package net.xy.jcms.controller.configurations;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.apache.commons.lang.StringUtils;
 
 import net.xy.jcms.controller.configurations.ConfigurationIterationStrategy.ClimbUp;
 import net.xy.jcms.shared.DebugUtils;
 import net.xy.jcms.shared.IRenderer;
 
 /**
- * is like the baserenderfactory an configuration delivering renderer instances described by an interface
+ * is like the baserenderfactory an configuration delivering renderer instances
+ * described by an interface
  * 
  * @author Xyan
  * 
  */
 public class RenderKitConfiguration extends Configuration<Map<?, IRenderer>> {
 
-    public RenderKitConfiguration(final Map<Class<? extends IRenderer>, IRenderer> configurationValue) {
+    /**
+     * default constructor by Class = IRenderer
+     * 
+     * @param configurationValue
+     */
+    public RenderKitConfiguration(final Map<?, IRenderer> configurationValue) {
         super(ConfigurationType.renderKitConfiguration, convert(configurationValue));
     }
 
@@ -40,8 +50,10 @@ public class RenderKitConfiguration extends Configuration<Map<?, IRenderer>> {
      */
     public IRenderer get(final Class<? extends IRenderer> rInterface, final ComponentConfiguration config) {
         IRenderer value = null;
-        final ClimbUp strategy = new ClimbUp(config, rInterface.getName());
+        final ClimbUp strategy = new ClimbUp(config, rInterface.getSimpleName());
+        final List<String> retrievalStack = new ArrayList<String>();
         for (final String pathKey : strategy) {
+            retrievalStack.add(pathKey);
             value = getConfigurationValue().get(pathKey);
             if (value != null) {
                 break;
@@ -51,7 +63,7 @@ public class RenderKitConfiguration extends Configuration<Map<?, IRenderer>> {
             return value;
         } else {
             throw new IllegalArgumentException("An mendatory renderer was missing! "
-                    + DebugUtils.printFields(rInterface));
+                    + DebugUtils.printFields(rInterface, retrievalStack));
         }
     }
 
@@ -87,5 +99,69 @@ public class RenderKitConfiguration extends Configuration<Map<?, IRenderer>> {
             }
         }
         return result;
+    }
+
+    /**
+     * creates an config based on parsing an string
+     * 
+     * @param configString
+     * @return
+     */
+    public static RenderKitConfiguration initByString(final String configString) {
+        final Map<String, IRenderer> result = new HashMap<String, IRenderer>();
+        final String[] lines = configString.split("\n");
+        for (final String line : lines) {
+            if (StringUtils.isBlank(line) || line.trim().startsWith("#")) {
+                continue;
+            }
+            final String[] parsed = line.trim().split("=", 2);
+            try {
+                final String iface = parsed[0];
+                final String classPath = parsed[1];
+                result.put(iface.trim(), rendererCachePool(classPath.trim()));
+            } catch (final IndexOutOfBoundsException ex) {
+                throw new IllegalArgumentException(
+                        "Error by parsing body configuration line for the template configuration. "
+                                + DebugUtils.printFields(line));
+            } catch (final ClassNotFoundException e) {
+                throw new IllegalArgumentException("Fragment class couldn't be found. " + DebugUtils.printFields(line));
+            } catch (final InstantiationException e) {
+                throw new IllegalArgumentException("Fragment class couldn't be instantiated. "
+                        + DebugUtils.printFields(line));
+            } catch (final IllegalAccessException e) {
+                throw new IllegalArgumentException("Fragment class couldn't be instantiated. "
+                        + DebugUtils.printFields(line));
+            }
+        }
+        return new RenderKitConfiguration(result);
+    }
+
+    /**
+     * cache pool
+     */
+    private final static Map<String, IRenderer> cachePool = new HashMap<String, IRenderer>();
+
+    /**
+     * manages an cached pool of loaded renderer instances
+     * 
+     * @param classPath
+     * @return
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     * @throws ClassNotFoundException
+     */
+    public static IRenderer rendererCachePool(final String classPath) throws InstantiationException, IllegalAccessException,
+            ClassNotFoundException {
+        if (cachePool.containsKey(classPath)) {
+            return cachePool.get(classPath);
+        } else {
+            final Object renderer = Thread.currentThread().getContextClassLoader().loadClass(classPath).newInstance();
+            if (IRenderer.class.isInstance(renderer)) {
+                cachePool.put(classPath, (IRenderer) renderer);
+                return (IRenderer) renderer;
+            } else {
+                throw new IllegalArgumentException("Renderer class don't implements IRenderer.");
+            }
+        }
     }
 }

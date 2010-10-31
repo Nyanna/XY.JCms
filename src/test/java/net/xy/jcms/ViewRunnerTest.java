@@ -27,10 +27,6 @@ public class ViewRunnerTest {
 
     public static class TestFragement extends AbstractFragment {
 
-        public TestFragement() {
-            super(true);
-        }
-
         @Override
         public void render(final IOutWriter out, final FragmentConfiguration config) {
             out.append(new StringBuilder("first test: "));
@@ -53,7 +49,7 @@ public class ViewRunnerTest {
 
                 @Override
                 protected ComponentConfiguration[] prepareChildren(final ContentRepository repository) {
-                    final ComponentConfiguration text = addComponent("testus", TextComponent.getInstance());
+                    addComponent("testus", TextComponent.getInstance());
                     return null;
                 }
             };
@@ -72,20 +68,28 @@ public class ViewRunnerTest {
     @Test
     public void testViewRunner() {
         final Configuration<?>[] test = new Configuration<?>[] { new TemplateConfiguration(new HashMap<String, IFragment>() {
+            private static final long serialVersionUID = -4045340286970438413L;
+
             {
                 put("root", new TestFragement());
             }
         }), new UIConfiguration(new Properties() {
+            private static final long serialVersionUID = -1203791194278285716L;
+
             {
                 put("testus", "steronus");
             }
         }), new MessageConfiguration(new Properties() {
+            private static final long serialVersionUID = -9001849818985539140L;
+
             {
                 put("text", "steronus1");
             }
-        }), new RenderKitConfiguration(new HashMap<Class<? extends IRenderer>, IRenderer>() {
+        }), new RenderKitConfiguration(new HashMap<String, IRenderer>() {
+            private static final long serialVersionUID = 8311301144389878165L;
+
             {
-                put(ITextRenderer.class, new TextRenderer());
+                put(ITextRenderer.class.getSimpleName(), new TextRenderer());
             }
         }) };
 

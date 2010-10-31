@@ -46,10 +46,15 @@ public class ViewRunner {
                 ConfigurationType.templateconfiguration, configuration);
         if (tmplConfig != null) {
             final IFragment root = tmplConfig.get(ENTRY_TEMPLATE);
-            final ComponentConfiguration rootConfig = root.getConfiguration();
-            return initializeConfigurations(rootConfig, configuration);
+            if (root != null) {
+                final ComponentConfiguration rootConfig = root.getConfiguration();
+                if (rootConfig != null) {
+                    return initializeConfigurations(rootConfig, configuration);
+                }
+                throw new IllegalArgumentException("Root template doesn't returns an configuration object");
+            }
         }
-        return null;
+        throw new IllegalArgumentException("At least an root template has to be specified.");
     }
 
     /**
@@ -93,6 +98,9 @@ public class ViewRunner {
      * @param configuration
      */
     public static void runView(final IOutWriter out, final ComponentConfiguration configuration) {
+        if (configuration == null || out == null) {
+            throw new IllegalArgumentException("Runview has to be executed with an outwriter and an configuration tree.");
+        }
         ComponentConfiguration.render(out, configuration);
     }
 

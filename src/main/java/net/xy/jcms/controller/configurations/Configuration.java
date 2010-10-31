@@ -18,7 +18,7 @@ package net.xy.jcms.controller.configurations;
 
 import java.io.InputStream;
 import java.util.EnumSet;
-import java.util.HashMap;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
@@ -102,7 +102,7 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
          * hashed to determine view changes.
          */
         public static final EnumSet<ConfigurationType> VIEWAPPLICABLE = EnumSet.of(contentRepository, UIConfiguration,
-                messageConfiguration, renderKitConfiguration);
+                messageConfiguration, renderKitConfiguration, templateconfiguration);
 
         /**
          * all configuration will be additionally obmitted to the controllers
@@ -225,10 +225,22 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
      * @return
      */
     public static Configuration<?> initByString(final ConfigurationType type, final String in) {
+        // TODO [HIGH] implement configuration initializers
         switch (type) {
-
+        case templateconfiguration:
+            return TemplateConfiguration.initByString(in);
+        case UIConfiguration:
+            return UIConfiguration.initByString(in);
+        case messageConfiguration:
+            return MessageConfiguration.initByString(in);
+        case contentConfiguration:
+            return ContentConfiguration.initByString(in);
+        case renderKitConfiguration:
+            return RenderKitConfiguration.initByString(in);
+        case dataModel:
+        default:
+            throw new UnsupportedOperationException("Configurationtype is not implemented to be initialized by stream.");
         }
-        return new TemplateConfiguration(new HashMap());
     }
 
     /**
@@ -241,8 +253,11 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
      */
     public static Configuration<?> initByStream(final ConfigurationType type, final InputStream stream) {
         switch (type) {
-
+        default:
+            // TODO [HIGH] implement stream reading and inclusion mechanism
+            return new ContentConfiguration(new Properties());
+            // throw new
+            // UnsupportedOperationException("Configurationtype is not implemented to be initialized by stream.");
         }
-        return new TemplateConfiguration(new HashMap());
     }
 }

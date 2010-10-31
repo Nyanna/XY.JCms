@@ -30,7 +30,7 @@ public class BoxRenderer extends BaseRenderer implements IBoxRenderer {
     @Override
     public StringBuilder renderBegin(final String styleClass) {
         if (StringUtils.isNotBlank(styleClass)) {
-            return new StringBuilder("<div " + StringEscapeUtils.escapeHtml(styleClass) + "/>");
+            return new StringBuilder("<div class=" + StringEscapeUtils.escapeHtml(styleClass) + ">");
         }
         return new StringBuilder("<div>");
     }

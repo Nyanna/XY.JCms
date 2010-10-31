@@ -12,9 +12,12 @@
  */
 package net.xy.jcms.controller.configurations;
 
-import java.util.Map.Entry;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import net.xy.jcms.controller.configurations.ConfigurationIterationStrategy.ClimbUp;
+import net.xy.jcms.shared.DebugUtils;
+
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -23,22 +26,15 @@ import org.apache.commons.lang.StringUtils;
  * @author xyan
  * 
  */
-public class UIConfiguration extends Configuration<Properties> {
+public class UIConfiguration extends AbstractPropertyBasedConfiguration {
 
     /**
-     * default constructor
+     * default
      * 
      * @param configurationValue
      */
     public UIConfiguration(final Properties configurationValue) {
         super(ConfigurationType.UIConfiguration, configurationValue);
-    }
-
-    @Override
-    public void mergeConfiguration(final Configuration<Properties> otherConfig) {
-        for (final Entry<Object, Object> entry : otherConfig.getConfigurationValue().entrySet()) {
-            getConfigurationValue().put(entry.getKey(), entry.getValue());
-        }
     }
 
     /**
@@ -49,9 +45,11 @@ public class UIConfiguration extends Configuration<Properties> {
      */
     public Object getConfig(final UI<?> ui, final ComponentConfiguration config) {
         Object value = null;
+        final List<String> retrievalStack = new ArrayList<String>();
         if (ui.isIterate()) {
             final ClimbUp strategy = new ClimbUp(config, ui.getKey());
             for (final String pathKey : strategy) {
+                retrievalStack.add(pathKey);
                 value = getConfigurationValue().getProperty(pathKey);
                 if (rightType(ui, value)) {
                     // type check based on class parameter
@@ -62,7 +60,9 @@ public class UIConfiguration extends Configuration<Properties> {
                 }
             }
         } else {
-            value = getConfigurationValue().get(ConfigurationIterationStrategy.fullPath(config, ui.getKey()));
+            final String pathKey = ConfigurationIterationStrategy.fullPath(config, ui.getKey());
+            value = getConfigurationValue().get(pathKey);
+            retrievalStack.add(pathKey);
             // type check based on class parameter
             if (value != null && !rightType(ui, value)) {
                 throw new IllegalArgumentException("An vital ui configuration is not the right object type!");
@@ -73,7 +73,8 @@ public class UIConfiguration extends Configuration<Properties> {
         } else if (value == null && ui.getDefaultValue() != null && !(ui.getDefaultValue() instanceof Class<?>)) {
             return ui.getDefaultValue();
         } else {
-            throw new IllegalArgumentException("An vital ui configuration is missing, check the configuration!");
+            throw new IllegalArgumentException("An vital ui configuration is missing, check the configuration! "
+                    + DebugUtils.printFields(retrievalStack));
         }
     }
 
@@ -98,14 +99,14 @@ public class UIConfiguration extends Configuration<Properties> {
         return false;
     }
 
-    @Override
-    public int hashCode() {
-        return getConfigurationValue().hashCode();
-    }
-
-    @Override
-    public boolean equals(final Object object) {
-        return getConfigurationValue().equals(object);
+    /**
+     * creates an config based on parsing an string
+     * 
+     * @param configString
+     * @return
+     */
+    public static UIConfiguration initByString(final String configString) {
+        return new UIConfiguration(AbstractPropertyBasedConfiguration.initPropertiesByString(configString));
     }
 
     /**
@@ -126,8 +127,9 @@ public class UIConfiguration extends Configuration<Properties> {
         private final V defaultValue;
 
         /**
-         * should the value retrieved using component path iteration as example in case auf styleClass it should not so
-         * that it finds only exact matching keys
+         * should the value retrieved using component path iteration as example
+         * in case auf styleClass it should not so that it finds only exact
+         * matching keys
          */
         private final boolean iterate;
 
@@ -189,6 +191,20 @@ public class UIConfiguration extends Configuration<Properties> {
          */
         public boolean isIterate() {
             return iterate;
+        }
+
+        /**
+         * gets description
+         * 
+         * @return
+         */
+        public String getDescription() {
+            return description;
+        }
+
+        @Override
+        public String toString() {
+            return DebugUtils.printFields(key, defaultValue);
         }
     }
 

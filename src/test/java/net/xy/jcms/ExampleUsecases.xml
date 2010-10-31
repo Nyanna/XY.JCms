@@ -94,13 +94,13 @@
 	
 	        <configuration type="templateconfiguration">
 	        	<![CDATA[
-	        	root = de.jamba.frontend.templates.Mainlayout
-				root.header = de.jamba.frontend.fragments.CatalogHeader
-				root.content = de.jamba.frontend.layouts.NavigationAndSidebar
-				root.content.navigation = de.jamba.frontend.fragments.DefaultNavigation
-				root.content.sidebar = de.jamba.frontend.fragments.GroupPagesSidebar
-				root.content.maincontent = de.jamba.frontend.fragments.TwoContentListsWithTeaser
-				root.footer = de.jamba.frontend.fragments.CatalogFooter
+	        	root = net.xy.jcms.portal.templates.ExampleMainLayout
+				#root.header = de.jamba.frontend.fragments.CatalogHeader
+				#root.content = de.jamba.frontend.layouts.NavigationAndSidebar
+				#root.content.navigation = de.jamba.frontend.fragments.DefaultNavigation
+				#root.content.sidebar = de.jamba.frontend.fragments.GroupPagesSidebar
+				#root.content.maincontent = de.jamba.frontend.fragments.TwoContentListsWithTeaser
+				#root.footer = de.jamba.frontend.fragments.CatalogFooter
 	            ]]>
 	        </configuration>
         </configurations>

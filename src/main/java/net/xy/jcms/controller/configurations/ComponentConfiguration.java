@@ -37,12 +37,14 @@ public abstract class ComponentConfiguration {
     public final static String COMPONENT_PATH_SEPARATOR = ".";
 
     /**
-     * holds the mendatory component id. On every added component id got set on every fragment not.
+     * holds the mendatory component id. On every added component id got set on
+     * every fragment not.
      */
     private String id = "";
 
     /**
-     * holds an id stacked component path. On every added component path got set on every fragment not.
+     * holds an id stacked component path. On every added component path got set
+     * on every fragment not.
      */
     private String componentPath = "";
 
@@ -52,7 +54,8 @@ public abstract class ComponentConfiguration {
     private ComponentConfiguration parent = null;
 
     /**
-     * holds the appropriated components instance, which requests and renders these configuration
+     * holds the appropriated components instance, which requests and renders
+     * these configuration
      */
     private final IComponent compInstance;
 
@@ -73,7 +76,8 @@ public abstract class ComponentConfiguration {
     }
 
     /**
-     * initializes the complete component configuration in case of an missconfiguration it throws an exception
+     * initializes the complete component configuration in case of an
+     * missconfiguration it throws an exception
      * 
      * @param cmpConfig
      *            ComponentConfiguration to be initialized
@@ -246,6 +250,7 @@ public abstract class ComponentConfiguration {
         final ComponentConfiguration[] childs = prepareChildren(repository);
         if (childs != null) {
             for (final ComponentConfiguration child : childs) {
+                child.getId();
                 // TODO remove or change to mapp
                 // addChildren(id, child);
             }
@@ -320,7 +325,7 @@ public abstract class ComponentConfiguration {
             for (final String key : prepare) {
                 if (!messages.containsKey(key)) {
                     if (config == null) {
-                        throw new IllegalArgumentException("An requiered configuration was missing");
+                        throw new IllegalArgumentException("An requiered message configuration was missing");
                     }
                     messages.put(key, config.getMessage(key, this));
                 }
@@ -354,7 +359,12 @@ public abstract class ComponentConfiguration {
             for (final UI<?> ui : prepare) {
                 if (!uiconfig.containsKey(ui.getKey())) {
                     if (config == null) {
-                        throw new IllegalArgumentException("An requiered configuration was missing");
+                        if (ui.getDefaultValue() != null) {
+                            uiconfig.put(ui.getKey(), ui.getDefaultValue());
+                            continue;
+                        }
+                        throw new IllegalArgumentException("An requiered configuration was missing. "
+                                + DebugUtils.printFields(ui));
                     }
                     uiconfig.put(ui.getKey(), config.getConfig(ui, this));
                     // TODO [LOW] add type safty through separate get boolean
@@ -368,13 +378,15 @@ public abstract class ComponentConfiguration {
     public Object getUIConfig(final String key) {
         final Object config = uiconfig.get(key);
         if (config == null) {
-            throw new IllegalArgumentException("An not configured ui configuration were requested!");
+            throw new IllegalArgumentException("An not configured ui configuration were requested! "
+                    + DebugUtils.printFields(key));
         }
         return config;
     }
 
     /**
-     * method to configure childs ui config aggregation. Only usefull in the aggregation phase.
+     * method to configure childs ui config aggregation. Only usefull in the
+     * aggregation phase.
      * 
      * @param key
      * @param value

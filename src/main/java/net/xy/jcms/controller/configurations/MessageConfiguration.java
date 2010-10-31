@@ -12,10 +12,12 @@
  */
 package net.xy.jcms.controller.configurations;
 
-import java.util.Map.Entry;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import net.xy.jcms.controller.configurations.ConfigurationIterationStrategy.FullPathOrRoot;
+import net.xy.jcms.shared.DebugUtils;
 
 /**
  * implements an default property configuration for messages
@@ -23,7 +25,7 @@ import net.xy.jcms.controller.configurations.ConfigurationIterationStrategy.Full
  * @author xyan
  * 
  */
-public class MessageConfiguration extends Configuration<Properties> {
+public class MessageConfiguration extends AbstractPropertyBasedConfiguration {
 
     /**
      * default constructor
@@ -32,13 +34,6 @@ public class MessageConfiguration extends Configuration<Properties> {
      */
     public MessageConfiguration(final Properties configurationValue) {
         super(ConfigurationType.messageConfiguration, configurationValue);
-    }
-
-    @Override
-    public void mergeConfiguration(final Configuration<Properties> otherConfig) {
-        for (final Entry<Object, Object> entry : otherConfig.getConfigurationValue().entrySet()) {
-            getConfigurationValue().put(entry.getKey(), entry.getValue());
-        }
     }
 
     /**
@@ -50,24 +45,30 @@ public class MessageConfiguration extends Configuration<Properties> {
     public String getMessage(final String key, final ComponentConfiguration config) {
         String value = null;
         final FullPathOrRoot strategy = new FullPathOrRoot(config, key);
+        final List<String> retrievalStack = new ArrayList<String>();
         for (final String pathKey : strategy) {
+            retrievalStack.add(pathKey);
             value = getConfigurationValue().getProperty(pathKey);
+            if (value != null) {
+                break;
+            }
         }
         if (value != null) {
             return value;
         } else {
-            throw new IllegalArgumentException("An mendatory message configuration was missing!");
+            throw new IllegalArgumentException("An mendatory message configuration was missing! "
+                    + DebugUtils.printFields(key, retrievalStack));
         }
     }
 
-    @Override
-    public int hashCode() {
-        return getConfigurationValue().hashCode();
-    }
-
-    @Override
-    public boolean equals(final Object object) {
-        return getConfigurationValue().equals(object);
+    /**
+     * creates an config based on parsing an string
+     * 
+     * @param configString
+     * @return
+     */
+    public static MessageConfiguration initByString(final String configString) {
+        return new MessageConfiguration(AbstractPropertyBasedConfiguration.initPropertiesByString(configString));
     }
 
 }

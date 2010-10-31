@@ -50,7 +50,6 @@ public class UsecaseParser {
             }
         }
         return cases.toArray(new Usecase[cases.size()]);
-
     }
 
     private static Usecase parseUsecase(final XMLStreamReader parser) throws XMLStreamException {

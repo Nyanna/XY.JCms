@@ -30,7 +30,7 @@ public class TranslationParser {
      * @return
      * @throws XMLStreamException
      */
-    public static List<TranslationRule> parse(final InputStream in) throws XMLStreamException {
+    public static TranslationRule[] parse(final InputStream in) throws XMLStreamException {
         final XMLInputFactory factory = XMLInputFactory.newInstance();
         factory.setProperty("javax.xml.stream.isCoalescing", true);
         final XMLStreamReader parser = factory.createXMLStreamReader(in);
@@ -50,7 +50,7 @@ public class TranslationParser {
      * @return
      * @throws XMLStreamException
      */
-    private static List<TranslationRule> parseRules(final XMLStreamReader parser) throws XMLStreamException {
+    private static TranslationRule[] parseRules(final XMLStreamReader parser) throws XMLStreamException {
         final List<TranslationRule> rules = new ArrayList<TranslationRule>();
         while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
             if (parser.getLocalName().equals("rule")) {
@@ -59,7 +59,7 @@ public class TranslationParser {
                 throw new IllegalArgumentException("Syntax error nothing allowed between rule sections.");
             }
         }
-        return rules;
+        return rules.toArray(new TranslationRule[rules.size()]);
     }
 
     /**

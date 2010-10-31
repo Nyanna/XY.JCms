@@ -16,13 +16,20 @@ public class MockController implements IController {
     public NALKey invoke(final IDataAccessContext dac, final Configuration<?>[] configuration) {
         Assert.assertTrue(configuration[0] instanceof MessageConfiguration);
         final MessageConfiguration mess = (MessageConfiguration) configuration[0];
+        if (mess != null) {
+
+        }
         return new NALKey("subcategory");
     }
 
     @Override
-    public NALKey invoke(final IDataAccessContext dac, final Configuration<?>[] configuration, final Map<Object, Object> parameters) {
+    public NALKey invoke(final IDataAccessContext dac, final Configuration<?>[] configuration,
+            final Map<Object, Object> parameters) {
         Assert.assertTrue(configuration[0] instanceof MessageConfiguration);
         final MessageConfiguration mess = (MessageConfiguration) configuration[0];
+        if (mess != null) {
+
+        }
         return new NALKey("subcategory");
     }
 }

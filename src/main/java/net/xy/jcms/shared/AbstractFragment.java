@@ -22,8 +22,8 @@ public abstract class AbstractFragment extends AbstractComponent implements IFra
      * 
      * @param skip
      */
-    protected AbstractFragment(final boolean skip) {
-        super(skip);
+    public AbstractFragment() {
+        super(true);
     }
 
     @Override

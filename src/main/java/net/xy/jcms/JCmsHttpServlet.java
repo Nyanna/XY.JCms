@@ -46,13 +46,13 @@ import net.xy.jcms.shared.adapter.ServletOutputStreamAdapter;
  * @author xyan
  * 
  */
-public class MockServlet extends HttpServlet {
+public class JCmsHttpServlet extends HttpServlet {
     private static final long serialVersionUID = 8620296669723265576L;
 
     /**
      * logger
      */
-    static final Logger LOG = Logger.getLogger(MockServlet.class);
+    static final Logger LOG = Logger.getLogger(JCmsHttpServlet.class);
 
     @Override
     public void service(final ServletRequest req, final ServletResponse res) throws ServletException, IOException {

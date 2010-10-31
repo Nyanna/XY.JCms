@@ -1,7 +1,5 @@
 package net.xy.jcms;
 
-import java.util.List;
-
 import javax.xml.stream.XMLStreamException;
 
 import net.xy.jcms.controller.TranslationConfiguration.TranslationRule;
@@ -14,7 +12,7 @@ public class TranslationParserTest {
 
     @Test
     public void parseXml() {
-        List<TranslationRule> rules = null;
+        TranslationRule[] rules = null;
         try {
             rules = TranslationParser.parse(this.getClass().getResourceAsStream("ExampleTranslationRules.xml"));
         } catch (final XMLStreamException e) {

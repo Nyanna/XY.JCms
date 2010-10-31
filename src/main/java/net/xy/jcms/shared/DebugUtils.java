@@ -9,7 +9,8 @@ package net.xy.jcms.shared;
 public class DebugUtils {
 
     /**
-     * concatenates various object to be proper displayed on console or vice versa
+     * concatenates various object to be proper displayed on console or vice
+     * versa
      * 
      * @param args
      * @return
@@ -17,6 +18,9 @@ public class DebugUtils {
     public static String printFields(final Object... args) {
         final StringBuilder ret = new StringBuilder();
         for (final Object entry : args) {
+            if (entry == null) {
+                continue;
+            }
             ret.append("[").append(entry.getClass().getSimpleName()).append("=").append(entry.toString()).append("]");
         }
         return ret.toString();

@@ -421,7 +421,11 @@ public abstract class TranslationConfiguration {
         if (adapter == null) {
             throw new IllegalArgumentException("Translation configuration adapter was not injected");
         }
-        return adapter.getRuleList(dac);
+        final TranslationRule[] list = adapter.getRuleList(dac);
+        if (list == null) {
+            throw new IllegalArgumentException("Rulelist can't be retrieved.");
+        }
+        return list;
     }
 
     /**

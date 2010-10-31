@@ -103,6 +103,7 @@ public class UsecaseAgent {
      */
     public static String applyCaching(final Configuration<?>[] configs) {
         for (final Configuration<?> config : configs) {
+            config.getClass();
             // TODO [LOW] implement ouput caching and configuration hashing
         }
         return null;

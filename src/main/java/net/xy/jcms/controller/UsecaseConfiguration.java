@@ -355,7 +355,11 @@ public class UsecaseConfiguration {
         if (adapter == null) {
             throw new IllegalArgumentException("Usecase configuration adapter was not injected");
         }
-        return adapter.getUsecaseList(dac);
+        final Usecase[] list = adapter.getUsecaseList(dac);
+        if (list == null) {
+            throw new IllegalArgumentException("Usecase list can't be retrieved.");
+        }
+        return list;
     }
 
     /**
