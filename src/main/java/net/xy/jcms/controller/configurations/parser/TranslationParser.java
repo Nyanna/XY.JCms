@@ -27,7 +27,7 @@ public class TranslationParser {
      * IllegalArgumentExceptions in case of syntax error.
      * 
      * @param in
-     * @return
+     * @return value
      * @throws XMLStreamException
      */
     public static TranslationRule[] parse(final InputStream in) throws XMLStreamException {
@@ -47,7 +47,7 @@ public class TranslationParser {
      * goes over any <rule reactOn="^du" buildOff="du" usecase="contentgroup">
      * 
      * @param parser
-     * @return
+     * @return value
      * @throws XMLStreamException
      */
     private static TranslationRule[] parseRules(final XMLStreamReader parser) throws XMLStreamException {
@@ -67,7 +67,7 @@ public class TranslationParser {
      * usecase="contentgroup">
      * 
      * @param parser
-     * @return
+     * @return value
      * @throws XMLStreamException
      */
     private static TranslationRule parseRule(final XMLStreamReader parser) throws XMLStreamException {
@@ -105,7 +105,7 @@ public class TranslationParser {
      * convert="de.jamba.ContentGroupConverter"/>
      * 
      * @param parser
-     * @return
+     * @return value
      * @throws XMLStreamException
      */
     private static List<RuleParameter> parseParameter(final XMLStreamReader parser) throws XMLStreamException {

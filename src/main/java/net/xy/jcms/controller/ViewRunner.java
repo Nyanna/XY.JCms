@@ -39,7 +39,7 @@ public class ViewRunner {
      * aggregates the component configuration tree
      * 
      * @param configuration
-     * @return
+     * @return value
      */
     public static ComponentConfiguration runConfiguration(final Configuration<?>[] configuration) {
         final TemplateConfiguration tmplConfig = (TemplateConfiguration) getConfigurationByType(
@@ -62,7 +62,7 @@ public class ViewRunner {
      * 
      * @param draftTree
      * @param model
-     * @return
+     * @return value
      */
     private static ComponentConfiguration initializeConfigurations(final ComponentConfiguration rootConfig,
             final Configuration<?>[] model) {
@@ -79,7 +79,7 @@ public class ViewRunner {
      * gets an configuration out of an configurationlist
      * 
      * @param configuration
-     * @return
+     * @return value
      */
     private static Configuration<?> getConfigurationByType(final ConfigurationType type,
             final Configuration<?>[] configuration) {

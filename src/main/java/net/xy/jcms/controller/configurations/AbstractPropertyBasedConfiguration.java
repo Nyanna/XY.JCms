@@ -58,7 +58,7 @@ public abstract class AbstractPropertyBasedConfiguration extends Configuration<P
      * parses an string to an property
      * 
      * @param configString
-     * @return
+     * @return value
      */
     protected static Properties initPropertiesByString(final String configString) {
         final Properties properties = new Properties();

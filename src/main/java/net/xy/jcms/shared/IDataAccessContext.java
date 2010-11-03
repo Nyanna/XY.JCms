@@ -12,6 +12,8 @@
  */
 package net.xy.jcms.shared;
 
+import java.util.Map;
+
 /**
  * a context in which all information are provided who are vital to access external resources. Formaly known as portal
  * context, request context, portal configuration, cappsubrand and vice versa. It will be filled by an factory injected
@@ -22,5 +24,14 @@ package net.xy.jcms.shared;
  * 
  */
 public interface IDataAccessContext {
+
+    /**
+     * builds protocol dependent references for the client, URL for http, commandlines with args for CLI
+     * 
+     * @param path
+     * @param parameters
+     * @return value
+     */
+    public String buildUriWithParams(final String path, Map<Object, Object> parameters);
 
 }

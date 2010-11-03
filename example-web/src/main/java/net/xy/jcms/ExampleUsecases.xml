@@ -18,6 +18,34 @@
  */
  -->
 <usecases>
+    <usecase id="simpleHallo" >
+    	<description>simple test page provided be the example webapp</description>
+        <configurations>
+	        <configuration type="templateconfiguration">
+	        	<![CDATA[
+	        	root = net.xy.jcms.portal.templates.ExampleMainLayout
+	            ]]>
+	        </configuration>
+	        <configuration type="UIConfiguration">
+	        	<![CDATA[
+	            xyx-maincontent.styleClass = xyx-test
+	            ]]>
+	        </configuration>
+	        <configuration type="renderKitConfiguration">
+	        	<![CDATA[
+	            IBoxRenderer = net.xy.jcms.portal.renderer.BoxRenderer
+	            ITextRenderer = net.xy.jcms.portal.renderer.TextRenderer
+	            ]]>
+	        </configuration>
+	        <configuration type="messageConfiguration">
+	        	<![CDATA[
+	            bind_maincontentbox1 = ...
+	            xyx-maincontent.simpleText.text = hi was für ein spass
+	            ]]>
+	        </configuration>
+        </configurations>
+    </usecase>
+
     <usecase id="subcategory" >
     	<description> sld ead asd alksdas dliasudish ad asd asuzd uas ukdza sdzas dkuuas dzsaukdz  ku</description>
         <parameter>

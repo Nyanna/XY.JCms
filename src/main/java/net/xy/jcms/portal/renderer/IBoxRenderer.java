@@ -27,14 +27,14 @@ public interface IBoxRenderer extends IBaseRenderer {
     /**
      * renders opebtag with styleclass
      * 
-     * @return
+     * @return value
      */
     public StringBuilder renderBegin(final String styleClass);
 
     /**
      * renders closing tag
      * 
-     * @return
+     * @return value
      */
     public StringBuilder renderEnd();
 

@@ -26,4 +26,11 @@ public interface IOutWriter {
      * @param buffer
      */
     public abstract void append(final StringBuilder buffer);
+
+    /**
+     * appends an rendered output string to the output
+     * 
+     * @param buffer
+     */
+    public abstract void append(final String buffer);
 }

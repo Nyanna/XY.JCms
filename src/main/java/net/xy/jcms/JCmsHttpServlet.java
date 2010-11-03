@@ -32,6 +32,8 @@ import net.xy.jcms.controller.ViewRunner;
 import net.xy.jcms.controller.configurations.ComponentConfiguration;
 import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
+import net.xy.jcms.controller.configurations.ControllerConfiguration;
+import net.xy.jcms.controller.configurations.stores.ClientStore;
 import net.xy.jcms.shared.IDataAccessContext;
 import net.xy.jcms.shared.adapter.HttpProtocolRequestAdapter;
 import net.xy.jcms.shared.adapter.HttpProtocolResponseAdapter;
@@ -39,9 +41,8 @@ import net.xy.jcms.shared.adapter.HttpRequestDataAccessContext;
 import net.xy.jcms.shared.adapter.ServletOutputStreamAdapter;
 
 /**
- * The following injections have to be made: ITranslationConfigurationAdapter -
- * to get translations based on dac, IUsecaseConfigurationAdapter - to get the
- * usecases based on dac
+ * The following injections have to be made: ITranslationConfigurationAdapter - to get translations based on dac,
+ * IUsecaseConfigurationAdapter - to get the usecases based on dac
  * 
  * @author xyan
  * 
@@ -62,7 +63,8 @@ public class JCmsHttpServlet extends HttpServlet {
     }
 
     @Override
-    protected void service(final HttpServletRequest request, final HttpServletResponse response) throws ServletException,
+    protected void service(final HttpServletRequest request, final HttpServletResponse response)
+            throws ServletException,
             IOException {
         /**
          * first get portal configuration out from request information
@@ -78,6 +80,7 @@ public class JCmsHttpServlet extends HttpServlet {
         // the request: cookie data, header data,
         // post data
         NALKey forward = HttpProtocolRequestAdapter.apply(request, firstForward);
+        final ClientStore store = HttpProtocolRequestAdapter.initClientStore(request);
 
         Usecase usecase;
         do {
@@ -92,11 +95,14 @@ public class JCmsHttpServlet extends HttpServlet {
             }
 
             /**
-             * run the controllers for the usecase, maybe redirect to another
-             * usecase. there should also be an expiration contoller for http tu
-             * use client caching feature.
+             * run the controllers for the usecase, maybe redirect to another usecase. there should also be an
+             * expiration contoller for http tu use client caching feature.
              */
             try {
+                // sets the clientstore retrieved from protocol adapter
+                final ControllerConfiguration cConfig = (ControllerConfiguration) usecase
+                        .getConfiguration(ConfigurationType.controllerConfiguration);
+                cConfig.setClientStore(store);
                 forward = UsecaseAgent.executeController(usecase, dac, forward.getParameters());
             } catch (final ClassNotFoundException ex) {
                 LOG.error(ex);
@@ -106,12 +112,12 @@ public class JCmsHttpServlet extends HttpServlet {
 
         // run the protocol response adapter, which fills for http as an example
         // the headers
-        HttpProtocolResponseAdapter.apply(response, usecase.getConfigurationList(ConfigurationType.CONTROLLERAPPLICABLE));
+        HttpProtocolResponseAdapter.apply(response,
+                usecase.getConfigurationList(ConfigurationType.CONTROLLERAPPLICABLE));
 
         /**
-         * at this point caching takes effect by the safe asumption that the
-         * same configuration leads to the same result. realized through hashing
-         * and persistance.
+         * at this point caching takes effect by the safe asumption that the same configuration leads to the same
+         * result. realized through hashing and persistance.
          */
         final String output = UsecaseAgent.applyCaching(usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE));
 
@@ -119,15 +125,13 @@ public class JCmsHttpServlet extends HttpServlet {
             response.getWriter().append(output);
         } else {
             /**
-             * get the configurationtree for the usecase from an empty run
-             * through the componenttree
+             * get the configurationtree for the usecase from an empty run through the componenttree
              */
             final Configuration<?>[] viewConfig = usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE);
             final ComponentConfiguration confTree = ViewRunner.runConfiguration(viewConfig);
 
             /**
-             * run and return the rendering tree through streamprocessing to the
-             * client
+             * run and return the rendering tree through streamprocessing to the client
              */
             ViewRunner.runView(new ServletOutputStreamAdapter(response.getOutputStream()), confTree);
         }

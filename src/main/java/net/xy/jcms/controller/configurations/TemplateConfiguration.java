@@ -44,7 +44,7 @@ public class TemplateConfiguration extends Configuration<Map<String, IFragment>>
      * returns an key associated template deffinition
      * 
      * @param tmplName
-     * @return
+     * @return value
      */
     public IFragment get(final String tmplName, final ComponentConfiguration config) {
         IFragment value = null;
@@ -64,7 +64,7 @@ public class TemplateConfiguration extends Configuration<Map<String, IFragment>>
      * retrieve the root fragment.
      * 
      * @param tmplName
-     * @return
+     * @return value
      */
     public IFragment get(final String tmplName) {
         return getConfigurationValue().get(tmplName);
@@ -89,7 +89,7 @@ public class TemplateConfiguration extends Configuration<Map<String, IFragment>>
      * creates an config based on parsing an string
      * 
      * @param configString
-     * @return
+     * @return value
      */
     public static TemplateConfiguration initByString(final String configString) {
         final Map<String, IFragment> result = new HashMap<String, IFragment>();
@@ -129,7 +129,7 @@ public class TemplateConfiguration extends Configuration<Map<String, IFragment>>
      * manages an cached pool of loaded fragment instances
      * 
      * @param classPath
-     * @return
+     * @return value
      * @throws InstantiationException
      * @throws IllegalAccessException
      * @throws ClassNotFoundException

@@ -89,7 +89,7 @@ public abstract class TranslationConfiguration {
         /**
          * returns the pattern
          * 
-         * @return
+         * @return value
          */
         public Pattern getReacton() {
             return reactOn;
@@ -98,7 +98,7 @@ public abstract class TranslationConfiguration {
         /**
          * returns the usecaseid
          * 
-         * @return
+         * @return value
          */
         public String getUsecase() {
             return usecase;
@@ -107,7 +107,7 @@ public abstract class TranslationConfiguration {
         /**
          * returns the parameter transformationrule list
          * 
-         * @return
+         * @return value
          */
         public List<RuleParameter> getParameters() {
             return parameters;
@@ -116,7 +116,7 @@ public abstract class TranslationConfiguration {
         /**
          * gets the reactOn matching build pattern
          * 
-         * @return
+         * @return value
          */
         public String getBuildOff() {
             return buildOff;
@@ -157,7 +157,7 @@ public abstract class TranslationConfiguration {
         /**
          * returns the parameters name which should be set
          * 
-         * @return
+         * @return value
          */
         public String getParameterName() {
             return parameterName;
@@ -166,7 +166,7 @@ public abstract class TranslationConfiguration {
         /**
          * returns the substitution group
          * 
-         * @return
+         * @return value
          */
         public Integer getAplicatesToGroup() {
             return aplicatesToGroup;
@@ -175,7 +175,7 @@ public abstract class TranslationConfiguration {
         /**
          * returns the type converter
          * 
-         * @return
+         * @return value
          */
         public String getConverter() {
             return converter;
@@ -186,7 +186,7 @@ public abstract class TranslationConfiguration {
      * uses the key to find an translationrule and builds an path
      * 
      * @param key
-     * @return
+     * @return value
      */
     public static String find(final NALKey key, final IDataAccessContext dac) {
         if (key != null) {
@@ -320,7 +320,7 @@ public abstract class TranslationConfiguration {
      * 
      * @param id
      * @param list
-     * @return
+     * @return value
      */
     private static TranslationRule[] getRulesById(final String id, final TranslationRule[] list) {
         final List<TranslationRule> retList = new ArrayList<TranslationRule>();
@@ -338,7 +338,7 @@ public abstract class TranslationConfiguration {
      * 
      * @param list
      * @param struct
-     * @return
+     * @return value
      */
     private static TranslationRule findMostMatchingParams(final TranslationRule[] list, final NALKey struct) {
         TranslationRule foundRule = null;
@@ -359,7 +359,7 @@ public abstract class TranslationConfiguration {
      * 
      * @param ruleParameters
      * @param struct
-     * @return
+     * @return value
      */
     private static int countMatchingParams(final List<RuleParameter> ruleParameters, final NALKey struct) {
         int counter = 0;
@@ -379,7 +379,7 @@ public abstract class TranslationConfiguration {
      * @param level
      *            navigation level
      * @param path
-     * @return
+     * @return value
      */
     public static NALKey find(final String path, final IDataAccessContext dac) {
         final NALKey key = null;
@@ -397,7 +397,7 @@ public abstract class TranslationConfiguration {
      * 
      * @param rule
      * @param matcher
-     * @return
+     * @return value
      */
     private static NALKey createKey(final TranslationRule rule, final Matcher matcher) {
         final NALKey key = new NALKey(rule.getUsecase());
@@ -415,7 +415,7 @@ public abstract class TranslationConfiguration {
      * actually only used for the mock configuration.
      * 
      * @param level
-     * @return
+     * @return value
      */
     protected static TranslationRule[] getRuleList(final IDataAccessContext dac) {
         if (adapter == null) {

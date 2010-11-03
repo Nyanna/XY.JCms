@@ -18,6 +18,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
+
 import net.xy.jcms.controller.NavigationAbstractionLayer.NALKey;
 import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
@@ -34,8 +37,8 @@ import net.xy.jcms.shared.IDataAccessContext;
  */
 public class UsecaseConfiguration {
     /**
-     * main usecase object describing all and anything. After these usecase
-     * comes only singleton and static code concern this.
+     * main usecase object describing all and anything. After these usecase comes only singleton and static code concern
+     * this.
      * 
      * @author Xyan
      * 
@@ -52,8 +55,8 @@ public class UsecaseConfiguration {
         private final String description;
 
         /**
-         * the request/input parameters, KeyChain, Cookies, Post etc... All
-         * these parameters are mendatory and will be validated.
+         * the request/input parameters, KeyChain, Cookies, Post etc... All these parameters are mendatory and will be
+         * validated.
          */
         private final Parameter[] parameterList;
 
@@ -63,9 +66,8 @@ public class UsecaseConfiguration {
         private final Controller[] controllerList;
 
         /**
-         * an list of connected configurations. note: these list is the whole
-         * and only configuration no other configuration would be delivered to
-         * all involved code.
+         * an list of connected configurations. note: these list is the whole and only configuration no other
+         * configuration would be delivered to all involved code.
          */
         private final Configuration<?>[] configurationList;
 
@@ -88,11 +90,10 @@ public class UsecaseConfiguration {
         }
 
         /**
-         * merges an list of configuration to an list were alls configuration of
-         * the same type are merged
+         * merges an list of configuration to an list were alls configuration of the same type are merged
          * 
          * @param mergeList
-         * @return
+         * @return value
          */
         @SuppressWarnings({ "unchecked", "rawtypes" })
         private static Configuration<?>[] mergeConfigurations(final Configuration<?>[] mergeList) {
@@ -112,7 +113,7 @@ public class UsecaseConfiguration {
         /**
          * returns the id
          * 
-         * @return
+         * @return value
          */
         public String getId() {
             return id;
@@ -121,7 +122,7 @@ public class UsecaseConfiguration {
         /**
          * returns the parameter list
          * 
-         * @return
+         * @return value
          */
         public Parameter[] getParameterList() {
             return parameterList;
@@ -130,7 +131,7 @@ public class UsecaseConfiguration {
         /**
          * returns the controllerlist
          * 
-         * @return
+         * @return value
          */
         public Controller[] getControllerList() {
             return controllerList;
@@ -139,7 +140,7 @@ public class UsecaseConfiguration {
         /**
          * return all available configuration
          * 
-         * @return
+         * @return value
          */
         public Configuration<?>[] getConfigurationList() {
             return configurationList;
@@ -149,7 +150,7 @@ public class UsecaseConfiguration {
          * gets only specific types of configuration
          * 
          * @param types
-         * @return
+         * @return value
          */
         public Configuration<?>[] getConfigurationList(final EnumSet<ConfigurationType> types) {
             final List<Configuration<?>> returnedConfig = new ArrayList<Configuration<?>>();
@@ -162,19 +163,26 @@ public class UsecaseConfiguration {
         }
 
         /**
-         * get one specific configuration
+         * get one specific configuration or inits en empty one
          * 
          * @param types
-         * @return
+         * @return never null instead it creates an empty configuration of the requested type.
          */
-        public Configuration<?> getConfigurationList(final ConfigurationType type) {
-            return getConfigurationList(EnumSet.of(type))[0];
+        public Configuration<?> getConfiguration(final ConfigurationType type) {
+            final Configuration<?>[] config = getConfigurationList(EnumSet.of(type));
+            if (config == null || config.length <= 0) {
+                final Configuration<?> emptyConf = Configuration.initByString(type, StringUtils.EMPTY);
+                ArrayUtils.add(configurationList, emptyConf);
+                return emptyConf;
+            } else {
+                return config[0];
+            }
         }
 
         /**
          * returns the description
          * 
-         * @return
+         * @return value
          */
         public String getDescription() {
             return description;
@@ -200,8 +208,7 @@ public class UsecaseConfiguration {
         private final String parameterKey;
 
         /**
-         * the type of this parameters value, can be an primitive or an complex
-         * type like contentType
+         * the type of this parameters value, can be an primitive or an complex type like contentType
          */
         private final String parameterType;
 
@@ -220,7 +227,7 @@ public class UsecaseConfiguration {
         /**
          * returns the parameter name
          * 
-         * @return
+         * @return value
          */
         public String getParameterKey() {
             return parameterKey;
@@ -229,7 +236,7 @@ public class UsecaseConfiguration {
         /**
          * returns the type of the parameters value
          * 
-         * @return
+         * @return value
          */
         public String getParameterType() {
             return parameterType;
@@ -272,7 +279,7 @@ public class UsecaseConfiguration {
         /**
          * returns the id
          * 
-         * @return
+         * @return value
          */
         final public String getControllerId() {
             return controllerId;
@@ -281,7 +288,7 @@ public class UsecaseConfiguration {
         /**
          * returns the list of configuration types to obmit
          * 
-         * @return
+         * @return value
          */
         public EnumSet<ConfigurationType> getObmitedConfigurations() {
             return obmitedConfigurations;
@@ -292,7 +299,7 @@ public class UsecaseConfiguration {
          * 
          * @param dac
          * @param configuration
-         * @return
+         * @return value
          * @throws ClassNotFoundException
          */
         public NALKey invoke(final IDataAccessContext dac, final Configuration<?>[] configuration)
@@ -306,7 +313,7 @@ public class UsecaseConfiguration {
          * @param dac
          * @param configuration
          * @param parameters
-         * @return
+         * @return value
          * @throws ClassNotFoundException
          */
         public NALKey invoke(final IDataAccessContext dac, final Configuration<?>[] configuration,
@@ -326,11 +333,10 @@ public class UsecaseConfiguration {
     }
 
     /**
-     * finds the most matching usecase for an given struct by comparing its id
-     * and parameters
+     * finds the most matching usecase for an given struct by comparing its id and parameters
      * 
      * @param struct
-     * @return
+     * @return value
      */
     public static Usecase findUsecaseForStruct(final NALKey struct, final IDataAccessContext dac) {
         if (struct == null) {
@@ -349,7 +355,7 @@ public class UsecaseConfiguration {
     /**
      * retrieves the usecase list
      * 
-     * @return
+     * @return value
      */
     private static Usecase[] getUsecaseList(final IDataAccessContext dac) {
         if (adapter == null) {
@@ -381,7 +387,7 @@ public class UsecaseConfiguration {
      * 
      * @param id
      * @param list
-     * @return
+     * @return value
      */
     private static Usecase[] getUsecasesById(final String id, final Usecase[] list) {
         final List<Usecase> retList = new ArrayList<Usecase>();
@@ -398,7 +404,7 @@ public class UsecaseConfiguration {
      * 
      * @param list
      * @param struct
-     * @return
+     * @return value
      */
     private static Usecase findMostMatchingParams(final Usecase[] list, final NALKey struct) {
         Usecase foundCase = null;
@@ -419,7 +425,7 @@ public class UsecaseConfiguration {
      * 
      * @param ucase
      * @param struct
-     * @return
+     * @return value
      */
     private static int countMatchingParams(final Usecase ucase, final NALKey struct) {
         int counter = 0;

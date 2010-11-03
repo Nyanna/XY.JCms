@@ -56,7 +56,7 @@ public abstract class FragmentConfiguration extends ComponentConfiguration {
     /**
      * returns the component instance
      * 
-     * @return
+     * @return value
      */
     private IComponent getCompInstance() {
         return compInstance;

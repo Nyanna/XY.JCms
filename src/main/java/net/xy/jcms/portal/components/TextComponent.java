@@ -14,6 +14,8 @@ package net.xy.jcms.portal.components;
 
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
+
 import net.xy.jcms.controller.configurations.ComponentConfiguration;
 import net.xy.jcms.controller.configurations.ContentRepository;
 import net.xy.jcms.controller.configurations.UIConfiguration.UI;
@@ -35,8 +37,8 @@ public class TextComponent extends AbstractComponent {
             @Override
             protected UI<?>[] prepareUIConfig() {
                 return new UI[] {//
-                new UI<Boolean>("renderHidden", Boolean.FALSE),//
-                        new UI<String>("container", "div", false) };
+                new UI<String>("container", "", false),//
+                        new UI<String>("styleclass", "", false) };
             }
 
             @SuppressWarnings("unchecked")
@@ -65,7 +67,22 @@ public class TextComponent extends AbstractComponent {
     @Override
     public void render(final IOutWriter out, final ComponentConfiguration config) {
         final ITextRenderer r = (ITextRenderer) config.getRenderer(ITextRenderer.class);
-        out.append(r.renderText(new StringBuilder(config.getMessage("text"))));
+        final String text = config.getMessage("text");
+        final String container = (String) config.getUIConfig("container");
+        final String style = (String) config.getUIConfig("styleclass");
+
+        if (StringUtils.isNotBlank(container)) {
+            if (StringUtils.isNotBlank(style)) {
+                out.append(r.renderTextWithStyle(text, container, style));
+            } else {
+                out.append(r.renderTextInContainer(text, container));
+            }
+        } else if (StringUtils.isNotBlank(style)) {
+            out.append(r.renderTextWithStyle(text, null, style));
+        } else {
+            // render text only
+            out.append(r.renderText(text));
+        }
     }
 
     private TextComponent() {

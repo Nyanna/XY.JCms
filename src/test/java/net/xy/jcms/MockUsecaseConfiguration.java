@@ -30,7 +30,7 @@ public class MockUsecaseConfiguration implements IUsecaseConfigurationAdapter {
     /**
      * mock configuration
      * 
-     * @return
+     * @return value
      */
     @Override
     public Usecase[] getUsecaseList(final IDataAccessContext dac) {

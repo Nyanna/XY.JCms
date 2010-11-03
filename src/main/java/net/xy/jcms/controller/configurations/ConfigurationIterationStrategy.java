@@ -157,7 +157,7 @@ public class ConfigurationIterationStrategy {
      * 
      * @param actual
      * @param requestedKey
-     * @return
+     * @return value
      */
     public static String fullPath(final ComponentConfiguration actual, final String requestedKey) {
         return actual.getComponentPath() + ComponentConfiguration.COMPONENT_PATH_SEPARATOR + requestedKey;

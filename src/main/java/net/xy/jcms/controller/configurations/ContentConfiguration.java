@@ -35,7 +35,7 @@ public class ContentConfiguration extends AbstractPropertyBasedConfiguration {
      * get an content property
      * 
      * @param key
-     * @return
+     * @return value
      */
     public String getConfig(final String key, final ComponentConfiguration config) {
         return getConfigurationValue().getProperty(key);
@@ -45,7 +45,7 @@ public class ContentConfiguration extends AbstractPropertyBasedConfiguration {
      * creates an config based on parsing an string
      * 
      * @param configString
-     * @return
+     * @return value
      */
     public static ContentConfiguration initByString(final String configString) {
         return new ContentConfiguration(AbstractPropertyBasedConfiguration.initPropertiesByString(configString));

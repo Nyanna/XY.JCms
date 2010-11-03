@@ -193,19 +193,17 @@ public class UsecaseParser {
                 include = parser.getAttributeValue(i);
             }
         }
-        if (!ConfigurationType.dataModel.equals(type)) {
-            if (type == null) {
-                throw new IllegalArgumentException("Configuration type must be set [" + parser.getLocation() + "]");
-            }
-            if (include != null) {
-                config = getConfigurationByInclude(type, include);
-            } else {
-                config = getConfigurationByBody(type, parser);
-            }
+        if (type == null) {
+            throw new IllegalArgumentException("Configuration type must be set [" + parser.getLocation() + "]");
+        }
+        if (include != null) {
+            config = getConfigurationByInclude(type, include);
+        } else {
+            config = getConfigurationByBody(type, parser);
+        }
 
-            if (config == null) {
-                throw new IllegalArgumentException("Configuration could not be retrieved [" + parser.getLocation() + "]");
-            }
+        if (config == null) {
+            throw new IllegalArgumentException("Configuration could not be retrieved [" + parser.getLocation() + "]");
         }
         parser.nextTag();
         return config;

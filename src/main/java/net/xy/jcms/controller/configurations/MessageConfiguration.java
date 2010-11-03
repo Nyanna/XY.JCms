@@ -40,7 +40,7 @@ public class MessageConfiguration extends AbstractPropertyBasedConfiguration {
      * get an message text
      * 
      * @param key
-     * @return
+     * @return value
      */
     public String getMessage(final String key, final ComponentConfiguration config) {
         String value = null;
@@ -65,7 +65,7 @@ public class MessageConfiguration extends AbstractPropertyBasedConfiguration {
      * creates an config based on parsing an string
      * 
      * @param configString
-     * @return
+     * @return value
      */
     public static MessageConfiguration initByString(final String configString) {
         return new MessageConfiguration(AbstractPropertyBasedConfiguration.initPropertiesByString(configString));

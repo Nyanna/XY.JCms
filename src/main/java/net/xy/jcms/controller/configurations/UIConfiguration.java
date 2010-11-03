@@ -41,7 +41,7 @@ public class UIConfiguration extends AbstractPropertyBasedConfiguration {
      * get an config value
      * 
      * @param key
-     * @return
+     * @return value
      */
     public Object getConfig(final UI<?> ui, final ComponentConfiguration config) {
         Object value = null;
@@ -83,7 +83,7 @@ public class UIConfiguration extends AbstractPropertyBasedConfiguration {
      * 
      * @param ui
      * @param value
-     * @return
+     * @return value
      */
     private boolean rightType(final UI<?> ui, final Object value) {
         if (value != null) {
@@ -103,7 +103,7 @@ public class UIConfiguration extends AbstractPropertyBasedConfiguration {
      * creates an config based on parsing an string
      * 
      * @param configString
-     * @return
+     * @return value
      */
     public static UIConfiguration initByString(final String configString) {
         return new UIConfiguration(AbstractPropertyBasedConfiguration.initPropertiesByString(configString));
@@ -169,7 +169,7 @@ public class UIConfiguration extends AbstractPropertyBasedConfiguration {
         /**
          * get key
          * 
-         * @return
+         * @return value
          */
         public String getKey() {
             return key;
@@ -178,7 +178,7 @@ public class UIConfiguration extends AbstractPropertyBasedConfiguration {
         /**
          * get default value
          * 
-         * @return
+         * @return value
          */
         public V getDefaultValue() {
             return defaultValue;
@@ -187,7 +187,7 @@ public class UIConfiguration extends AbstractPropertyBasedConfiguration {
         /**
          * iterate over path is true
          * 
-         * @return
+         * @return value
          */
         public boolean isIterate() {
             return iterate;
@@ -196,7 +196,7 @@ public class UIConfiguration extends AbstractPropertyBasedConfiguration {
         /**
          * gets description
          * 
-         * @return
+         * @return value
          */
         public String getDescription() {
             return description;

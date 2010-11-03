@@ -14,7 +14,8 @@ public class TranslationParserTest {
     public void parseXml() {
         TranslationRule[] rules = null;
         try {
-            rules = TranslationParser.parse(this.getClass().getResourceAsStream("ExampleTranslationRules.xml"));
+            rules = TranslationParser.parse(Thread.currentThread().getContextClassLoader()
+                    .getResourceAsStream("net/xy/jcms/ExampleTranslationRules.xml"));
         } catch (final XMLStreamException e) {
             e.printStackTrace();
         }

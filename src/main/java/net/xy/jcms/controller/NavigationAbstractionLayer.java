@@ -83,7 +83,7 @@ public class NavigationAbstractionLayer {
          * returns an parameter
          * 
          * @param key
-         * @return parameter
+         * @return value parameter
          */
         public Object getParameter(final Object key) {
             return parameters.get(key);
@@ -92,7 +92,7 @@ public class NavigationAbstractionLayer {
         /**
          * returns the key id
          * 
-         * @return
+         * @return value
          */
         public String getId() {
             return id;
@@ -101,7 +101,7 @@ public class NavigationAbstractionLayer {
         /**
          * get the parametermap
          * 
-         * @return
+         * @return value
          */
         public Map<Object, Object> getParameters() {
             return parameters;

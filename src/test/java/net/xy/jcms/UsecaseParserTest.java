@@ -14,7 +14,8 @@ public class UsecaseParserTest {
     public void tesParser() {
         Usecase[] cases = null;
         try {
-            cases = UsecaseParser.parse(this.getClass().getResourceAsStream("ExampleUsecases.xml"));
+            cases = UsecaseParser.parse(Thread.currentThread().getContextClassLoader()
+                    .getResourceAsStream("net/xy/jcms/ExampleUsecases.xml"));
         } catch (final XMLStreamException e) {
             e.printStackTrace();
         }

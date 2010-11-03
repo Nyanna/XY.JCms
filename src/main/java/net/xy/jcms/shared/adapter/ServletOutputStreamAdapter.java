@@ -29,6 +29,7 @@ public class ServletOutputStreamAdapter implements IOutWriter {
     public void append(final StringBuilder buffer) {
         try {
             outStream.print(buffer.toString());
+            outStream.print("\n");
         } catch (final IOException e) {
             LOG.equals(e);
         }
@@ -36,6 +37,16 @@ public class ServletOutputStreamAdapter implements IOutWriter {
 
     public ServletOutputStreamAdapter(final ServletOutputStream outStream) {
         this.outStream = outStream;
+    }
+
+    @Override
+    public void append(final String buffer) {
+        try {
+            outStream.print(buffer);
+            outStream.print("\n");
+        } catch (final IOException e) {
+            LOG.equals(e);
+        }
     }
 
 }

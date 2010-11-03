@@ -15,7 +15,7 @@ public interface IUsecaseConfigurationAdapter {
      * returns the usecase list
      * 
      * @param dac
-     * @return
+     * @return value
      */
     public Usecase[] getUsecaseList(final IDataAccessContext dac);
 }

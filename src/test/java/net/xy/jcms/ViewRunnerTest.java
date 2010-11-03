@@ -61,37 +61,45 @@ public class ViewRunnerTest {
         @Override
         public void append(final StringBuilder buffer) {
             System.out.append(buffer);
+            System.out.append("\n");
+        }
+
+        @Override
+        public void append(final String buffer) {
+            System.out.append(buffer);
+            System.out.append("\n");
         }
 
     }
 
     @Test
     public void testViewRunner() {
-        final Configuration<?>[] test = new Configuration<?>[] { new TemplateConfiguration(new HashMap<String, IFragment>() {
-            private static final long serialVersionUID = -4045340286970438413L;
+        final Configuration<?>[] test = new Configuration<?>[] {
+                new TemplateConfiguration(new HashMap<String, IFragment>() {
+                    private static final long serialVersionUID = -4045340286970438413L;
 
-            {
-                put("root", new TestFragement());
-            }
-        }), new UIConfiguration(new Properties() {
-            private static final long serialVersionUID = -1203791194278285716L;
+                    {
+                        put("root", new TestFragement());
+                    }
+                }), new UIConfiguration(new Properties() {
+                    private static final long serialVersionUID = -1203791194278285716L;
 
-            {
-                put("testus", "steronus");
-            }
-        }), new MessageConfiguration(new Properties() {
-            private static final long serialVersionUID = -9001849818985539140L;
+                    {
+                        put("testus", "steronus");
+                    }
+                }), new MessageConfiguration(new Properties() {
+                    private static final long serialVersionUID = -9001849818985539140L;
 
-            {
-                put("text", "steronus1");
-            }
-        }), new RenderKitConfiguration(new HashMap<String, IRenderer>() {
-            private static final long serialVersionUID = 8311301144389878165L;
+                    {
+                        put("text", "steronus1");
+                    }
+                }), new RenderKitConfiguration(new HashMap<String, IRenderer>() {
+                    private static final long serialVersionUID = 8311301144389878165L;
 
-            {
-                put(ITextRenderer.class.getSimpleName(), new TextRenderer());
-            }
-        }) };
+                    {
+                        put(ITextRenderer.class.getSimpleName(), new TextRenderer());
+                    }
+                }) };
 
         final ComponentConfiguration result = ViewRunner.runConfiguration(test);
         System.out.append(result.toString() + "\n");

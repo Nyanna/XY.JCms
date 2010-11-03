@@ -37,14 +37,12 @@ public abstract class ComponentConfiguration {
     public final static String COMPONENT_PATH_SEPARATOR = ".";
 
     /**
-     * holds the mendatory component id. On every added component id got set on
-     * every fragment not.
+     * holds the mendatory component id. On every added component id got set on every fragment not.
      */
     private String id = "";
 
     /**
-     * holds an id stacked component path. On every added component path got set
-     * on every fragment not.
+     * holds an id stacked component path. On every added component path got set on every fragment not.
      */
     private String componentPath = "";
 
@@ -54,8 +52,7 @@ public abstract class ComponentConfiguration {
     private ComponentConfiguration parent = null;
 
     /**
-     * holds the appropriated components instance, which requests and renders
-     * these configuration
+     * holds the appropriated components instance, which requests and renders these configuration
      */
     private final IComponent compInstance;
 
@@ -76,8 +73,7 @@ public abstract class ComponentConfiguration {
     }
 
     /**
-     * initializes the complete component configuration in case of an
-     * missconfiguration it throws an exception
+     * initializes the complete component configuration in case of an missconfiguration it throws an exception
      * 
      * @param cmpConfig
      *            ComponentConfiguration to be initialized
@@ -120,7 +116,7 @@ public abstract class ComponentConfiguration {
     /**
      * get the component path
      * 
-     * @return
+     * @return value
      */
     final protected String getComponentPath() {
         return componentPath;
@@ -129,7 +125,7 @@ public abstract class ComponentConfiguration {
     /**
      * returns the components id
      * 
-     * @return
+     * @return value
      */
     final public String getId() {
         return id;
@@ -148,7 +144,7 @@ public abstract class ComponentConfiguration {
     /**
      * returns the component instance
      * 
-     * @return
+     * @return value
      */
     private IComponent getCompInstance() {
         return compInstance;
@@ -157,7 +153,7 @@ public abstract class ComponentConfiguration {
     /**
      * get the parent
      * 
-     * @return
+     * @return value
      */
     final protected ComponentConfiguration getParent() {
         return parent;
@@ -212,7 +208,7 @@ public abstract class ComponentConfiguration {
     /**
      * gets all childrens
      * 
-     * @return
+     * @return value
      */
     private Map<String, ComponentConfiguration> getChildren() {
         return children;
@@ -235,7 +231,7 @@ public abstract class ComponentConfiguration {
      * 
      * @param id
      * @param component
-     * @return
+     * @return value
      */
     public ComponentConfiguration addComponent(final String id, final IComponent component) {
         final ComponentConfiguration config = component.getConfiguration();
@@ -260,7 +256,7 @@ public abstract class ComponentConfiguration {
     /**
      * prepare and collect the child configuration
      * 
-     * @return
+     * @return value
      */
     protected abstract ComponentConfiguration[] prepareChildren(final ContentRepository repository);
 
@@ -268,7 +264,7 @@ public abstract class ComponentConfiguration {
      * get an single child configuration
      * 
      * @param id
-     * @return
+     * @return value
      */
     private ComponentConfiguration getChild(final String id) {
         final ComponentConfiguration child = children.get(id);
@@ -385,8 +381,7 @@ public abstract class ComponentConfiguration {
     }
 
     /**
-     * method to configure childs ui config aggregation. Only usefull in the
-     * aggregation phase.
+     * method to configure childs ui config aggregation. Only usefull in the aggregation phase.
      * 
      * @param key
      * @param value
@@ -470,13 +465,15 @@ public abstract class ComponentConfiguration {
      * @param out
      */
     public void renderTemplate(final String name, final IOutWriter out) {
-        getTemplate(id).render(out);
+        if (StringUtils.isNotBlank(name)) {
+            getTemplate(name).render(out);
+        }
     }
 
     /**
      * return the requested template list
      * 
-     * @return
+     * @return value
      */
     private Map<String, FragmentConfiguration> getTemplates() {
         return templates;
@@ -517,7 +514,7 @@ public abstract class ComponentConfiguration {
      * returns an prepared content object
      * 
      * @param key
-     * @return
+     * @return value
      */
     public Object getContent(final String key) {
         final Object contentObj = content.get(key);

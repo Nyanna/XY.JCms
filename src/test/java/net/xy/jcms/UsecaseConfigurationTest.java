@@ -1,6 +1,7 @@
 package net.xy.jcms;
 
 import java.util.EnumSet;
+import java.util.Map;
 import java.util.Properties;
 
 import net.xy.jcms.controller.UsecaseAgent;
@@ -31,6 +32,11 @@ public class UsecaseConfigurationTest {
         final NALKey key = new NALKey("contentgroup");
         key.addParameter("contentgroup", "Cars");
         final Usecase uCase = UsecaseConfiguration.findUsecaseForStruct(key, new IDataAccessContext() {
+
+            @Override
+            public String buildUriWithParams(final String path, final Map<Object, Object> parameters) {
+                return null;
+            }
         });
         Assert.assertNotNull(uCase);
         System.out.append(uCase.toString());
@@ -41,6 +47,11 @@ public class UsecaseConfigurationTest {
         final NALKey key = new NALKey("contentgroupNot");
         key.addParameter("contentgroup", "Cars");
         final Usecase uCase = UsecaseConfiguration.findUsecaseForStruct(key, new IDataAccessContext() {
+
+            @Override
+            public String buildUriWithParams(final String path, final Map<Object, Object> parameters) {
+                return null;
+            }
         });
         Assert.assertNull(uCase);
     }
@@ -50,6 +61,11 @@ public class UsecaseConfigurationTest {
         final NALKey key = new NALKey("contentgroupt");
         key.addParameter("contentgroupNot", "Cars");
         final Usecase uCase = UsecaseConfiguration.findUsecaseForStruct(key, new IDataAccessContext() {
+
+            @Override
+            public String buildUriWithParams(final String path, final Map<Object, Object> parameters) {
+                return null;
+            }
         });
         Assert.assertNull(uCase);
     }
@@ -61,7 +77,8 @@ public class UsecaseConfigurationTest {
             public Usecase[] getUsecaseList(final IDataAccessContext dac) {
                 return new Usecase[] {
                         new Usecase("contentgroup", "first test", new Parameter[] { new Parameter("contentgroup",
-                                "de.jamba.ContentGroup") }, new Controller[] { new Controller("net.xy.jcms.MockController",
+                                "de.jamba.ContentGroup") }, new Controller[] { new Controller(
+                                "net.xy.jcms.MockController",
                                 EnumSet.of(ConfigurationType.messageConfiguration))
 
                         }, new Configuration[] { new MessageConfiguration(new Properties() {
@@ -83,9 +100,19 @@ public class UsecaseConfigurationTest {
         final NALKey key = new NALKey("contentgroup");
         key.addParameter("contentgroup", "Cars");
         final Usecase uCase = UsecaseConfiguration.findUsecaseForStruct(key, new IDataAccessContext() {
+
+            @Override
+            public String buildUriWithParams(final String path, final Map<Object, Object> parameters) {
+                return null;
+            }
         });
         Assert.assertNotNull(uCase);
         final NALKey forward = UsecaseAgent.executeController(uCase, new IDataAccessContext() {
+
+            @Override
+            public String buildUriWithParams(final String path, final Map<Object, Object> parameters) {
+                return null;
+            }
         }, null);
         Assert.assertNotNull(forward);
         System.out.append(forward.toString());

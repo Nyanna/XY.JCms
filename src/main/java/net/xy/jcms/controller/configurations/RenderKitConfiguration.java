@@ -46,7 +46,7 @@ public class RenderKitConfiguration extends Configuration<Map<?, IRenderer>> {
      * return the singleton renderer instance
      * 
      * @param rInterface
-     * @return
+     * @return value
      */
     public IRenderer get(final Class<? extends IRenderer> rInterface, final ComponentConfiguration config) {
         IRenderer value = null;
@@ -87,7 +87,7 @@ public class RenderKitConfiguration extends Configuration<Map<?, IRenderer>> {
      * converts an incoming config to simple class names
      * 
      * @param config
-     * @return
+     * @return value
      */
     private static Map<String, IRenderer> convert(final Map<?, IRenderer> config) {
         final Map<String, IRenderer> result = new HashMap<String, IRenderer>();
@@ -105,7 +105,7 @@ public class RenderKitConfiguration extends Configuration<Map<?, IRenderer>> {
      * creates an config based on parsing an string
      * 
      * @param configString
-     * @return
+     * @return value
      */
     public static RenderKitConfiguration initByString(final String configString) {
         final Map<String, IRenderer> result = new HashMap<String, IRenderer>();
@@ -145,7 +145,7 @@ public class RenderKitConfiguration extends Configuration<Map<?, IRenderer>> {
      * manages an cached pool of loaded renderer instances
      * 
      * @param classPath
-     * @return
+     * @return value
      * @throws InstantiationException
      * @throws IllegalAccessException
      * @throws ClassNotFoundException

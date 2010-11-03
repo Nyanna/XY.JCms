@@ -35,7 +35,7 @@ public interface IController {
      * 
      * @param dac
      * @param configuration
-     * @return
+     * @return value
      */
     NALKey invoke(final IDataAccessContext dac, final Configuration<?>[] configuration);
 
@@ -46,7 +46,7 @@ public interface IController {
      * @param dac
      * @param configuration
      * @param parameters
-     * @return
+     * @return value
      */
     NALKey invoke(final IDataAccessContext dac, final Configuration<?>[] configuration, Map<Object, Object> parameters);
 }

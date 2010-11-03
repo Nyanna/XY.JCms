@@ -15,7 +15,7 @@ public interface ITranslationConfigurationAdapter {
      * return an rulelist
      * 
      * @param dac
-     * @return
+     * @return value
      */
     public TranslationRule[] getRuleList(final IDataAccessContext dac);
 }

@@ -46,15 +46,9 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
      */
     public static enum ConfigurationType {
         /**
-         * the datamodel is an simple container for contexts information.it
-         * triggers alteration and would be altered it will be passed through
-         * the controllers only.
-         */
-        dataModel,
-        /**
          * contentconfiguration will be used for the most content aggregating
-         * controllers. there output is added to the datamodel and it will be
-         * droped after controllerphase.
+         * controllers. there output is added to the contentRepository and it
+         * will be droped after controllerphase.
          */
         contentConfiguration,
         /**
@@ -107,7 +101,7 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
         /**
          * all configuration will be additionally obmitted to the controllers
          */
-        public static final EnumSet<ConfigurationType> CONTROLLERAPPLICABLE = EnumSet.of(dataModel);
+        public static final EnumSet<ConfigurationType> CONTROLLERAPPLICABLE = EnumSet.of(controllerConfiguration);
     }
 
     /**
@@ -163,7 +157,7 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
     /**
      * returns configurationType
      * 
-     * @return
+     * @return value
      */
     public ConfigurationType getConfigurationType() {
         return configurationType;
@@ -172,7 +166,7 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
     /**
      * return the real configuration holding object
      * 
-     * @return
+     * @return value
      */
     protected CONFIGURATION_OBJECT getConfigurationValue() {
         return configurationValue;
@@ -181,7 +175,7 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
     /**
      * return the configurations origin
      * 
-     * @return
+     * @return value
      */
     public String getConfigurationSource() {
         return configurationSource;
@@ -199,7 +193,7 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
      * alghorhytm which returns the same hash for equal configuration based on
      * its own sight.
      * 
-     * @return
+     * @return value
      */
     @Override
     public abstract int hashCode();
@@ -222,7 +216,7 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
      * 
      * @param type
      * @param in
-     * @return
+     * @return value
      */
     public static Configuration<?> initByString(final ConfigurationType type, final String in) {
         // TODO [HIGH] implement configuration initializers
@@ -237,7 +231,6 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
             return ContentConfiguration.initByString(in);
         case renderKitConfiguration:
             return RenderKitConfiguration.initByString(in);
-        case dataModel:
         default:
             throw new UnsupportedOperationException("Configurationtype is not implemented to be initialized by stream.");
         }
@@ -249,7 +242,7 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
      * 
      * @param type
      * @param stream
-     * @return
+     * @return value
      */
     public static Configuration<?> initByStream(final ConfigurationType type, final InputStream stream) {
         switch (type) {
