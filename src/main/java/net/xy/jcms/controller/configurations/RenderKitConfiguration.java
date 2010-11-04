@@ -25,8 +25,7 @@ import net.xy.jcms.shared.DebugUtils;
 import net.xy.jcms.shared.IRenderer;
 
 /**
- * is like the baserenderfactory an configuration delivering renderer instances
- * described by an interface
+ * is like the baserenderfactory an configuration delivering renderer instances described by an interface
  * 
  * @author Xyan
  * 
@@ -91,6 +90,9 @@ public class RenderKitConfiguration extends Configuration<Map<?, IRenderer>> {
      */
     private static Map<String, IRenderer> convert(final Map<?, IRenderer> config) {
         final Map<String, IRenderer> result = new HashMap<String, IRenderer>();
+        if (config == null) {
+            return result;
+        }
         for (final Entry<?, IRenderer> entry : config.entrySet()) {
             if (entry.getKey() instanceof Class<?>) {
                 result.put(((Class<?>) entry.getKey()).getName(), entry.getValue());
@@ -150,7 +152,8 @@ public class RenderKitConfiguration extends Configuration<Map<?, IRenderer>> {
      * @throws IllegalAccessException
      * @throws ClassNotFoundException
      */
-    public static IRenderer rendererCachePool(final String classPath) throws InstantiationException, IllegalAccessException,
+    public static IRenderer rendererCachePool(final String classPath) throws InstantiationException,
+            IllegalAccessException,
             ClassNotFoundException {
         if (cachePool.containsKey(classPath)) {
             return cachePool.get(classPath);

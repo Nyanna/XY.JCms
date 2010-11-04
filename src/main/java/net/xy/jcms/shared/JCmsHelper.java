@@ -30,30 +30,38 @@ public class JCmsHelper {
     public static void setConfiguration(final String translationConfigXml, final String usecaseConfigurationXml) {
 
         TranslationConfiguration.setTranslationAdapter(new ITranslationConfigurationAdapter() {
+            TranslationRule[] cache = null;
 
             @Override
             public TranslationRule[] getRuleList(final IDataAccessContext dac) {
+                if (cache != null) {
+                    return cache;
+                }
                 try {
-                    return TranslationParser.parse(Thread.currentThread().getContextClassLoader()
+                    cache = TranslationParser.parse(Thread.currentThread().getContextClassLoader()
                             .getResourceAsStream(translationConfigXml));
                 } catch (final XMLStreamException e) {
                     e.printStackTrace();
                 }
-                return null;
+                return cache;
             }
         });
 
         UsecaseConfiguration.setUsecaseAdapter(new IUsecaseConfigurationAdapter() {
+            Usecase[] cache = null;
 
             @Override
             public Usecase[] getUsecaseList(final IDataAccessContext dac) {
+                if (cache != null) {
+                    return cache;
+                }
                 try {
-                    return UsecaseParser.parse(Thread.currentThread().getContextClassLoader()
+                    cache = UsecaseParser.parse(Thread.currentThread().getContextClassLoader()
                             .getResourceAsStream(usecaseConfigurationXml));
                 } catch (final XMLStreamException e) {
                     e.printStackTrace();
                 }
-                return null;
+                return cache;
             }
         });
     }
