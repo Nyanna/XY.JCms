@@ -1,3 +1,19 @@
+/**
+ *  This file is part of XY.JCms, Copyright 2010 (C) Xyan Kruse, Xyan@gmx.net, Xyan.kilu.de
+ *
+ *  XY.JCms is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  XY.JCms is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with XY.JCms.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.xy.jcms.controller.configurations.parser;
 
 import java.io.InputStream;
@@ -33,6 +49,8 @@ public class TranslationParser {
     public static TranslationRule[] parse(final InputStream in) throws XMLStreamException {
         final XMLInputFactory factory = XMLInputFactory.newInstance();
         factory.setProperty("javax.xml.stream.isCoalescing", true);
+        // not supported be the reference implementation
+        // factory.setProperty(XMLInputFactory.IS_VALIDATING, Boolean.TRUE);
         final XMLStreamReader parser = factory.createXMLStreamReader(in);
         while (parser.hasNext()) {
             final int event = parser.next();
