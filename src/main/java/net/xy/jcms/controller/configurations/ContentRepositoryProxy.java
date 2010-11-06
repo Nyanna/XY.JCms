@@ -52,10 +52,10 @@ public class ContentRepositoryProxy extends ContentRepository {
 
     @Override
     public Object getContent(final String key, final Class<?> type, final ComponentConfiguration config) {
-        final Object value = super.getContent(key, type, config);
-        if (value != null) {
-            presentContent.put(ConfigurationIterationStrategy.fullPath(config, key), value.getClass());
-            return value;
+        final Match<String, Object> value = super.getContentMatch(key, type, config);
+        if (value.getValue() != null) {
+            presentContent.put(value.getPath(), value.getValue().getClass());
+            return value.getValue();
         } else {
             missingContent.put(ConfigurationIterationStrategy.fullPath(config, key), type);
             return new Object();

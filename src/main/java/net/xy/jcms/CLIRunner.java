@@ -41,7 +41,7 @@ public class CLIRunner {
      */
     static final Logger LOG = Logger.getLogger(CLIRunner.class);
 
-    // TODO [implement options to run CLI configuration display]
+    // TODO [HIGH] implement options to run CLI configuration display
     // -check=missing|all
     // -usecase=*.xml
     // -translation=*.xml

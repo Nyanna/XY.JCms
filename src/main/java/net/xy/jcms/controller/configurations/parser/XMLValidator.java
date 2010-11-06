@@ -16,6 +16,180 @@
  */
 package net.xy.jcms.controller.configurations.parser;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+
+import net.xy.jcms.shared.DebugUtils;
+
+import org.xml.sax.DTDHandler;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.Locator;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.XMLReaderFactory;
+
+/**
+ * validated xml accordingly to their dtd loaded from classpath dtd directory
+ * 
+ * @author Xyan
+ * 
+ */
 public class XMLValidator {
 
+    /**
+     * delegate which loads the inputstream from string in current thread
+     * context
+     * 
+     * @param xml
+     * @throws XMLValidationException
+     */
+    public static void validate(final String xml) throws XMLValidationException {
+        validate(Thread.currentThread().getContextClassLoader()
+                            .getResourceAsStream(xml));
+    }
+
+    /**
+     * validates the xml
+     * 
+     * @param xml
+     * @throws XMLValidationException
+     */
+    public static void validate(final InputStream xml) throws XMLValidationException {
+        try {
+            final XMLReader parser = XMLReaderFactory.createXMLReader();
+            final SAXReactor handler = new SAXReactor();
+            parser.setFeature("http://xml.org/sax/features/validation", Boolean.TRUE);
+            parser.setDTDHandler(handler);
+            parser.setEntityResolver(handler);
+            parser.setErrorHandler(handler);
+            parser.parse(new InputSource(xml));
+        } catch (final SAXException e) {
+            throw new XMLValidationException("Error processing the XMl", e);
+        } catch (final IOException e) {
+            throw new XMLValidationException("XML couldn't be read", e);
+        }
+    }
+
+    /**
+     * simpla wrapper
+     * 
+     * @author Xyan
+     * 
+     */
+    public static class XMLValidationException extends SAXParseException {
+        private static final long serialVersionUID = -7367344028891878212L;
+
+        /**
+         * default constructor with message
+         * 
+         * @param message
+         */
+        public XMLValidationException(final String message) {
+            super(message, new Locator() {
+
+                @Override
+                public String getSystemId() {
+                    return null;
+                }
+
+                @Override
+                public String getPublicId() {
+                    return null;
+                }
+
+                @Override
+                public int getLineNumber() {
+                    return 0;
+                }
+
+                @Override
+                public int getColumnNumber() {
+                    return 0;
+                }
+            });
+        }
+
+        /**
+         * encapsulation constructor
+         * 
+         * @param message
+         * @param ex
+         */
+        public XMLValidationException(final String message, final Exception ex) {
+            super(message, "", "", 0, 0, ex);
+        }
+    }
+
+    /**
+     * handler for the sax parser
+     * 
+     * @author Xyan
+     * 
+     */
+    private static class SAXReactor implements DTDHandler, EntityResolver, ErrorHandler {
+
+        @Override
+        public void warning(final SAXParseException exception) throws SAXException {
+            throw new XMLValidationException("Error on validating the XML", exception);
+        }
+
+        @Override
+        public void error(final SAXParseException exception) throws SAXException {
+            throw new XMLValidationException("Error on validating the XML", exception);
+        }
+
+        @Override
+        public void fatalError(final SAXParseException exception) throws SAXException {
+            throw new XMLValidationException("Error on validating the XML", exception);
+        }
+
+        @Override
+        public InputSource resolveEntity(final String publicId, String systemId) throws SAXException, IOException {
+            if (systemId.startsWith("file:///")) {
+                systemId = systemId.replace("file:///", "").replace("\\", File.separator).replace("/", File.separator);
+                // will opel X:/matrice/root/"systemid"
+                try {
+                    return new InputSource(new FileInputStream(systemId));
+                } catch (final FileNotFoundException ex) {
+                    // get systemId only name for classpath retrieval
+                    if (systemId.lastIndexOf(File.separator) >= -1
+                            && systemId.lastIndexOf(File.separator) + 1 < systemId.length()) {
+                        systemId = systemId.substring(systemId.lastIndexOf(File.separator) + 1);
+                    }
+                }
+            }
+            try {
+                final InputStream st = Thread.currentThread().getContextClassLoader()
+                        .getResourceAsStream(systemId);
+                st.available();
+                return new InputSource(st);
+            } catch (final Exception ex) {
+                try {
+                    final InputStream st = Thread.currentThread().getContextClassLoader()
+                            .getResourceAsStream("dtd/" + systemId);
+                    st.available();
+                    return new InputSource(st);
+                } catch (final Exception ex2) {
+                }
+            }
+            throw new XMLValidationException("An mendatory entity couln't be resolved. "
+                    + DebugUtils.printFields(publicId, systemId));
+        }
+
+        @Override
+        public void notationDecl(final String name, final String publicId, final String systemId) throws SAXException {
+        }
+
+        @Override
+        public void unparsedEntityDecl(final String name, final String publicId, final String systemId,
+                final String notationName)
+                throws SAXException {
+        }
+    }
 }

@@ -251,7 +251,7 @@ public abstract class ComponentConfiguration {
         if (childs != null) {
             for (final ComponentConfiguration child : childs) {
                 child.getId();
-                // TODO remove or change to mapp
+                // TODO [LOW] remove or change to mapp
                 // addChildren(id, child);
             }
         }

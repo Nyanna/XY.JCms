@@ -44,34 +44,41 @@ public class UIConfiguration extends AbstractPropertyBasedConfiguration {
      * @return value
      */
     public Object getConfig(final UI<?> ui, final ComponentConfiguration config) {
-        Object value = null;
+        return getConfigMatch(ui, config).getValue();
+    }
+
+    public Match<String, Object> getConfigMatch(final UI<?> ui, final ComponentConfiguration config) {
+        Match<String, Object> value = new Match<String, Object>(null, null);
         final List<String> retrievalStack = new ArrayList<String>();
         if (ui.isIterate()) {
             final ClimbUp strategy = new ClimbUp(config, ui.getKey());
             for (final String pathKey : strategy) {
                 retrievalStack.add(pathKey);
-                value = getConfigurationValue().getProperty(pathKey);
-                if (rightType(ui, value)) {
+                final Object found = getConfigurationValue().getProperty(pathKey);
+                if (rightType(ui, found)) {
                     // type check based on class parameter
+                    value = new Match<String, Object>(pathKey, found);
                     break;
                 }
-                if (value != null) {
+                if (found != null) {
                     throw new IllegalArgumentException("An vital ui configuration is not the right object type!");
                 }
             }
         } else {
             final String pathKey = ConfigurationIterationStrategy.fullPath(config, ui.getKey());
-            value = getConfigurationValue().get(pathKey);
+            final Object found = getConfigurationValue().get(pathKey);
             retrievalStack.add(pathKey);
             // type check based on class parameter
-            if (value != null && !rightType(ui, value)) {
+            if (found != null && !rightType(ui, found)) {
                 throw new IllegalArgumentException("An vital ui configuration is not the right object type!");
             }
+            value = new Match<String, Object>(pathKey, found);
         }
-        if (value != null) {
+        if (value.getValue() != null) {
             return value;
-        } else if (value == null && ui.getDefaultValue() != null && !(ui.getDefaultValue() instanceof Class<?>)) {
-            return ui.getDefaultValue();
+        } else if (value.getValue() == null && ui.getDefaultValue() != null && !(ui.getDefaultValue() instanceof Class<?>)) {
+            return new Match<String, Object>("#" + ConfigurationIterationStrategy.fullPath(config, ui.getKey()),
+                    ui.getDefaultValue());
         } else {
             throw new IllegalArgumentException("An vital ui configuration is missing, check the configuration! "
                     + DebugUtils.printFields(retrievalStack));

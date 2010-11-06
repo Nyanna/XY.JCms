@@ -47,15 +47,27 @@ public class TemplateConfiguration extends Configuration<Map<String, IFragment>>
      * @return value
      */
     public IFragment get(final String tmplName, final ComponentConfiguration config) {
-        IFragment value = null;
+        return getMatch(tmplName, config).getValue();
+    }
+
+    /**
+     * returns an key associated template deffinition and where it was found
+     * 
+     * @param tmplName
+     * @param config
+     * @return never null
+     */
+    public Match<String, IFragment> getMatch(final String tmplName, final ComponentConfiguration config) {
+        Match<String, IFragment> value = new Match<String, IFragment>(null, null);
         final ClimbUp strategy = new ClimbUp(config, tmplName);
         for (final String pathKey : strategy) {
-            value = getConfigurationValue().get(pathKey);
-            if (value != null) {
+            final IFragment found = getConfigurationValue().get(pathKey);
+            if (found != null) {
+                value = new Match<String, IFragment>(pathKey, found);
                 break;
             }
         }
-        if (value != null) {
+        if (value.getValue() != null) {
             return value;
         } else {
             throw new IllegalArgumentException("An mendatory fragment/template definition was not found!");

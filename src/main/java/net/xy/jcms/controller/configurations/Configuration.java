@@ -217,7 +217,6 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
      * @return value
      */
     public static Configuration<?> initByString(final ConfigurationType type, final String in) {
-        // TODO [HIGH] implement configuration initializers
         switch (type) {
         case TemplateConfiguration:
             return TemplateConfiguration.initByString(in);

@@ -43,17 +43,29 @@ public class MessageConfiguration extends AbstractPropertyBasedConfiguration {
      * @return value
      */
     public String getMessage(final String key, final ComponentConfiguration config) {
-        String value = null;
+        return getMessageMatch(key, config).getValue();
+    }
+
+    /**
+     * get an message text and where ist was found, closure
+     * 
+     * @param key
+     * @param config
+     * @return
+     */
+    public Match<String, String> getMessageMatch(final String key, final ComponentConfiguration config) {
+        Match<String, String> value = new Match<String, String>(null, null);
         final FullPathOrRoot strategy = new FullPathOrRoot(config, key);
         final List<String> retrievalStack = new ArrayList<String>();
         for (final String pathKey : strategy) {
             retrievalStack.add(pathKey);
-            value = getConfigurationValue().getProperty(pathKey);
-            if (value != null) {
+            final String found = getConfigurationValue().getProperty(pathKey);
+            if (found != null) {
+                value = new Match<String, String>(pathKey, found);
                 break;
             }
         }
-        if (value != null) {
+        if (value.getValue() != null) {
             return value;
         } else {
             throw new IllegalArgumentException("An mendatory message configuration was missing! "

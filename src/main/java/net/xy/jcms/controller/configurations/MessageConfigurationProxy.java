@@ -54,14 +54,14 @@ public class MessageConfigurationProxy extends MessageConfiguration {
 
     @Override
     public String getMessage(final String key, final ComponentConfiguration config) {
-        String value = null;
+        Match<String, String> value = new Match<String, String>(null, null);
         try {
-            value = super.getMessage(key, config);
+            value = super.getMessageMatch(key, config);
         } catch (final IllegalArgumentException ex) {
         }
-        if (value != null) {
-            presentKeys.put(ConfigurationIterationStrategy.fullPath(config, key), value);
-            return value;
+        if (value.getValue() != null) {
+            presentKeys.put(value.getPath(), value.getValue());
+            return value.getValue();
         } else {
             missingKeys.add(ConfigurationIterationStrategy.fullPath(config, key));
             return "dummy";

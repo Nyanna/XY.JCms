@@ -36,12 +36,34 @@ public class ContentRepository extends Configuration<Map<String, Object>> {
         getConfigurationValue().putAll(otherConfig.getConfigurationValue());
     }
 
+    /**
+     * get an key based content object
+     * 
+     * @param key
+     * @param type
+     * @param config
+     * @return
+     */
     public Object getContent(final String key, final Class<?> type, final ComponentConfiguration config) {
-        final Object got = getConfigurationValue().get(ConfigurationIterationStrategy.fullPath(config, key));
-        if (!type.isInstance(got)) {
-            return null;
+        return getContentMatch(key, type, config).getValue();
+    }
+
+    /**
+     * gets an key based content object and where it was found, closure
+     * 
+     * @param key
+     * @param type
+     * @param config
+     * @return
+     */
+    public Match<String, Object> getContentMatch(final String key, final Class<?> type, final ComponentConfiguration config) {
+        final Match<String, Object> got = new Match<String, Object>(null, null);
+        final String pathKey = ConfigurationIterationStrategy.fullPath(config, key);
+        final Object found = getConfigurationValue().get(pathKey);
+        if (!type.isInstance(found)) {
+            return got;
         }
-        return got;
+        return new Match<String, Object>(pathKey, found);
     }
 
     @Override

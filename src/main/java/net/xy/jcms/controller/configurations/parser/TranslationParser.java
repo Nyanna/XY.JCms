@@ -127,7 +127,7 @@ public class TranslationParser {
      * @throws XMLStreamException
      */
     private static List<RuleParameter> parseParameter(final XMLStreamReader parser) throws XMLStreamException {
-        // TODO: [LOW] type conversion maybe via callback
+        // TODO [LOW] type conversion maybe via callback
         final List<RuleParameter> params = new ArrayList<RuleParameter>();
         while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
             String parameterName = null, converter = null;

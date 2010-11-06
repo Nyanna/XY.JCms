@@ -50,14 +50,15 @@ public class TemplateConfigurationProxy extends TemplateConfiguration {
 
     @Override
     public IFragment get(final String tmplName, final ComponentConfiguration config) {
-        IFragment value = null;
+        Match<String, IFragment> value = new Match<String, IFragment>(null, null);
         try {
-            value = super.get(tmplName, config);
+            value = super.getMatch(tmplName, config);
         } catch (final IllegalArgumentException ex) {
         }
-        if (value != null) {
-            presentTmpls.put(ConfigurationIterationStrategy.fullPath(config, tmplName), value.getClass().getName());
-            return value;
+        if (value.getValue() != null) {
+            presentTmpls.put(value.getPath(), value.getValue().getClass()
+                    .getName());
+            return value.getValue();
         } else {
             missingTmpls.add(ConfigurationIterationStrategy.fullPath(config, tmplName));
             return Empty.getInstance();

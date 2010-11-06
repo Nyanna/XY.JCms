@@ -52,15 +52,15 @@ public class UIConfigurationProxy extends UIConfiguration {
 
     @Override
     public Object getConfig(final UI<?> ui, final ComponentConfiguration config) {
-        Object value = null;
+        Match<String, Object> value = new Match<String, Object>(null, null);
         try {
-            value = super.getConfig(ui, config);
+            value = super.getConfigMatch(ui, config);
         } catch (final IllegalArgumentException ex) {
         }
-        if (value != null) {
-            prepared.put(ConfigurationIterationStrategy.fullPath(config, ui.getKey()),
-                    new UI<Object>(ui.getKey(), value, ui.isIterate()));
-            return value;
+        if (value.getValue() != null) {
+            prepared.put(value.getPath(),
+                    new UI<Object>(ui.getKey(), value.getValue(), ui.isIterate()));
+            return value.getValue();
         } else {
             missing.put(ConfigurationIterationStrategy.fullPath(config, ui.getKey()), ui);
             return new Object();

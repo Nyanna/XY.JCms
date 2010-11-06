@@ -51,15 +51,15 @@ public class RenderKitConfigurationProxy extends RenderKitConfiguration {
 
     @Override
     public IRenderer get(final Class<? extends IRenderer> rInterface, final ComponentConfiguration config) {
-        IRenderer value = null;
+        Match<String, IRenderer> value = new Match<String, IRenderer>(null, null);
         try {
-            value = super.get(rInterface, config);
+            value = super.getMatch(rInterface, config);
         } catch (final IllegalArgumentException ex) {
         }
-        if (value != null) {
-            presentIfaces.put(ConfigurationIterationStrategy.fullPath(config, rInterface.getSimpleName()), value.getClass()
+        if (value.getValue() != null) {
+            presentIfaces.put(value.getPath(), value.getValue().getClass()
                     .getName());
-            return value;
+            return value.getValue();
         } else {
             missingIfaces.add(ConfigurationIterationStrategy.fullPath(config, rInterface.getSimpleName()));
             missingIfaces.add(rInterface.getSimpleName());

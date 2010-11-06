@@ -26,6 +26,8 @@ import net.xy.jcms.controller.configurations.ITranslationConfigurationAdapter;
 import net.xy.jcms.controller.configurations.IUsecaseConfigurationAdapter;
 import net.xy.jcms.controller.configurations.parser.TranslationParser;
 import net.xy.jcms.controller.configurations.parser.UsecaseParser;
+import net.xy.jcms.controller.configurations.parser.XMLValidator;
+import net.xy.jcms.controller.configurations.parser.XMLValidator.XMLValidationException;
 
 /**
  * global helper class with various functions
@@ -41,9 +43,12 @@ public class JCmsHelper {
      * 
      * @param translationConfigXml
      * @param usecaseConfigurationXml
+     * @throws XMLValidationException
      */
-    public static void setConfiguration(final String translationConfigXml, final String usecaseConfigurationXml) {
+    public static void setConfiguration(final String translationConfigXml, final String usecaseConfigurationXml)
+            throws XMLValidationException {
 
+        XMLValidator.validate(translationConfigXml);
         TranslationConfiguration.setTranslationAdapter(new ITranslationConfigurationAdapter() {
             TranslationRule[] cache = null;
 
@@ -62,6 +67,7 @@ public class JCmsHelper {
             }
         });
 
+        XMLValidator.validate(usecaseConfigurationXml);
         UsecaseConfiguration.setUsecaseAdapter(new IUsecaseConfigurationAdapter() {
             Usecase[] cache = null;
 

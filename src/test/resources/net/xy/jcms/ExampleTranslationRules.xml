@@ -30,6 +30,5 @@
         <parameter name="contentgroup" group="1" convert="de.jamba.ContentGroupConverter"/>
         <parameter name="catalogid" group="2" convert="net.xyan.SimpleDataTypeConverter"/>
     </rule>
-
     <rule reactOn="^Hm du willst dich also Einloggen$" buildOff="Hm du willst dich also Einloggen" usecase="userLogin"/>
 </rules>

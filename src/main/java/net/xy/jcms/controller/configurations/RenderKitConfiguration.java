@@ -25,7 +25,8 @@ import net.xy.jcms.shared.DebugUtils;
 import net.xy.jcms.shared.IRenderer;
 
 /**
- * is like the baserenderfactory an configuration delivering renderer instances described by an interface
+ * is like the baserenderfactory an configuration delivering renderer instances
+ * described by an interface
  * 
  * @author Xyan
  * 
@@ -48,17 +49,29 @@ public class RenderKitConfiguration extends Configuration<Map<?, IRenderer>> {
      * @return value
      */
     public IRenderer get(final Class<? extends IRenderer> rInterface, final ComponentConfiguration config) {
-        IRenderer value = null;
+        return getMatch(rInterface, config).getValue();
+    }
+
+    /**
+     * return the singleton renderer instance and where it was found, closure
+     * 
+     * @param rInterface
+     * @param config
+     * @return
+     */
+    public Match<String, IRenderer> getMatch(final Class<? extends IRenderer> rInterface, final ComponentConfiguration config) {
+        Match<String, IRenderer> value = new Match<String, IRenderer>(null, null);
         final ClimbUp strategy = new ClimbUp(config, rInterface.getSimpleName());
         final List<String> retrievalStack = new ArrayList<String>();
         for (final String pathKey : strategy) {
             retrievalStack.add(pathKey);
-            value = getConfigurationValue().get(pathKey);
-            if (value != null) {
+            final IRenderer found = getConfigurationValue().get(pathKey);
+            if (found != null) {
+                value = new Match<String, IRenderer>(pathKey, found);
                 break;
             }
         }
-        if (value != null) {
+        if (value.getValue() != null) {
             return value;
         } else {
             throw new IllegalArgumentException("An mendatory renderer was missing! "
