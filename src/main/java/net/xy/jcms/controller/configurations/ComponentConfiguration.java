@@ -37,12 +37,14 @@ public abstract class ComponentConfiguration {
     public final static String COMPONENT_PATH_SEPARATOR = ".";
 
     /**
-     * holds the mendatory component id. On every added component id got set on every fragment not.
+     * holds the mendatory component id. On every added component id got set on
+     * every fragment not.
      */
     private String id = "";
 
     /**
-     * holds an id stacked component path. On every added component path got set on every fragment not.
+     * holds an id stacked component path. On every added component path got set
+     * on every fragment not.
      */
     private String componentPath = "";
 
@@ -52,7 +54,8 @@ public abstract class ComponentConfiguration {
     private ComponentConfiguration parent = null;
 
     /**
-     * holds the appropriated components instance, which requests and renders these configuration
+     * holds the appropriated components instance, which requests and renders
+     * these configuration
      */
     private final IComponent compInstance;
 
@@ -73,7 +76,8 @@ public abstract class ComponentConfiguration {
     }
 
     /**
-     * initializes the complete component configuration in case of an missconfiguration it throws an exception
+     * initializes the complete component configuration in case of an
+     * missconfiguration it throws an exception
      * 
      * @param cmpConfig
      *            ComponentConfiguration to be initialized
@@ -381,7 +385,8 @@ public abstract class ComponentConfiguration {
     }
 
     /**
-     * method to configure childs ui config aggregation. Only usefull in the aggregation phase.
+     * method to configure childs ui config aggregation. Only usefull in the
+     * aggregation phase.
      * 
      * @param key
      * @param value
@@ -442,6 +447,8 @@ public abstract class ComponentConfiguration {
                         throw new IllegalArgumentException("An requiered configuration was missing");
                     }
                     final FragmentConfiguration tmplConfig = config.get(name, this).getConfiguration();
+                    ((ComponentConfiguration) tmplConfig).setId(name);
+                    ((ComponentConfiguration) tmplConfig).setParent(this);
                     templates.put(name, tmplConfig);
                 }
             }

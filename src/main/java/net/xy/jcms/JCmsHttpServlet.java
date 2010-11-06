@@ -101,7 +101,7 @@ public class JCmsHttpServlet extends HttpServlet {
             try {
                 // sets the clientstore retrieved from protocol adapter
                 final ControllerConfiguration cConfig = (ControllerConfiguration) usecase
-                        .getConfiguration(ConfigurationType.controllerConfiguration);
+                        .getConfiguration(ConfigurationType.ControllerConfiguration);
                 cConfig.setClientStore(store);
                 forward = UsecaseAgent.executeController(usecase, dac, forward.getParameters());
             } catch (final ClassNotFoundException ex) {

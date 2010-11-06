@@ -28,7 +28,7 @@ public class ContentRepository extends Configuration<Map<String, Object>> {
      * @param configurationValue
      */
     public ContentRepository(final Map<String, Object> configurationValue) {
-        super(ConfigurationType.contentRepository, configurationValue);
+        super(ConfigurationType.ContentRepository, configurationValue);
     }
 
     @Override

@@ -28,7 +28,7 @@ public class ContentConfiguration extends AbstractPropertyBasedConfiguration {
      * @param configurationValue
      */
     public ContentConfiguration(final Properties configurationValue) {
-        super(ConfigurationType.contentConfiguration, configurationValue);
+        super(ConfigurationType.ContentConfiguration, configurationValue);
     }
 
     /**

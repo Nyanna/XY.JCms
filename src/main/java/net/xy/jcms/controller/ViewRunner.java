@@ -43,7 +43,7 @@ public class ViewRunner {
      */
     public static ComponentConfiguration runConfiguration(final Configuration<?>[] configuration) {
         final TemplateConfiguration tmplConfig = (TemplateConfiguration) getConfigurationByType(
-                ConfigurationType.templateconfiguration, configuration);
+                ConfigurationType.TemplateConfiguration, configuration);
         if (tmplConfig != null) {
             final IFragment root = tmplConfig.get(ENTRY_TEMPLATE);
             if (root != null) {
@@ -67,11 +67,11 @@ public class ViewRunner {
     private static ComponentConfiguration initializeConfigurations(final ComponentConfiguration rootConfig,
             final Configuration<?>[] model) {
         ComponentConfiguration.initialize(rootConfig,
-                (ContentRepository) getConfigurationByType(ConfigurationType.contentRepository, model),
-                (TemplateConfiguration) getConfigurationByType(ConfigurationType.templateconfiguration, model),
+                (ContentRepository) getConfigurationByType(ConfigurationType.ContentRepository, model),
+                (TemplateConfiguration) getConfigurationByType(ConfigurationType.TemplateConfiguration, model),
                 (UIConfiguration) getConfigurationByType(ConfigurationType.UIConfiguration, model),
-                (MessageConfiguration) getConfigurationByType(ConfigurationType.messageConfiguration, model),
-                (RenderKitConfiguration) getConfigurationByType(ConfigurationType.renderKitConfiguration, model));
+                (MessageConfiguration) getConfigurationByType(ConfigurationType.MessageConfiguration, model),
+                (RenderKitConfiguration) getConfigurationByType(ConfigurationType.RenderKitConfiguration, model));
         return rootConfig;
     }
 

@@ -33,7 +33,7 @@ public class MessageConfiguration extends AbstractPropertyBasedConfiguration {
      * @param configurationValue
      */
     public MessageConfiguration(final Properties configurationValue) {
-        super(ConfigurationType.messageConfiguration, configurationValue);
+        super(ConfigurationType.MessageConfiguration, configurationValue);
     }
 
     /**

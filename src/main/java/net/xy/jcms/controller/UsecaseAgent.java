@@ -84,7 +84,7 @@ public class UsecaseAgent {
             final EnumSet<ConfigurationType> types = controller.getObmitedConfigurations().clone();
             types.addAll(ConfigurationType.CONTROLLERAPPLICABLE);
             final Configuration<?>[] configs = usecase.getConfigurationList(types);
-            if (types.contains(ConfigurationType.parameters)) {
+            if (types.contains(ConfigurationType.Parameters)) {
                 // obmit parameters if configured
                 return controller.invoke(dac, configs, parameters);
             } else {

@@ -26,13 +26,17 @@ import net.xy.jcms.controller.UsecaseConfiguration.Usecase;
 import net.xy.jcms.controller.configurations.ComponentConfiguration;
 import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
-import net.xy.jcms.controller.configurations.ContentRepositoryDummy;
-import net.xy.jcms.controller.configurations.MessageConfigurationDummy;
-import net.xy.jcms.controller.configurations.RenderKitConfigurationDummy;
+import net.xy.jcms.controller.configurations.ContentRepository;
+import net.xy.jcms.controller.configurations.ContentRepositoryProxy;
+import net.xy.jcms.controller.configurations.MessageConfiguration;
+import net.xy.jcms.controller.configurations.MessageConfigurationProxy;
+import net.xy.jcms.controller.configurations.RenderKitConfiguration;
+import net.xy.jcms.controller.configurations.RenderKitConfigurationProxy;
 import net.xy.jcms.controller.configurations.TemplateConfiguration;
-import net.xy.jcms.controller.configurations.TemplateConfigurationDummy;
+import net.xy.jcms.controller.configurations.TemplateConfigurationProxy;
+import net.xy.jcms.controller.configurations.UIConfiguration;
 import net.xy.jcms.controller.configurations.UIConfiguration.UI;
-import net.xy.jcms.controller.configurations.UIConfigurationDummy;
+import net.xy.jcms.controller.configurations.UIConfigurationProxy;
 import net.xy.jcms.shared.IDataAccessContext;
 
 import org.apache.commons.lang.StringUtils;
@@ -46,7 +50,8 @@ public class JavaConfigCollector {
     static final Logger LOG = Logger.getLogger(JCmsHttpServlet.class);
 
     /**
-     * does an configuration aggregation only run and returns an dummy config list containing all requested configs
+     * does an configuration aggregation only run and returns an dummy config
+     * list containing all requested configs
      * 
      * @param request
      * @param params
@@ -55,8 +60,7 @@ public class JavaConfigCollector {
      * @throws ExecutionException
      */
     public static Configuration<?>[] getConfig(final String request, final Map<String, Object> params,
-            final IDataAccessContext dac)
-            throws ExecutionException {
+            final IDataAccessContext dac) throws ExecutionException {
         /**
          * DAC would be obmitted
          */
@@ -84,7 +88,8 @@ public class JavaConfigCollector {
             }
 
             /**
-             * run the controllers for the usecase, maybe redirect to another usecase.
+             * run the controllers for the usecase, maybe redirect to another
+             * usecase.
              */
             try {
                 forward = UsecaseAgent.executeController(usecase, dac, forward.getParameters());
@@ -95,9 +100,11 @@ public class JavaConfigCollector {
         } while (forward != null);
 
         /**
-         * get the configurationtree for the usecase from an empty run through the componenttree
+         * get the configurationtree for the usecase from an empty run through
+         * the componenttree
          */
         final Configuration<?>[] viewConfig = getDummyConfigs(usecase);
+        @SuppressWarnings("unused")
         final ComponentConfiguration confTree = ViewRunner.runConfiguration(viewConfig);
         return viewConfig;
     }
@@ -111,50 +118,67 @@ public class JavaConfigCollector {
      */
     public static String getConsoleConfigString(final String request, final Map<String, Object> params,
             final IDataAccessContext dac) {
+        final boolean getAll = params != null && params.containsKey("getAll") ? true : false;
         final StringBuilder ret = new StringBuilder();
         try {
             final Configuration<?>[] configs = getConfig(request, params, dac);
             for (final Configuration<?> config : configs) {
                 switch (config.getConfigurationType()) {
                 case UIConfiguration:
+                    final Map<String, UI<?>> uis;
+                    if (getAll) {
+                        uis = ((UIConfigurationProxy) config).getPrepared();
+                    } else {
+                        uis = ((UIConfigurationProxy) config).getMissing();
+                    }
                     ret.append("##### UIconfiguration:\n\n");
-                    for (final Entry<String, UI<?>> entry : ((UIConfigurationDummy) config).getPrepared().entrySet()) {
-                        ret.append(entry.getKey()).append(" = ").append(entry.getValue().getDefaultValue())
-                                .append(" # ").append(entry.getValue().getDescription()).append("\n");
+                    if (!uis.isEmpty()) {
+                        for (final Entry<String, UI<?>> entry : uis.entrySet()) {
+                            if (StringUtils.isNotBlank(entry.getValue().getDescription())) {
+                                ret.append(" # ").append(entry.getValue().getDescription()).append("\n");
+                            }
+                            ret.append(entry.getKey()).append(" = ").append(entry.getValue().getDefaultValue()).append("\n");
+                        }
+                        ret.append("\n");
                     }
-                    ret.append("\n");
                     break;
-                case contentRepository:
+                case ContentRepository:
+                    final Map<String, Class<?>> content;
+                    if (getAll) {
+                        content = ((ContentRepositoryProxy) config).getReqContent();
+                    } else {
+                        content = ((ContentRepositoryProxy) config).getMissingContent();
+                    }
                     ret.append("##### Content configuration:\n\n");
-                    for (final Entry<String, Class<?>> entry : ((ContentRepositoryDummy) config).getReqContent()
-                            .entrySet()) {
-                        ret.append(entry.getKey()).append(" - ").append(entry.getValue().getSimpleName()).append("\n");
+                    if (!content.isEmpty()) {
+                        for (final Entry<String, Class<?>> entry : content.entrySet()) {
+                            ret.append(entry.getKey()).append(" - ").append(entry.getValue().getSimpleName()).append("\n");
+                        }
+                        ret.append("\n");
                     }
-                    ret.append("\n");
                     break;
-                case messageConfiguration:
+                case MessageConfiguration:
                     ret.append("##### Message Configuration:\n\n");
-                    if (!((MessageConfigurationDummy) config).getKeys().isEmpty()) {
-                        ret.append(StringUtils.join(((MessageConfigurationDummy) config).getKeys(), " = \n")).append(
-                                " = \n");
-                        ret.append("\n");
+                    if (getAll) {
+                        printMapHelper(ret, ((MessageConfigurationProxy) config).getKeys());
+                    } else {
+                        printListHelper(ret, ((MessageConfigurationProxy) config).getMissingKeys());
                     }
                     break;
-                case renderKitConfiguration:
+                case RenderKitConfiguration:
                     ret.append("##### RenderKit Configuration:\n\n");
-                    if (!((RenderKitConfigurationDummy) config).getInterfaceNames().isEmpty()) {
-                        ret.append(
-                                StringUtils.join(((RenderKitConfigurationDummy) config).getInterfaceNames(), " = \n"))
-                                .append(" = \n");
-                        ret.append("\n");
+                    if (getAll) {
+                        printMapHelper(ret, ((RenderKitConfigurationProxy) config).getInterfaceNames());
+                    } else {
+                        printListHelper(ret, ((RenderKitConfigurationProxy) config).getMissingInterfaceNames());
                     }
                     break;
-                case templateconfiguration:
+                case TemplateConfiguration:
                     ret.append("##### Template Configuration:\n\n");
-                    if (!((TemplateConfigurationDummy) config).getTemplateNames().isEmpty()) {
-                        ret.append(StringUtils.join(((TemplateConfigurationDummy) config).getTemplateNames(), " = \n"))
-                                .append(" = \n");
-                        ret.append("\n");
+                    if (getAll) {
+                        printMapHelper(ret, ((TemplateConfigurationProxy) config).getTemplateNames());
+                    } else {
+                        printListHelper(ret, ((TemplateConfigurationProxy) config).getMissingTemplateNames());
                     }
                     break;
                 default:
@@ -169,6 +193,34 @@ public class JavaConfigCollector {
     }
 
     /**
+     * helper for handling lists and printing it out nicely
+     * 
+     * @param ret
+     * @param list
+     */
+    private static void printListHelper(final StringBuilder ret, final List<String> list) {
+        if (!list.isEmpty()) {
+            ret.append(StringUtils.join(list, " = \n")).append(" = \n");
+            ret.append("\n");
+        }
+    }
+
+    /**
+     * helper for handling an printing string maps nicely
+     * 
+     * @param ret
+     * @param map
+     */
+    private static void printMapHelper(final StringBuilder ret, final Map<String, String> map) {
+        if (!map.isEmpty()) {
+            for (final Entry<String, String> entry : map.entrySet()) {
+                ret.append(entry.getKey()).append(" = ").append(entry.getValue()).append("\n");
+            }
+            ret.append("\n");
+        }
+    }
+
+    /**
      * inits the dummy configuration objects
      * 
      * @param usecase
@@ -176,13 +228,19 @@ public class JavaConfigCollector {
      */
     private static Configuration<?>[] getDummyConfigs(final Usecase usecase) {
         final List<Configuration<?>> configs = new ArrayList<Configuration<?>>();
-        configs.add(new UIConfigurationDummy());
-        configs.add(new ContentRepositoryDummy());
-        configs.add(new MessageConfigurationDummy());
-        configs.add(new RenderKitConfigurationDummy());
-        configs.add(new TemplateConfigurationDummy(
-                (TemplateConfiguration) usecase.getConfiguration(ConfigurationType.templateconfiguration)
-                ));
+        configs.add(new UIConfigurationProxy((UIConfiguration) usecase.getConfiguration(ConfigurationType.UIConfiguration)));
+        try {
+            configs.add(new ContentRepositoryProxy((ContentRepository) usecase
+                    .getConfiguration(ConfigurationType.ContentRepository)));
+        } catch (final UnsupportedOperationException ex) {
+            configs.add(new ContentRepositoryProxy());
+        }
+        configs.add(new MessageConfigurationProxy((MessageConfiguration) usecase
+                .getConfiguration(ConfigurationType.MessageConfiguration)));
+        configs.add(new RenderKitConfigurationProxy((RenderKitConfiguration) usecase
+                .getConfiguration(ConfigurationType.RenderKitConfiguration)));
+        configs.add(new TemplateConfigurationProxy((TemplateConfiguration) usecase
+                .getConfiguration(ConfigurationType.TemplateConfiguration)));
         return configs.toArray(new Configuration<?>[configs.size()]);
     }
 

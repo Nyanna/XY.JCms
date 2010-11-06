@@ -38,7 +38,7 @@ public class RenderKitConfiguration extends Configuration<Map<?, IRenderer>> {
      * @param configurationValue
      */
     public RenderKitConfiguration(final Map<?, IRenderer> configurationValue) {
-        super(ConfigurationType.renderKitConfiguration, convert(configurationValue));
+        super(ConfigurationType.RenderKitConfiguration, convert(configurationValue));
     }
 
     /**

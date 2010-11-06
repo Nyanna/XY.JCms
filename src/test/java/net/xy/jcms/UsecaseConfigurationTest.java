@@ -79,7 +79,7 @@ public class UsecaseConfigurationTest {
                         new Usecase("contentgroup", "first test", new Parameter[] { new Parameter("contentgroup",
                                 "de.jamba.ContentGroup") }, new Controller[] { new Controller(
                                 "net.xy.jcms.MockController",
-                                EnumSet.of(ConfigurationType.messageConfiguration))
+                                EnumSet.of(ConfigurationType.MessageConfiguration))
 
                         }, new Configuration[] { new MessageConfiguration(new Properties() {
                             private static final long serialVersionUID = 4127043651680566300L;

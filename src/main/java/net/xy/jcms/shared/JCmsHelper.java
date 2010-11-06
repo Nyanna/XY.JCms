@@ -1,7 +1,5 @@
 package net.xy.jcms.shared;
 
-import java.io.InputStream;
-
 import javax.xml.stream.XMLStreamException;
 
 import net.xy.jcms.controller.TranslationConfiguration;
@@ -22,7 +20,8 @@ import net.xy.jcms.controller.configurations.parser.UsecaseParser;
 public class JCmsHelper {
 
     /**
-     * sets the configuration via two obmitted xml resource names, via thread classloader
+     * sets the configuration via two obmitted xml resource names, via thread
+     * classloader
      * 
      * @param translationConfigXml
      * @param usecaseConfigurationXml

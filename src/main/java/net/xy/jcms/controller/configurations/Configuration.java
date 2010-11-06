@@ -20,6 +20,8 @@ import java.io.InputStream;
 import java.util.EnumSet;
 import java.util.Properties;
 
+import net.xy.jcms.shared.DebugUtils;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -46,17 +48,17 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
      */
     public static enum ConfigurationType {
         /**
-         * contentconfiguration will be used for the most content aggregating
-         * controllers. there output is added to the contentRepository and it
+         * ContentConfiguration will be used for the most content aggregating
+         * controllers. there output is added to the ContentRepository and it
          * will be droped after controllerphase.
          */
-        contentConfiguration,
+        ContentConfiguration,
         /**
          * the repository contains all to the view obmitted content would empty
          * initialized and is the result of the proccesing the
-         * contentConfiguration
+         * ContentConfiguration
          */
-        contentRepository,
+        ContentRepository,
         /**
          * this configuration gots refilled in the components tree configuration
          * objects it will not be used but can be altered by controllers.
@@ -66,42 +68,38 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
          * this configuration gots refilled into cinfiguration objects for the
          * include fragments components building the componenttree.
          */
-        templateconfiguration,
+        TemplateConfiguration,
         /**
          * the message configuration gots refilled into the component
          * configuration objects
          */
-        messageConfiguration,
-        /**
-         * descripen the orderflow configuration
-         */
-        orderFlowConfiguration,
+        MessageConfiguration,
         /**
          * configuration only used in the controllers, would not be taken into
          * account when hashing the datamodel
          */
-        controllerConfiguration,
+        ControllerConfiguration,
         /**
          * usually an renderfactory which provides the renderer for the
          * component configuration
          */
-        renderKitConfiguration,
+        RenderKitConfiguration,
         /**
          * just an triger to obmit usecase parameters to the handler
          */
-        parameters;
+        Parameters;
 
         /**
          * these configuration are obmittedt to the view and therefore will be
          * hashed to determine view changes.
          */
-        public static final EnumSet<ConfigurationType> VIEWAPPLICABLE = EnumSet.of(contentRepository, UIConfiguration,
-                messageConfiguration, renderKitConfiguration, templateconfiguration);
+        public static final EnumSet<ConfigurationType> VIEWAPPLICABLE = EnumSet.of(ContentRepository, UIConfiguration,
+                MessageConfiguration, RenderKitConfiguration, TemplateConfiguration);
 
         /**
          * all configuration will be additionally obmitted to the controllers
          */
-        public static final EnumSet<ConfigurationType> CONTROLLERAPPLICABLE = EnumSet.of(controllerConfiguration);
+        public static final EnumSet<ConfigurationType> CONTROLLERAPPLICABLE = EnumSet.of(ControllerConfiguration);
     }
 
     /**
@@ -221,18 +219,19 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
     public static Configuration<?> initByString(final ConfigurationType type, final String in) {
         // TODO [HIGH] implement configuration initializers
         switch (type) {
-        case templateconfiguration:
+        case TemplateConfiguration:
             return TemplateConfiguration.initByString(in);
         case UIConfiguration:
             return UIConfiguration.initByString(in);
-        case messageConfiguration:
+        case MessageConfiguration:
             return MessageConfiguration.initByString(in);
-        case contentConfiguration:
+        case ContentConfiguration:
             return ContentConfiguration.initByString(in);
-        case renderKitConfiguration:
+        case RenderKitConfiguration:
             return RenderKitConfiguration.initByString(in);
         default:
-            throw new UnsupportedOperationException("Configurationtype is not implemented to be initialized by stream.");
+            throw new UnsupportedOperationException("Configurationtype is not implemented to be initialized by stream. "
+                    + DebugUtils.printFields(type));
         }
     }
 

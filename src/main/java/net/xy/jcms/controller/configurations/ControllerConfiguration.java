@@ -4,7 +4,7 @@ import net.xy.jcms.controller.configurations.stores.ClientStore;
 
 public class ControllerConfiguration extends Configuration<Object> {
     public ControllerConfiguration(final ConfigurationType configurationType, final Object configurationValue) {
-        super(ConfigurationType.controllerConfiguration, null);
+        super(ConfigurationType.ControllerConfiguration, null);
     }
 
     @Override

@@ -37,7 +37,7 @@ public class TemplateConfiguration extends Configuration<Map<String, IFragment>>
      * @param configurationValue
      */
     public TemplateConfiguration(final Map<String, IFragment> configurationValue) {
-        super(ConfigurationType.templateconfiguration, configurationValue);
+        super(ConfigurationType.TemplateConfiguration, configurationValue);
     }
 
     /**
@@ -51,6 +51,9 @@ public class TemplateConfiguration extends Configuration<Map<String, IFragment>>
         final ClimbUp strategy = new ClimbUp(config, tmplName);
         for (final String pathKey : strategy) {
             value = getConfigurationValue().get(pathKey);
+            if (value != null) {
+                break;
+            }
         }
         if (value != null) {
             return value;
