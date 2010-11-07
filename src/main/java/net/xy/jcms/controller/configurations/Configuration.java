@@ -18,6 +18,7 @@ package net.xy.jcms.controller.configurations;
 
 import java.io.InputStream;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.Properties;
 
 import net.xy.jcms.shared.DebugUtils;
@@ -228,6 +229,10 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
             return ContentConfiguration.initByString(in);
         case RenderKitConfiguration:
             return RenderKitConfiguration.initByString(in);
+        case ControllerConfiguration:
+            return ControllerConfiguration.initByString(in);
+        case ContentRepository:
+            return new ContentRepository(new HashMap<String, Object>());
         default:
             throw new UnsupportedOperationException("Configurationtype is not implemented to be initialized by stream. "
                     + DebugUtils.printFields(type));

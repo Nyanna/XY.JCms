@@ -36,9 +36,8 @@ public class TextComponent extends AbstractComponent {
 
             @Override
             protected UI<?>[] prepareUIConfig() {
-                return new UI[] {//
-                new UI<String>("container", "", false),//
-                        new UI<String>("styleclass", "", false) };
+                return new UI[] { UI_CONTAINER,//
+                        UI_STYLECLASS };
             }
 
             @SuppressWarnings("unchecked")
@@ -69,7 +68,7 @@ public class TextComponent extends AbstractComponent {
         final ITextRenderer r = (ITextRenderer) config.getRenderer(ITextRenderer.class);
         final String text = config.getMessage("text");
         final String container = (String) config.getUIConfig("container");
-        final String style = (String) config.getUIConfig("styleclass");
+        final String style = (String) config.getUIConfig("styleClass");
 
         if (StringUtils.isNotBlank(container)) {
             if (StringUtils.isNotBlank(style)) {

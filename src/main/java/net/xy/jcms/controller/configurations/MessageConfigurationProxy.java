@@ -100,4 +100,13 @@ public class MessageConfigurationProxy extends MessageConfiguration {
     public Map<String, String> getPresentKeys() {
         return presentKeys;
     }
+
+    /**
+     * returns true if a config is missing
+     * 
+     * @return
+     */
+    public boolean isMissing() {
+        return missingKeys.isEmpty() ? false : true;
+    }
 }

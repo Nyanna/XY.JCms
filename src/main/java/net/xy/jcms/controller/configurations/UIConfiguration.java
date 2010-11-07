@@ -27,6 +27,10 @@ import org.apache.commons.lang.StringUtils;
  * 
  */
 public class UIConfiguration extends AbstractPropertyBasedConfiguration {
+    /**
+     * gloabl type constant for this type
+     */
+    public static final ConfigurationType TYPE = ConfigurationType.UIConfiguration;
 
     /**
      * default
@@ -34,7 +38,7 @@ public class UIConfiguration extends AbstractPropertyBasedConfiguration {
      * @param configurationValue
      */
     public UIConfiguration(final Properties configurationValue) {
-        super(ConfigurationType.UIConfiguration, configurationValue);
+        super(TYPE, configurationValue);
     }
 
     /**
@@ -143,8 +147,7 @@ public class UIConfiguration extends AbstractPropertyBasedConfiguration {
         /**
          * for live cms specifies an description for the user
          */
-        // TODO [LOW] use and init description
-        private final String description = "";
+        private String description = "";
 
         /**
          * default constructor
@@ -157,6 +160,17 @@ public class UIConfiguration extends AbstractPropertyBasedConfiguration {
         }
 
         /**
+         * constructor with additional description
+         * 
+         * @param key
+         * @param defaultValue
+         * @param description
+         */
+        public UI(final String key, final V defaultValue, final String description) {
+            this(key, defaultValue, true, description);
+        }
+
+        /**
          * constructor with additional iterationflag
          * 
          * @param key
@@ -165,12 +179,27 @@ public class UIConfiguration extends AbstractPropertyBasedConfiguration {
          *            turn component path iteration off
          */
         public UI(final String key, final V defaultValue, final boolean iterate) {
+            this(key, defaultValue, iterate, null);
+        }
+
+        /**
+         * constructor with additional description
+         * 
+         * @param key
+         * @param defaultValue
+         * @param iterate
+         * @param description
+         */
+        public UI(final String key, final V defaultValue, final boolean iterate, final String description) {
             if (StringUtils.isBlank(key)) {
                 throw new IllegalArgumentException("UI config key can't be blank.");
             }
             this.key = key;
             this.defaultValue = defaultValue;
             this.iterate = iterate;
+            if (description != null) {
+                this.description = description;
+            }
         }
 
         /**

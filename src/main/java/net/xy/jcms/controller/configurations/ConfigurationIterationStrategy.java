@@ -79,7 +79,7 @@ public class ConfigurationIterationStrategy {
                 actual = actual.getParent();
             }
             final StringBuilder key = new StringBuilder(actual.getComponentPath());
-            if (StringUtils.isNotEmpty(key.toString())) {
+            if (key.length() > 1) {
                 key.append(ComponentConfiguration.COMPONENT_PATH_SEPARATOR);
             }
             key.append(requestedKey);
@@ -155,7 +155,7 @@ public class ConfigurationIterationStrategy {
                 }
             }
             final StringBuilder key = new StringBuilder(actual.getComponentPath());
-            if (StringUtils.isNotEmpty(key.toString())) {
+            if (key.length() > 1) {
                 key.append(ComponentConfiguration.COMPONENT_PATH_SEPARATOR);
             }
             key.append(requestedKey);

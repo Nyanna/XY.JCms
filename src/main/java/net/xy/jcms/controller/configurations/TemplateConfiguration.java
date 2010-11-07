@@ -30,6 +30,10 @@ import net.xy.jcms.shared.IFragment;
  * 
  */
 public class TemplateConfiguration extends Configuration<Map<String, IFragment>> {
+    /**
+     * gloabl type constant for this type
+     */
+    public static final ConfigurationType TYPE = ConfigurationType.TemplateConfiguration;
 
     /**
      * default constructor
@@ -37,7 +41,7 @@ public class TemplateConfiguration extends Configuration<Map<String, IFragment>>
      * @param configurationValue
      */
     public TemplateConfiguration(final Map<String, IFragment> configurationValue) {
-        super(ConfigurationType.TemplateConfiguration, configurationValue);
+        super(TYPE, configurationValue);
     }
 
     /**

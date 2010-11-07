@@ -23,13 +23,23 @@ public class ServletOutputStreamAdapter implements IOutWriter {
      */
     static final Logger LOG = Logger.getLogger(ServletOutputStreamAdapter.class);
 
+    /**
+     * outstream
+     */
     private final ServletOutputStream outStream;
+
+    /**
+     * internal buffer needed for caching of the complete output
+     */
+    private final StringBuilder internalBuffer = new StringBuilder();
 
     @Override
     public void append(final StringBuilder buffer) {
         try {
             outStream.print(buffer.toString());
             outStream.print("\n");
+            internalBuffer.append(buffer);
+            internalBuffer.append("\n");
         } catch (final IOException e) {
             LOG.equals(e);
         }
@@ -44,9 +54,19 @@ public class ServletOutputStreamAdapter implements IOutWriter {
         try {
             outStream.print(buffer);
             outStream.print("\n");
+            internalBuffer.append(buffer);
+            internalBuffer.append("\n");
         } catch (final IOException e) {
             LOG.equals(e);
         }
     }
 
+    /**
+     * returns the buffer stored for putput caching
+     * 
+     * @return
+     */
+    public StringBuilder getBuffer() {
+        return internalBuffer;
+    }
 }

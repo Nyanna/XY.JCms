@@ -12,6 +12,8 @@
  */
 package net.xy.jcms.shared;
 
+import net.xy.jcms.controller.configurations.UIConfiguration.UI;
+
 /**
  * abstract component functionality singleton pattern
  * 
@@ -32,6 +34,18 @@ public abstract class AbstractComponent implements IComponent {
      * 
      * @param skip
      */
-    protected AbstractComponent(final boolean skip) {}
+    protected AbstractComponent(final boolean skip) {
+    }
 
+    /**
+     * place for static and widespread used ui configs
+     */
+    public static final UI<String> UI_STYLECLASS = new UI<String>("styleClass", "", false,
+            "Sets an optional styleclass for html used in the class attribute");
+
+    public static final UI<String> UI_CONTAINER = new UI<String>("container", "", false,
+            "Specify an optional container surrounding the text (not used by renderkits)");
+
+    public static final UI<String> UI_STYLEID = new UI<String>("id", "", false,
+            "Sets an optional style id in an present container (not used by all renderkits)");
 }

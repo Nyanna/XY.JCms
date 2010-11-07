@@ -22,8 +22,10 @@ import net.xy.jcms.controller.TranslationConfiguration;
 import net.xy.jcms.controller.UsecaseConfiguration;
 import net.xy.jcms.controller.TranslationConfiguration.TranslationRule;
 import net.xy.jcms.controller.UsecaseConfiguration.Usecase;
+import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.ITranslationConfigurationAdapter;
 import net.xy.jcms.controller.configurations.IUsecaseConfigurationAdapter;
+import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
 import net.xy.jcms.controller.configurations.parser.TranslationParser;
 import net.xy.jcms.controller.configurations.parser.UsecaseParser;
 import net.xy.jcms.controller.configurations.parser.XMLValidator;
@@ -85,5 +87,21 @@ public class JCmsHelper {
                 return cache;
             }
         });
+    }
+
+    /**
+     * gets an configuration out of an configurationlist
+     * 
+     * @param configuration
+     * @return value
+     */
+    public static Configuration<?> getConfigurationByType(final ConfigurationType type,
+            final Configuration<?>[] configuration) {
+        for (final Configuration<?> config : configuration) {
+            if (type.equals(config.getConfigurationType())) {
+                return config;
+            }
+        }
+        return null;
     }
 }

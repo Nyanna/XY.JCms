@@ -56,4 +56,19 @@ public interface IBaseRenderer extends IRenderer {
      */
     public StringBuilder renderEndTag(final String tag);
 
+    /**
+     * method for rendering meta link tags in html
+     * 
+     * @param href
+     * @return
+     */
+    public StringBuilder renderMetaLink(final String href);
+
+    /**
+     * renders various script inclusions
+     * 
+     * @param href
+     * @return
+     */
+    public StringBuilder renderScriptInclude(final String scriptUri);
 }

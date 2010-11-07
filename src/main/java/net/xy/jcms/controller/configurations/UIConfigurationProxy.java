@@ -97,4 +97,13 @@ public class UIConfigurationProxy extends UIConfiguration {
         return missing;
     }
 
+    /**
+     * returns true if a config is missing
+     * 
+     * @return
+     */
+    public boolean isMissing() {
+        return missing.isEmpty() ? false : true;
+    }
+
 }

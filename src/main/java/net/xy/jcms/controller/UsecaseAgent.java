@@ -19,12 +19,15 @@ package net.xy.jcms.controller;
 import java.util.EnumSet;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import net.xy.jcms.controller.NavigationAbstractionLayer.NALKey;
 import net.xy.jcms.controller.UsecaseConfiguration.Controller;
 import net.xy.jcms.controller.UsecaseConfiguration.Usecase;
 import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
 import net.xy.jcms.shared.IDataAccessContext;
+import net.xy.jcms.shared.cache.XYCache;
 
 /**
  * Agent determing the usecase from an KeyChain.
@@ -34,9 +37,29 @@ import net.xy.jcms.shared.IDataAccessContext;
  */
 public class UsecaseAgent {
     /**
+     * logger
+     */
+    private static final Logger LOG = Logger.getLogger(UsecaseAgent.class);
+
+    /**
      * usecase to last try when no usecases could be found
      */
     private static final String ERROR_USECASE_ID = "ERROR";
+
+    /**
+     * cache instance used for cahcing the usecase output
+     */
+    private static final String USECASE_OUPUT_CACHE_ID = "USECASE_OUPUT_CACHE_ID";
+
+    /**
+     * cache region
+     */
+    private static final String CACHE_REGION = "USECASE_CACHE";
+
+    /**
+     * in seconds
+     */
+    private static final int OUTPUT_EXPIRATION_TIME = 60;
 
     /**
      * exception marker
@@ -101,11 +124,21 @@ public class UsecaseAgent {
      * @param usecase
      * @return null or the cached ouput
      */
-    public static String applyCaching(final Configuration<?>[] configs) {
+    public static String applyCaching(final Configuration<?>[] configs, final String toStore) {
+        final StringBuilder hashKey = new StringBuilder();
         for (final Configuration<?> config : configs) {
-            config.getClass();
-            // TODO [LOW] implement ouput caching and configuration hashing
+            hashKey.append(config.hashCode());
         }
-        return null;
+        if (toStore == null) {
+            final String result = (String) XYCache.getInstance(USECASE_OUPUT_CACHE_ID).get(CACHE_REGION, hashKey.toString(),
+                    OUTPUT_EXPIRATION_TIME);
+            if (result != null) {
+                LOG.info("Cache object was found! Yeah.");
+            }
+            return result;
+        } else {
+            XYCache.getInstance(USECASE_OUPUT_CACHE_ID).put(CACHE_REGION, hashKey.toString(), toStore);
+            return null;
+        }
     }
 }

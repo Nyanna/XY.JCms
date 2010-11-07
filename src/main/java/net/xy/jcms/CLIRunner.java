@@ -13,6 +13,7 @@
 package net.xy.jcms;
 
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -26,8 +27,10 @@ import net.xy.jcms.controller.UsecaseConfiguration.Usecase;
 import net.xy.jcms.controller.configurations.ComponentConfiguration;
 import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
+import net.xy.jcms.shared.DebugUtils;
 import net.xy.jcms.shared.IDataAccessContext;
 import net.xy.jcms.shared.IOutWriter;
+import net.xy.jcms.shared.cache.XYCache;
 
 /**
  * adaption of JCms to run on an console
@@ -41,18 +44,47 @@ public class CLIRunner {
      */
     static final Logger LOG = Logger.getLogger(CLIRunner.class);
 
-    // TODO [HIGH] implement options to run CLI configuration display
+    // TODO [LOW] implement options to run CLI configuration display
     // -check=missing|all
     // -usecase=*.xml
     // -translation=*.xml
     // param=value
 
     /**
-     * main entry poitn for the console
+     * main entry point for the console
      * 
      * @param args
      */
     public static void main(final String[] args) {
+        new CLIRunner(args);
+    }
+
+    /**
+     * sole constructor
+     */
+    public CLIRunner() {
+    }
+
+    /**
+     * constructor automaticly initiates the programm
+     * 
+     * @param args
+     */
+    public CLIRunner(final String[] args) {
+        final long start = System.nanoTime();
+        LOG.info("Execution started: " + start);
+        try {
+            Main(args);
+        } finally {
+            XYCache.destroy();
+        }
+        LOG.info("Execution succeeded in nanoseconds " + (System.nanoTime() - start));
+    }
+
+    /**
+     * instance main method
+     */
+    protected void Main(final String[] args) {
         /**
          * first get portal configuration out from call information
          */
@@ -61,8 +93,11 @@ public class CLIRunner {
 
             @Override
             public String buildUriWithParams(final String path, final Map<Object, Object> parameters) {
-                // TODO Auto-generated method stub
-                return null;
+                final StringBuilder cli = new StringBuilder(path);
+                for (final Entry<Object, Object> entry : parameters.entrySet()) {
+                    cli.append(" ").append(entry.getKey()).append("=").append("\"").append(entry.getValue()).append("\"");
+                }
+                return cli.toString();
             }
         };
 
@@ -73,6 +108,7 @@ public class CLIRunner {
             System.out.append("You have to specify at least one request String.");
             return;
         }
+        LOG.info("Run on Console: " + DebugUtils.printFields(args[0]));
         final NALKey firstForward = NavigationAbstractionLayer.translatePathToKey(args[0], dac);
 
         // run the protocol adapter which fills the struct with parameters from
@@ -111,7 +147,8 @@ public class CLIRunner {
          * same configuration leads to the same result. realized through hashing
          * and persistance.
          */
-        final String output = UsecaseAgent.applyCaching(usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE));
+        final String output = UsecaseAgent
+                .applyCaching(usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE), null);
 
         if (output != null) {
             System.out.append(output);
@@ -127,7 +164,14 @@ public class CLIRunner {
              * run and return the rendering tree through streamprocessing to the
              * client
              */
-            ViewRunner.runView(new ConsoleOutWriter(), confTree);
+            final ConsoleOutWriter out = new ConsoleOutWriter();
+            ViewRunner.runView(out, confTree);
+
+            /**
+             * caches the ouput for the future
+             */
+            UsecaseAgent
+                    .applyCaching(usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE), out.getBuffer().toString());
         }
 
     }
@@ -139,17 +183,34 @@ public class CLIRunner {
      * 
      */
     public static class ConsoleOutWriter implements IOutWriter {
+        /**
+         * internal buffer needed for caching of the complete output
+         */
+        private final StringBuilder internalBuffer = new StringBuilder();
 
         @Override
         public void append(final StringBuilder buffer) {
             System.out.append(buffer);
             System.out.append("\n");
+            internalBuffer.append(buffer);
+            internalBuffer.append("\n");
         }
 
         @Override
         public void append(final String buffer) {
             System.out.append(buffer);
             System.out.append("\n");
+            internalBuffer.append(buffer);
+            internalBuffer.append("\n");
+        }
+
+        /**
+         * returns the buffer stored for putput caching
+         * 
+         * @return
+         */
+        public StringBuilder getBuffer() {
+            return internalBuffer;
         }
 
     }

@@ -26,6 +26,10 @@ import net.xy.jcms.shared.DebugUtils;
  * 
  */
 public class MessageConfiguration extends AbstractPropertyBasedConfiguration {
+    /**
+     * gloabl type constant for this type
+     */
+    public static final ConfigurationType TYPE = ConfigurationType.MessageConfiguration;
 
     /**
      * default constructor
@@ -33,7 +37,7 @@ public class MessageConfiguration extends AbstractPropertyBasedConfiguration {
      * @param configurationValue
      */
     public MessageConfiguration(final Properties configurationValue) {
-        super(ConfigurationType.MessageConfiguration, configurationValue);
+        super(TYPE, configurationValue);
     }
 
     /**

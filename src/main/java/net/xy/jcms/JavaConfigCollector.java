@@ -120,8 +120,12 @@ public class JavaConfigCollector {
             final IDataAccessContext dac) {
         final boolean getAll = params != null && params.containsKey("getAll") ? true : false;
         final StringBuilder ret = new StringBuilder();
+        boolean isMissingConfig = false;
         try {
+            final long start = System.nanoTime();
+            LOG.info("Configuration aggregation started: " + start);
             final Configuration<?>[] configs = getConfig(request, params, dac);
+            LOG.info("Configuration aggregation succeeded in nanoseconds " + (System.nanoTime() - start));
             for (final Configuration<?> config : configs) {
                 switch (config.getConfigurationType()) {
                 case UIConfiguration:
@@ -130,6 +134,10 @@ public class JavaConfigCollector {
                         uis = ((UIConfigurationProxy) config).getPrepared();
                     } else {
                         uis = ((UIConfigurationProxy) config).getMissing();
+                    }
+                    if (((UIConfigurationProxy) config).isMissing()) {
+                        isMissingConfig = true;
+                        ret.append("!!");
                     }
                     ret.append("##### UIconfiguration:\n\n");
                     if (!uis.isEmpty()) {
@@ -149,6 +157,10 @@ public class JavaConfigCollector {
                     } else {
                         content = ((ContentRepositoryProxy) config).getMissingContent();
                     }
+                    if (((ContentRepositoryProxy) config).isMissing()) {
+                        isMissingConfig = true;
+                        ret.append("!!");
+                    }
                     ret.append("##### Content configuration:\n\n");
                     if (!content.isEmpty()) {
                         for (final Entry<String, Class<?>> entry : content.entrySet()) {
@@ -158,6 +170,10 @@ public class JavaConfigCollector {
                     }
                     break;
                 case MessageConfiguration:
+                    if (((MessageConfigurationProxy) config).isMissing()) {
+                        isMissingConfig = true;
+                        ret.append("!!");
+                    }
                     ret.append("##### Message Configuration:\n\n");
                     if (getAll) {
                         printMapHelper(ret, ((MessageConfigurationProxy) config).getKeys());
@@ -166,6 +182,10 @@ public class JavaConfigCollector {
                     }
                     break;
                 case RenderKitConfiguration:
+                    if (((RenderKitConfigurationProxy) config).isMissing()) {
+                        isMissingConfig = true;
+                        ret.append("!!");
+                    }
                     ret.append("##### RenderKit Configuration:\n\n");
                     if (getAll) {
                         printMapHelper(ret, ((RenderKitConfigurationProxy) config).getInterfaceNames());
@@ -174,6 +194,10 @@ public class JavaConfigCollector {
                     }
                     break;
                 case TemplateConfiguration:
+                    if (((TemplateConfigurationProxy) config).isMissing()) {
+                        isMissingConfig = true;
+                        ret.append("!!");
+                    }
                     ret.append("##### Template Configuration:\n\n");
                     if (getAll) {
                         printMapHelper(ret, ((TemplateConfigurationProxy) config).getTemplateNames());
@@ -184,6 +208,9 @@ public class JavaConfigCollector {
                 default:
                     break;
                 }
+            }
+            if (!isMissingConfig) {
+                ret.append("\n ## No configuration is missing try running the View ##\n");
             }
             return ret.toString();
         } catch (final ExecutionException e) {

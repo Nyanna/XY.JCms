@@ -101,4 +101,13 @@ public class RenderKitConfigurationProxy extends RenderKitConfiguration {
         return missingIfaces;
     }
 
+    /**
+     * returns true if a config is missing
+     * 
+     * @return
+     */
+    public boolean isMissing() {
+        return missingIfaces.isEmpty() ? false : true;
+    }
+
 }

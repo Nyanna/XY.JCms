@@ -17,8 +17,6 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 
 import net.xy.jcms.controller.NavigationAbstractionLayer.NALKey;
@@ -37,8 +35,8 @@ import net.xy.jcms.shared.IDataAccessContext;
  */
 public class UsecaseConfiguration {
     /**
-     * main usecase object describing all and anything. After these usecase comes only singleton and static code concern
-     * this.
+     * main usecase object describing all and anything. After these usecase
+     * comes only singleton and static code concern this.
      * 
      * @author Xyan
      * 
@@ -55,8 +53,8 @@ public class UsecaseConfiguration {
         private final String description;
 
         /**
-         * the request/input parameters, KeyChain, Cookies, Post etc... All these parameters are mendatory and will be
-         * validated.
+         * the request/input parameters, KeyChain, Cookies, Post etc... All
+         * these parameters are mendatory and will be validated.
          */
         private final Parameter[] parameterList;
 
@@ -66,10 +64,11 @@ public class UsecaseConfiguration {
         private final Controller[] controllerList;
 
         /**
-         * an list of connected configurations. note: these list is the whole and only configuration no other
-         * configuration would be delivered to all involved code.
+         * an list of connected configurations. note: these list is the whole
+         * and only configuration no other configuration would be delivered to
+         * all involved code.
          */
-        private final Configuration<?>[] configurationList;
+        private final Map<ConfigurationType, Configuration<?>> configurationList;
 
         /**
          * default constructor
@@ -90,13 +89,14 @@ public class UsecaseConfiguration {
         }
 
         /**
-         * merges an list of configuration to an list were alls configuration of the same type are merged
+         * merges an list of configuration to an list were alls configuration of
+         * the same type are merged
          * 
          * @param mergeList
          * @return value
          */
         @SuppressWarnings({ "unchecked", "rawtypes" })
-        private static Configuration<?>[] mergeConfigurations(final Configuration<?>[] mergeList) {
+        private static Map<ConfigurationType, Configuration<?>> mergeConfigurations(final Configuration<?>[] mergeList) {
             final Map<ConfigurationType, Configuration<?>> returnedConfig = new HashMap<ConfigurationType, Configuration<?>>();
             for (final Configuration config : mergeList) {
                 if (returnedConfig.containsKey(config.getConfigurationType())) {
@@ -107,7 +107,7 @@ public class UsecaseConfiguration {
                     returnedConfig.put(config.getConfigurationType(), config);
                 }
             }
-            return returnedConfig.values().toArray(new Configuration[returnedConfig.size()]);
+            return returnedConfig;
         }
 
         /**
@@ -143,7 +143,7 @@ public class UsecaseConfiguration {
          * @return value
          */
         public Configuration<?>[] getConfigurationList() {
-            return configurationList;
+            return configurationList.values().toArray(new Configuration[configurationList.size()]);
         }
 
         /**
@@ -154,10 +154,12 @@ public class UsecaseConfiguration {
          */
         public Configuration<?>[] getConfigurationList(final EnumSet<ConfigurationType> types) {
             final List<Configuration<?>> returnedConfig = new ArrayList<Configuration<?>>();
-            for (final Configuration<?> config : configurationList) {
-                if (types.contains(config.getConfigurationType())) {
-                    returnedConfig.add(config);
+            for (final ConfigurationType type : types) {
+                if (!configurationList.containsKey(type)) {
+                    final Configuration<?> emptyConf = Configuration.initByString(type, StringUtils.EMPTY);
+                    configurationList.put(type, emptyConf);
                 }
+                returnedConfig.add(configurationList.get(type));
             }
             return returnedConfig.toArray(new Configuration[returnedConfig.size()]);
         }
@@ -166,13 +168,14 @@ public class UsecaseConfiguration {
          * get one specific configuration or inits en empty one
          * 
          * @param types
-         * @return never null instead it creates an empty configuration of the requested type.
+         * @return never null instead it creates an empty configuration of the
+         *         requested type.
          */
         public Configuration<?> getConfiguration(final ConfigurationType type) {
             final Configuration<?>[] config = getConfigurationList(EnumSet.of(type));
             if (config == null || config.length <= 0) {
                 final Configuration<?> emptyConf = Configuration.initByString(type, StringUtils.EMPTY);
-                ArrayUtils.add(configurationList, emptyConf);
+                configurationList.put(type, emptyConf);
                 return emptyConf;
             } else {
                 return config[0];
@@ -208,7 +211,8 @@ public class UsecaseConfiguration {
         private final String parameterKey;
 
         /**
-         * the type of this parameters value, can be an primitive or an complex type like contentType
+         * the type of this parameters value, can be an primitive or an complex
+         * type like contentType
          */
         private final String parameterType;
 
@@ -333,7 +337,8 @@ public class UsecaseConfiguration {
     }
 
     /**
-     * finds the most matching usecase for an given struct by comparing its id and parameters
+     * finds the most matching usecase for an given struct by comparing its id
+     * and parameters
      * 
      * @param struct
      * @return value

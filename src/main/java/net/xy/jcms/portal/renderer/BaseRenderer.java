@@ -43,4 +43,15 @@ public class BaseRenderer implements IBaseRenderer {
         return new StringBuilder("</").append(tag).append(">");
     }
 
+    @Override
+    public StringBuilder renderMetaLink(final String href) {
+        return new StringBuilder("<link href=\"").append(href).append(
+                "\" media=\"all\" type=\"text/css\" rel=\"stylesheet\">");
+    }
+
+    @Override
+    public StringBuilder renderScriptInclude(final String scriptUri) {
+        return new StringBuilder("<script src=\"").append("scriptUri").append("\" type=\"text/javascript\"></script>");
+    }
+
 }

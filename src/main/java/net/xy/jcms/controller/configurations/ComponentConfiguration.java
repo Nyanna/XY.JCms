@@ -506,7 +506,7 @@ public abstract class ComponentConfiguration {
             for (final Entry<String, Class<?>> entry : prepare.entrySet()) {
                 if (!content.containsKey(entry.getKey())) {
                     if (config == null) {
-                        throw new IllegalArgumentException("An requiered configuration was missing");
+                        throw new IllegalArgumentException("An requiered content object was missing");
                     }
                     final Object got = config.getContent(entry.getKey(), entry.getValue(), this);
                     content.put(entry.getKey(), got);
@@ -526,7 +526,7 @@ public abstract class ComponentConfiguration {
     public Object getContent(final String key) {
         final Object contentObj = content.get(key);
         if (contentObj == null) {
-            throw new IllegalArgumentException("An not configured ui configuration were requested!");
+            throw new IllegalArgumentException("An not cprepared content object were requested!");
         }
         return contentObj;
     }

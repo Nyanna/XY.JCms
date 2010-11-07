@@ -36,7 +36,7 @@ public class BoxComponent extends AbstractComponent {
 
             @Override
             protected UI<?>[] prepareUIConfig() {
-                return new UI<?>[] { new UI<String>("styleClass", null, false) };
+                return new UI<?>[] { UI_STYLECLASS };
             }
 
             @Override

@@ -97,4 +97,13 @@ public class TemplateConfigurationProxy extends TemplateConfiguration {
     public Map<String, String> getPresentTemplates() {
         return presentTmpls;
     }
+
+    /**
+     * returns true if a config is missing
+     * 
+     * @return
+     */
+    public boolean isMissing() {
+        return missingTmpls.isEmpty() ? false : true;
+    }
 }

@@ -21,6 +21,10 @@ import java.util.Properties;
  * 
  */
 public class ContentConfiguration extends AbstractPropertyBasedConfiguration {
+    /**
+     * gloabl type constant for this type
+     */
+    public static final ConfigurationType TYPE = ConfigurationType.ContentConfiguration;
 
     /**
      * default
@@ -28,7 +32,7 @@ public class ContentConfiguration extends AbstractPropertyBasedConfiguration {
      * @param configurationValue
      */
     public ContentConfiguration(final Properties configurationValue) {
-        super(ConfigurationType.ContentConfiguration, configurationValue);
+        super(TYPE, configurationValue);
     }
 
     /**

@@ -32,6 +32,10 @@ import net.xy.jcms.shared.IRenderer;
  * 
  */
 public class RenderKitConfiguration extends Configuration<Map<?, IRenderer>> {
+    /**
+     * gloabl type constant for this type
+     */
+    public static final ConfigurationType TYPE = ConfigurationType.RenderKitConfiguration;
 
     /**
      * default constructor by Class = IRenderer
@@ -39,7 +43,7 @@ public class RenderKitConfiguration extends Configuration<Map<?, IRenderer>> {
      * @param configurationValue
      */
     public RenderKitConfiguration(final Map<?, IRenderer> configurationValue) {
-        super(ConfigurationType.RenderKitConfiguration, convert(configurationValue));
+        super(TYPE, convert(configurationValue));
     }
 
     /**

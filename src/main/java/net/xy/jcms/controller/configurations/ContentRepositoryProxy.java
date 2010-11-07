@@ -92,4 +92,13 @@ public class ContentRepositoryProxy extends ContentRepository {
         return presentContent;
     }
 
+    /**
+     * returns true if a config is missing
+     * 
+     * @return
+     */
+    public boolean isMissing() {
+        return missingContent.isEmpty() ? false : true;
+    }
+
 }

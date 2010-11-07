@@ -21,6 +21,10 @@ import java.util.Map;
  * 
  */
 public class ContentRepository extends Configuration<Map<String, Object>> {
+    /**
+     * gloabl type constant for this type
+     */
+    public static final ConfigurationType TYPE = ConfigurationType.ContentRepository;
 
     /**
      * default constructor
@@ -28,7 +32,7 @@ public class ContentRepository extends Configuration<Map<String, Object>> {
      * @param configurationValue
      */
     public ContentRepository(final Map<String, Object> configurationValue) {
-        super(ConfigurationType.ContentRepository, configurationValue);
+        super(TYPE, configurationValue);
     }
 
     @Override
@@ -46,6 +50,16 @@ public class ContentRepository extends Configuration<Map<String, Object>> {
      */
     public Object getContent(final String key, final Class<?> type, final ComponentConfiguration config) {
         return getContentMatch(key, type, config).getValue();
+    }
+
+    /**
+     * inserts content to these key
+     * 
+     * @param key
+     * @param content
+     */
+    public void putContent(final String key, final Object content) {
+        getConfigurationValue().put(key, content);
     }
 
     /**

@@ -22,6 +22,7 @@ import net.xy.jcms.controller.configurations.TemplateConfiguration;
 import net.xy.jcms.controller.configurations.UIConfiguration;
 import net.xy.jcms.shared.IFragment;
 import net.xy.jcms.shared.IOutWriter;
+import net.xy.jcms.shared.JCmsHelper;
 
 /**
  * these runner gets the configuration tree and performs the output rendering
@@ -42,7 +43,7 @@ public class ViewRunner {
      * @return value
      */
     public static ComponentConfiguration runConfiguration(final Configuration<?>[] configuration) {
-        final TemplateConfiguration tmplConfig = (TemplateConfiguration) getConfigurationByType(
+        final TemplateConfiguration tmplConfig = (TemplateConfiguration) JCmsHelper.getConfigurationByType(
                 ConfigurationType.TemplateConfiguration, configuration);
         if (tmplConfig != null) {
             final IFragment root = tmplConfig.get(ENTRY_TEMPLATE);
@@ -67,28 +68,12 @@ public class ViewRunner {
     private static ComponentConfiguration initializeConfigurations(final ComponentConfiguration rootConfig,
             final Configuration<?>[] model) {
         ComponentConfiguration.initialize(rootConfig,
-                (ContentRepository) getConfigurationByType(ConfigurationType.ContentRepository, model),
-                (TemplateConfiguration) getConfigurationByType(ConfigurationType.TemplateConfiguration, model),
-                (UIConfiguration) getConfigurationByType(ConfigurationType.UIConfiguration, model),
-                (MessageConfiguration) getConfigurationByType(ConfigurationType.MessageConfiguration, model),
-                (RenderKitConfiguration) getConfigurationByType(ConfigurationType.RenderKitConfiguration, model));
+                (ContentRepository) JCmsHelper.getConfigurationByType(ConfigurationType.ContentRepository, model),
+                (TemplateConfiguration) JCmsHelper.getConfigurationByType(ConfigurationType.TemplateConfiguration, model),
+                (UIConfiguration) JCmsHelper.getConfigurationByType(ConfigurationType.UIConfiguration, model),
+                (MessageConfiguration) JCmsHelper.getConfigurationByType(ConfigurationType.MessageConfiguration, model),
+                (RenderKitConfiguration) JCmsHelper.getConfigurationByType(ConfigurationType.RenderKitConfiguration, model));
         return rootConfig;
-    }
-
-    /**
-     * gets an configuration out of an configurationlist
-     * 
-     * @param configuration
-     * @return value
-     */
-    private static Configuration<?> getConfigurationByType(final ConfigurationType type,
-            final Configuration<?>[] configuration) {
-        for (final Configuration<?> config : configuration) {
-            if (type.equals(config.getConfigurationType())) {
-                return config;
-            }
-        }
-        return null;
     }
 
     /**
