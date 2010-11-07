@@ -36,7 +36,7 @@ public class HttpRequestDataAccessContext implements IDataAccessContext {
     public HttpRequestDataAccessContext(final HttpServletRequest request) throws MalformedURLException {
         // gets cappsubrand default locale and various other jj related
         // informations mendatory to retrieve jj configuration
-        rootUrl = new URL(request.getProtocol(), request.getLocalName(), request.getLocalPort(), "");
+        rootUrl = new URL(request.getProtocol().split("/", 2)[0], request.getLocalName(), request.getLocalPort(), "");
     }
 
     @Override
