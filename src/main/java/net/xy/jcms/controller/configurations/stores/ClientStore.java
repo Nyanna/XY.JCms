@@ -16,6 +16,14 @@
  */
 package net.xy.jcms.controller.configurations.stores;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * provides an mechanism to store informations on the client in http it would be
  * an cookie
@@ -27,12 +35,39 @@ public class ClientStore {
     /**
      * limit in bytes -1 means not limit
      */
-    private int limit = -1;
+    private final int limit;
+
+    /**
+     * internal store
+     */
+    private final Map<String, Object> store = new HashMap<String, Object>();
+
+    /**
+     * stores the actual used bytes
+     */
+    private int actualUsage = 0;
+
+    /**
+     * stores the type of saving and reading mechanism
+     */
+    private final Type type;
+
+    /**
+     * triggers the method used for saving the store
+     * 
+     * @author Xyan
+     * 
+     */
+    public enum Type {
+        NONE, ONCLIENT, ONSERVER;
+    }
 
     /**
      * default constructor with deactivated store
      */
-    public ClientStore() {
+    public ClientStore(final Type type) {
+        this.type = type;
+        limit = -1;
     }
 
     /**
@@ -41,8 +76,9 @@ public class ClientStore {
      * @param limit
      *            capacity of bytes an client can store
      */
-    public ClientStore(final int limit) {
+    public ClientStore(final int limit, final Type type) {
         this.limit = limit;
+        this.type = type;
     }
 
     /**
@@ -55,16 +91,38 @@ public class ClientStore {
     }
 
     /**
+     * returns the storage type
+     * 
+     * @return
+     */
+    public Type getType() {
+        return type;
+    }
+
+    /**
      * checks if an object would exceeds the capacity left
      * 
      * @param object
      * @return true in case it exceeds or the store is NA
      */
     public boolean exceedsLimit(final Object object) {
-        if (getLimit() == -1) {
+        if (limit == -1) {
             return true;
         }
-        // TODO [LOW] implement limit check
+        if (limit == 0) {
+            return false;
+        }
+        if (object instanceof String) {
+            return actualUsage + ((String) object).length() > limit;
+        } else if (object instanceof Serializable) {
+            // serialization
+            final ByteArrayOutputStream st = serialize(object);
+            if (st != null) {
+                return actualUsage + st.size() > limit;
+            }
+        } else {
+            return actualUsage + object.toString().length() > limit;
+        }
         return false;
     }
 
@@ -78,10 +136,31 @@ public class ClientStore {
      *             if the store in NA or the value exceeds the limit
      */
     public void store(final String key, final Object value) throws ClientStoreException {
-        if (getLimit() == -1) {
+        if (limit == 0) {
             throw new ClientStoreException("Client don't supports storing");
         }
-        // TODO [HIGH] storing of Clientstore
+        if (value instanceof String) {
+            if (!(actualUsage + ((String) value).length() > limit)) {
+                store.put(key, value);
+                actualUsage = actualUsage + ((String) value).length();
+                return;
+            }
+        } else if (value instanceof Serializable) {
+            // serialization
+            final ByteArrayOutputStream st = serialize(value);
+            if (st != null && !(actualUsage + st.size() > limit)) {
+                store.put(key, value);
+                actualUsage = actualUsage + st.size();
+            }
+        } else {
+            final String objStr = value.toString();
+            if (!(actualUsage + objStr.length() > limit)) {
+                store.put(key, value);
+                actualUsage = actualUsage + objStr.length();
+                return;
+            }
+        }
+        throw new ClientStoreException("Object could not be analyzed or converted or stored.");
     }
 
     /**
@@ -93,6 +172,15 @@ public class ClientStore {
      */
     public Object getValue(final String key) {
         return key;
+    }
+
+    /**
+     * returns all object currently in the store
+     * 
+     * @return an unmodifyable map
+     */
+    public Map<String, Object> getAll() {
+        return Collections.unmodifiableMap(store);
     }
 
     /**
@@ -113,6 +201,45 @@ public class ClientStore {
         public ClientStoreException(final String string) {
             super(string);
         }
+    }
+
+    /**
+     * serializes an object
+     * 
+     * @param obj
+     * @return
+     */
+    private static ByteArrayOutputStream serialize(final Object obj) {
+        final ByteArrayOutputStream st = new ByteArrayOutputStream();
+        try {
+            final ObjectOutputStream out = new ObjectOutputStream(st);
+            out.writeObject(obj);
+            out.flush();
+        } catch (final IOException e) {
+            return null;
+        }
+        return st;
+    }
+
+    /**
+     * converts an object to anstring via toString or serialization
+     * 
+     * @param obj
+     * @return
+     */
+    public static String objectToString(final Object obj) {
+        if (obj instanceof String) {
+            return (String) obj;
+        } else if (obj instanceof Serializable) {
+            // serialization
+            final ByteArrayOutputStream st = serialize(obj);
+            if (st != null) {
+                return st.toString();
+            }
+        } else {
+            return obj.toString();
+        }
+        return null;
     }
 
 }

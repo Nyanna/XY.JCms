@@ -153,6 +153,22 @@ public class XYCache {
         manager.push(new Request(region, key, obj));
     }
 
+    /**
+     * flushes all regions from this cache
+     */
+    public void flush() {
+        manager.flush = true;
+    }
+
+    /**
+     * removes outdated objects from cache
+     * 
+     * @param maxOld
+     */
+    public void clean(final int maxOld) {
+        manager.clean = maxOld;
+    }
+
     // Manager
     /**
      * cache manager class
@@ -179,34 +195,97 @@ public class XYCache {
             this.base = base;
         }
 
-        // TODO [LOW] implement flush and clean operation
-        // clean auto/manual
-        // auto should raised when max mem of cache get reached in incrementally
-        // removes the oldes entrys firt 30 second 29, 28 until usage drops
-        // below 50%
-
         /**
          * flag which triggers thread shutdown
          */
         protected boolean stop = false;
 
+        /**
+         * trigger for flushing
+         */
+        protected boolean flush = false;
+
+        /**
+         * trigern for manual cleanup
+         */
+        protected int clean = 0;
+
         @Override
         public void run() {
-            if (stop) {
-                return; // shutdown trigered
+            while (!stop) { // shutdown trigered
+                try {
+                    Thread.sleep(50);
+                } catch (final InterruptedException e) {
+                    LOG.error("The thread was forced to shutdown.");
+                    return;
+                }
+                while (!tasks.isEmpty()) {
+                    final Request req = tasks.pop();
+                    proccessRequest(req);
+                    if (flush) {
+                        flush = false;
+                        flushAllRegions();
+                    }
+                    if (clean > 0) {
+                        clean(clean);
+                        clean = 0;
+                    }
+                    if (riseCleanup()) {
+                        incrementalClean();
+                    }
+                }
             }
-            try {
-                // LOG.debug("[SLEEP] Queue is empty sleeping a bit.");
-                Thread.sleep(50);
-                // LOG.debug("[WAKEUP] RingRing time to wakeup.");
-            } catch (final InterruptedException e) {
-                LOG.error("The thread was forced to shutdown.");
-                return;
+        }
+
+        /**
+         * checks all region and objects if they are older than maxAge
+         * 
+         * @param maxAge
+         *            in seconds
+         */
+        private void clean(final int maxAge) {
+            final long oldStamp = System.nanoTime() - maxAge;
+            for (final String regionName : base.keySet()) {
+                final Map<String, CacheObj> region = base.get(regionName);
+                for (final String key : region.keySet()) {
+                    final CacheObj obj = region.get(key);
+                    if (obj.getTimeStamp() < oldStamp) {
+                        // object to old, removing
+                        region.remove(key);
+                    }
+                }
             }
-            while (!tasks.isEmpty()) {
-                proccessRequest(tasks.pop());
+        }
+
+        /**
+         * flushes all region
+         */
+        private void flushAllRegions() {
+            for (final Object key : base.entrySet()) {
+                base.remove(key);
             }
-            run();
+        }
+
+        /**
+         * checks if an cleanup should be applied
+         * 
+         * @return
+         */
+        private boolean riseCleanup() {
+            // clean auto/manual
+            // auto should raised when max mem of cache get reached in
+            // incrementally
+            // removes the oldes entrys firt 30 second 29, 28 until usage drops
+            // below 50%
+            return false;
+        }
+
+        /**
+         * implements an incremental cleanup until threshhold is reached or
+         * cache is empty
+         */
+        private void incrementalClean() {
+            // TODO [LOW] implement incremental cache cleanup and trigger
         }
 
         /**
@@ -216,12 +295,8 @@ public class XYCache {
          * @return
          */
         private void proccessRequest(final Request req) {
-            // LOG.debug("Received request " + req.getRegion() + "." +
-            // req.getKey() + " " + req.getTimestamp());
             if (!base.containsKey(req.getRegion())) {
                 // create region if not exists
-                // LOG.debug("[CREATED] Region initially created " +
-                // req.getRegion());
                 base.put(req.getRegion(), new HashMap<String, CacheObj>());
             }
             boolean isUpdate = true; // default update
@@ -230,17 +305,8 @@ public class XYCache {
                 isUpdate = req.getTimestamp() > base.get(req.getRegion()).get(req.getKey()).getTimeStamp();
             }
             if (isUpdate) {
-                // LOG.debug("[CREATED] Request was processed and inserted " +
-                // req.getRegion() + "." + req.getKey() + " "
-                // + req.getTimestamp());
                 base.get(req.getRegion()).put(req.getKey(), new CacheObj(req.getTimestamp(), req.getObj()));
             }
-            // if (!isUpdate) {
-            // LOG.debug("[DROP] Received request was to old and would be skipped"
-            // + req.getRegion() + "." + req.getKey()
-            // + " "
-            // + req.getTimestamp());
-            // }
             return;
         }
 

@@ -30,7 +30,6 @@ public class ContentListComponent implements IComponent {
 
     @Override
     public void render(final IOutWriter out, final ComponentConfiguration config) {
-        // TODO Auto-generated method stub
 
     }
 

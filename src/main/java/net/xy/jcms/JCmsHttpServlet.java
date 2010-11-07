@@ -34,7 +34,6 @@ import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
 import net.xy.jcms.controller.configurations.ControllerConfiguration;
 import net.xy.jcms.controller.configurations.stores.ClientStore;
-import net.xy.jcms.shared.IDataAccessContext;
 import net.xy.jcms.shared.adapter.HttpProtocolRequestAdapter;
 import net.xy.jcms.shared.adapter.HttpProtocolResponseAdapter;
 import net.xy.jcms.shared.adapter.HttpRequestDataAccessContext;
@@ -73,7 +72,7 @@ public class JCmsHttpServlet extends HttpServlet {
         /**
          * first get portal configuration out from request information
          */
-        final IDataAccessContext dac = new HttpRequestDataAccessContext(request);
+        final HttpRequestDataAccessContext dac = new HttpRequestDataAccessContext(request);
 
         /**
          * first convert the request to an navigation/usecasestruct
@@ -84,7 +83,7 @@ public class JCmsHttpServlet extends HttpServlet {
         // the request: cookie data, header data,
         // post data
         NALKey forward = HttpProtocolRequestAdapter.apply(request, firstForward);
-        final ClientStore store = HttpProtocolRequestAdapter.initClientStore(request);
+        final ClientStore store = HttpProtocolRequestAdapter.initClientStore(request, dac);
 
         Usecase usecase;
         do {

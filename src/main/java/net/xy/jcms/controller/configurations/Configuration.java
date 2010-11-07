@@ -16,10 +16,12 @@
  */
 package net.xy.jcms.controller.configurations;
 
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.Properties;
 
 import net.xy.jcms.shared.DebugUtils;
 
@@ -248,12 +250,15 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
      * @return value
      */
     public static Configuration<?> initByStream(final ConfigurationType type, final InputStream stream) {
-        switch (type) {
-        default:
-            // TODO [HIGH] implement stream reading and inclusion mechanism
-            return new ContentConfiguration(new Properties());
-            // throw new
-            // UnsupportedOperationException("Configurationtype is not implemented to be initialized by stream.");
+        final StringBuilder writer = new StringBuilder();
+        final BufferedReader reader = new BufferedReader(new InputStreamReader(stream), 1024);
+        final char[] buffer = new char[1024];
+        try {
+            while (reader.read(buffer) != -1) {
+                writer.append(buffer);
+            }
+        } catch (final IOException e) {
         }
+        return initByString(type, writer.toString());
     }
 }

@@ -60,19 +60,22 @@ public class HttpProtocolRequestAdapter {
     }
 
     /**
-     * extracts an clientstore out from the http request, for http it fills the store always with all cookies
+     * extracts an clientstore out from the http request, for http it fills the
+     * store always with all cookies
      * 
      * @param request
      * @return returns an -1 limited store if the client don't supports an store
      */
-    public static ClientStore initClientStore(final HttpServletRequest request) {
-        if (request.getCookies() != null && request.getCookies().length > 0) {
+    public static ClientStore initClientStore(final HttpServletRequest request, final HttpRequestDataAccessContext dac) {
+        if (supportsCookies(request)) {
             // 20 per domain * 4 kb each calculated from the headerline RFC 2109
-            return new ClientStore(4000);
+            return new ClientStore(4000, ClientStore.Type.ONCLIENT);
+        } else if (request.getSession() != null) {
+            // session present read from there
+            dac.setSessionId(request.getSession().getId());
+            return new ClientStore(-1, ClientStore.Type.ONSERVER);
         } else {
-            // here can also session support implemented, which simulates an clientstore through the session api and
-            // referenceStore
-            return new ClientStore();
+            return new ClientStore(0, ClientStore.Type.NONE);
         }
     }
 
@@ -94,5 +97,15 @@ public class HttpProtocolRequestAdapter {
             params.put(cookie.getName() + ".secure", cookie.getSecure());
         }
         return params;
+    }
+
+    /**
+     * checks if client supports cookies based on if he has send at least one
+     * 
+     * @param request
+     * @return
+     */
+    public static boolean supportsCookies(final HttpServletRequest request) {
+        return request.getCookies() != null && request.getCookies().length > 0;
     }
 }

@@ -70,6 +70,9 @@ public class UsecaseConfiguration {
          */
         private final Map<ConfigurationType, Configuration<?>> configurationList;
 
+        // TODO [LOW] optimize all occurences of configuration list and replace
+        // them with not iteration strategy access
+
         /**
          * default constructor
          * 

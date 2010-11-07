@@ -12,6 +12,9 @@
  */
 package net.xy.jcms.shared.adapter;
 
+import java.util.Map.Entry;
+
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
 import net.xy.jcms.controller.configurations.Configuration;
@@ -26,22 +29,33 @@ import net.xy.jcms.controller.configurations.stores.ClientStore;
 public class HttpProtocolResponseAdapter {
 
     /**
-     * alters the response headers based on the obmitted configuration maybe an dedicated response configuration should
-     * be introduced
+     * alters the response headers based on the obmitted configuration maybe an
+     * dedicated response configuration should be introduced
      * 
      * @param response
      * @param model
      */
-    public static void apply(final HttpServletResponse response, final Configuration<?>[] model) {}
+    public static void apply(final HttpServletResponse response, final Configuration<?>[] model) {
+    }
 
     /**
-     * appends the clientstore back to the http response. for http it should only send changed dataas cookies.
+     * appends the clientstore back to the http response. for http it should
+     * only send changed dataas cookies.
      * 
      * @param store
      */
     public static void saveClientStore(final HttpServletResponse response, final ClientStore store) {
-        // TODO [LOW] implement client stopre saving in http
-        // in case of an of non supported cookies save to session
+        if (store == null) {
+            return;
+        }
+        if (ClientStore.Type.ONCLIENT.equals(store.getType())) {
+            // TODO [LOW] implement store object with expiration time
+            for (final Entry<String, Object> entry : store.getAll().entrySet()) {
+                response.addCookie(new Cookie(entry.getKey(), ClientStore.objectToString(entry.getValue())));
+            }
+        } else if (ClientStore.Type.ONSERVER.equals(store.getType())) {
+            // nothing todo for http session
+        }
         return;
     }
 }

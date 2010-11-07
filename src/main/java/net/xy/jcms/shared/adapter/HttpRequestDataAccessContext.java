@@ -33,6 +33,11 @@ public class HttpRequestDataAccessContext implements IDataAccessContext {
      */
     private final URL rootUrl;
 
+    /**
+     * if an session id should be stored on every link
+     */
+    private String sessionId = null;
+
     public HttpRequestDataAccessContext(final HttpServletRequest request) throws MalformedURLException {
         // gets cappsubrand default locale and various other jj related
         // informations mendatory to retrieve jj configuration
@@ -49,5 +54,23 @@ public class HttpRequestDataAccessContext implements IDataAccessContext {
         } catch (final MalformedURLException e) {
         }
         return null;
+    }
+
+    /**
+     * gets the session id string
+     * 
+     * @return
+     */
+    public String getSessionId() {
+        return sessionId;
+    }
+
+    /**
+     * sets an session id
+     * 
+     * @param sessionId
+     */
+    public void setSessionId(final String sessionId) {
+        this.sessionId = sessionId;
     }
 }

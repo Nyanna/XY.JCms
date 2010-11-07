@@ -26,7 +26,7 @@
         </parameter>
 
         <configurations>
-        	<configuration type="TemplateConfiguration" include="class://de.jj.fragmentspool.subcategoryPage"/>
+        	<!--configuration type="TemplateConfiguration" include="class://de.jj.fragmentspool.subcategoryPage"/-->
         </configurations>
     </usecase>
 
@@ -42,7 +42,7 @@
         </controller>
 
         <configurations>
-	        <configuration type="TemplateConfiguration" include="class://de.jj.fragmentspool.myarea.loginPage"/>
+	        <!--configuration type="TemplateConfiguration" include="class://de.jj.fragmentspool.myarea.loginPage"/-->
         </configurations>
     </usecase>
     
@@ -64,12 +64,12 @@
             <class path="net.xyan.controller.ContentUnavailableController" obmitConfig="ContentConfiguration"/>
         </controller>
         <configurations>
-	        <configuration type="ContentConfiguration" include="class://de.jamba.config.GlobalBindConfig"/>
+	        <!--configuration type="ContentConfiguration" include="class://de.jamba.config.GlobalBindConfig"/-->
 	        <configuration type="ContentConfiguration">
 	            bind_maincontentbox1 = ...
 	        </configuration>
 	
-	        <configuration type="UIConfiguration" include="class://de.jamba.config.CTypeUIConfig"/>
+	        <!--configuration type="UIConfiguration" include="class://de.jamba.config.CTypeUIConfig"/-->
 	        <configuration type="UIConfiguration">
 	        	<![CDATA[
 	            id_maincontentbox1 = ...

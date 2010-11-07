@@ -89,7 +89,7 @@ public class ControllerConfiguration extends Configuration<Map<String, Map<Strin
         return getConfigurationValue().equals(object);
     }
 
-    private ClientStore store = new ClientStore();
+    private ClientStore store = null;
 
     /**
      * returns an clientStore
