@@ -60,7 +60,7 @@ public interface IBaseRenderer extends IRenderer {
      * method for rendering meta link tags in html
      * 
      * @param href
-     * @return
+     * @return value
      */
     public StringBuilder renderMetaLink(final String href);
 
@@ -68,7 +68,40 @@ public interface IBaseRenderer extends IRenderer {
      * renders various script inclusions
      * 
      * @param href
-     * @return
+     * @return value
      */
     public StringBuilder renderScriptInclude(final String scriptUri);
+
+    /**
+     * render an link startTag
+     * 
+     * @param href
+     *            link reference
+     * @param title
+     *            the title of the link
+     * @param rel
+     *            seo/crawler param
+     * @return value
+     */
+    public StringBuilder renderLinkStart(final String href, final String title, final String rel);
+
+    /**
+     * render an closing link tag
+     * 
+     * @return value
+     */
+    public StringBuilder renderLinkEnd();
+
+    /**
+     * renders an standalone im image
+     * 
+     * @param src
+     *            image
+     * @param alt
+     *            if null title would be asumed
+     * @param title
+     *            if null alt would be asumed
+     * @return value
+     */
+    public StringBuilder renderImage(final String src, final String alt, final String title);
 }

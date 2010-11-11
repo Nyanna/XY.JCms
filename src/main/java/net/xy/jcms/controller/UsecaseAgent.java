@@ -103,18 +103,22 @@ public class UsecaseAgent {
     public static NALKey executeController(final Usecase usecase, final IDataAccessContext dac,
             final Map<Object, Object> parameters) throws ClassNotFoundException {
         final Controller[] list = usecase.getControllerList();
+        NALKey next = null;
         for (final Controller controller : list) {
             final EnumSet<ConfigurationType> types = controller.getObmitedConfigurations().clone();
             types.addAll(ConfigurationType.CONTROLLERAPPLICABLE);
             final Configuration<?>[] configs = usecase.getConfigurationList(types);
             if (types.contains(ConfigurationType.Parameters)) {
                 // obmit parameters if configured
-                return controller.invoke(dac, configs, parameters);
+                next = controller.invoke(dac, configs, parameters);
             } else {
-                return controller.invoke(dac, configs, null);
+                next = controller.invoke(dac, configs, null);
+            }
+            if (next != null) {
+                break;
             }
         }
-        return null;
+        return next;
     }
 
     /**

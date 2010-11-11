@@ -13,26 +13,17 @@
 package net.xy.jcms.controller.configurations;
 
 import net.xy.jcms.controller.configurations.UIConfiguration.UI;
-import net.xy.jcms.shared.IComponent;
 import net.xy.jcms.shared.IFragment;
-import net.xy.jcms.shared.IOutWriter;
 import net.xy.jcms.shared.IRenderer;
 
 /**
- * fragment configuratio scheme. an fragment is almost an component except of
- * the following restriktions: -an fragment can't own message or ui
- * configuration and can't request renderers
+ * fragment configuratio scheme. an fragment is almost an component except of the following restriktions: -an fragment
+ * can't own message or ui configuration and can't request renderers
  * 
  * @author Xyan
  * 
  */
 public abstract class FragmentConfiguration extends ComponentConfiguration {
-
-    /**
-     * holds the appropriated components instance, which requests and renders
-     * these configuration
-     */
-    private final IComponent compInstance;
 
     /**
      * default constructor
@@ -42,7 +33,6 @@ public abstract class FragmentConfiguration extends ComponentConfiguration {
      */
     protected FragmentConfiguration(final IFragment compInstance) {
         super(compInstance);
-        this.compInstance = compInstance;
     }
 
     /**
@@ -51,25 +41,6 @@ public abstract class FragmentConfiguration extends ComponentConfiguration {
     @Override
     final protected String[] prepareMessages() {
         return null;
-    }
-
-    /**
-     * returns the component instance
-     * 
-     * @return value
-     */
-    private IComponent getCompInstance() {
-        return compInstance;
-    }
-
-    /**
-     * security flaw needed to connect different types of configs. renders this
-     * template
-     * 
-     * @param out
-     */
-    protected void render(final IOutWriter out) {
-        getCompInstance().render(out, this);
     }
 
     /**
@@ -86,5 +57,10 @@ public abstract class FragmentConfiguration extends ComponentConfiguration {
     @Override
     protected Class<? extends IRenderer>[] prepareRenderers() {
         return null;
+    }
+
+    @Override
+    public void setUIConfig(final String key, final Object value) {
+        throw new IllegalArgumentException("Setting an UI config on an Template/Fragment is not supported!");
     }
 }

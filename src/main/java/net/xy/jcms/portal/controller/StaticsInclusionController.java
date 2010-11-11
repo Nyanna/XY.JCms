@@ -34,6 +34,7 @@ import net.xy.jcms.controller.usecase.IController;
 import net.xy.jcms.shared.IDataAccessContext;
 import net.xy.jcms.shared.JCmsHelper;
 import net.xy.jcms.shared.types.StringList;
+import net.xy.jcms.shared.types.StringMap;
 
 public class StaticsInclusionController implements IController {
 
@@ -87,22 +88,43 @@ public class StaticsInclusionController implements IController {
     private static void proccessBinVars(final List<String> binVars, final Map<String, String> ownC,
             final ContentRepository configC) {
         for (final String binVar : binVars) {
-            // get prefix
-            final String prefix = ownC.containsKey(binVar + "." + "prefix") ? ownC.get(binVar + "." + "prefix") : ownC
-                    .get("prefix");
-            // get url list
-            final StringList contentList = new StringList(ownC.get(binVar + "." + "content"));
-            // prefix if configured
-            if (StringUtils.isNotBlank(prefix)) {
-                final ListIterator<String> it = contentList.listIterator();
-                while (it.hasNext()) {
-                    final String content = it.next();
-                    it.set(prefix + content.trim());
+            // get domain in case of one
+            final String domain = ownC.containsKey(binVar + "." + "domain") ? ownC.get(binVar + "." + "domain") : ownC
+                    .get("domain");
+
+            // get path prefix
+            final String prefix = domain
+                    + (ownC.containsKey(binVar + "." + "prefix") ? ownC.get(binVar + "." + "prefix") : ownC
+                            .get("prefix"));
+            // get type
+            final String type = (ownC.containsKey(binVar + "." + "type") ? ownC.get(binVar + "." + "type") : ownC
+                    .get("type")).trim();
+
+            Object finalContent = null;
+            // get content in right object
+            if ("StringList".equalsIgnoreCase(type)) {
+                // get url list
+                final StringList contentList = new StringList(ownC.get(binVar + "." + "content"));
+                // prefix if configured
+                if (StringUtils.isNotBlank(prefix)) {
+                    final ListIterator<String> it = contentList.listIterator();
+                    while (it.hasNext()) {
+                        final String content = it.next();
+                        it.set(prefix + content.trim());
+                    }
                 }
+                finalContent = contentList;
+            } else if ("StringMap".equalsIgnoreCase(type)) {
+                finalContent = new StringMap(ownC.get(binVar + "." + "content"));
+            } else if ("String".equalsIgnoreCase(type)) {
+                finalContent = prefix + ownC.get(binVar + "." + "content");
             }
+
             // put in targets
-            for (final String target : new StringList(ownC.get(binVar + "." + "target"))) {
-                configC.putContent(target, contentList);
+            if (finalContent != null) {
+                for (final String target : new StringList(ownC.get(binVar + "." + "target"))) {
+                    configC.putContent(target, finalContent);
+                }
             }
         }
     }

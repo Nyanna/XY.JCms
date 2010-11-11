@@ -15,7 +15,6 @@ package net.xy.jcms.portal.templates;
 import java.util.Map;
 
 import net.xy.jcms.controller.configurations.ComponentConfiguration;
-import net.xy.jcms.controller.configurations.ContentRepository;
 import net.xy.jcms.controller.configurations.FragmentConfiguration;
 import net.xy.jcms.portal.components.BoxComponent;
 import net.xy.jcms.portal.components.TextComponent;
@@ -29,7 +28,7 @@ public class ExampleMainLayout extends AbstractFragment {
         return new FragmentConfiguration(this) {
 
             @Override
-            protected ComponentConfiguration[] prepareChildren(final ContentRepository repository) {
+            protected ComponentConfiguration[] prepareChildren(final Map<String, Object> content) {
                 final ComponentConfiguration maincontent = addComponent("xyx-maincontent", BoxComponent.getInstance());
                 final ComponentConfiguration simpletext = maincontent
                         .addComponent("simpleText", TextComponent.getInstance());
@@ -38,7 +37,7 @@ public class ExampleMainLayout extends AbstractFragment {
             }
 
             @Override
-            protected String[] prepareTemplates(final ContentRepository repository) {
+            protected String[] prepareTemplates(final Map<String, Object> content) {
                 return null;
             }
 

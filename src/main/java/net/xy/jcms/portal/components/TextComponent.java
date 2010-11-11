@@ -17,7 +17,6 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 
 import net.xy.jcms.controller.configurations.ComponentConfiguration;
-import net.xy.jcms.controller.configurations.ContentRepository;
 import net.xy.jcms.controller.configurations.UIConfiguration.UI;
 import net.xy.jcms.portal.renderer.ITextRenderer;
 import net.xy.jcms.shared.AbstractComponent;
@@ -47,12 +46,12 @@ public class TextComponent extends AbstractComponent {
             }
 
             @Override
-            protected String[] prepareTemplates(final ContentRepository repository) {
+            protected String[] prepareTemplates(final Map<String, Object> content) {
                 return null;
             }
 
             @Override
-            protected ComponentConfiguration[] prepareChildren(final ContentRepository repository) {
+            protected ComponentConfiguration[] prepareChildren(final Map<String, Object> content) {
                 return null;
             }
 

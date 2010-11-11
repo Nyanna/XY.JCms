@@ -12,7 +12,10 @@
  */
 package net.xy.jcms.controller.configurations;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -37,14 +40,12 @@ public abstract class ComponentConfiguration {
     public final static String COMPONENT_PATH_SEPARATOR = ".";
 
     /**
-     * holds the mendatory component id. On every added component id got set on
-     * every fragment not.
+     * holds the mendatory component id. On every added component id got set on every fragment not.
      */
     private String id = "";
 
     /**
-     * holds an id stacked component path. On every added component path got set
-     * on every fragment not.
+     * holds an id stacked component path. On every added component path got set on every fragment not.
      */
     private String componentPath = "";
 
@@ -54,10 +55,14 @@ public abstract class ComponentConfiguration {
     private ComponentConfiguration parent = null;
 
     /**
-     * holds the appropriated components instance, which requests and renders
-     * these configuration
+     * holds the appropriated components instance, which requests and renders these configuration
      */
     private final IComponent compInstance;
+
+    /**
+     * flag stores if the config were already initialized and if further configs are possible
+     */
+    private boolean ready = false;
 
     /**
      * constructor
@@ -76,8 +81,7 @@ public abstract class ComponentConfiguration {
     }
 
     /**
-     * initializes the complete component configuration in case of an
-     * missconfiguration it throws an exception
+     * initializes the complete component configuration in case of an missconfiguration it throws an exception
      * 
      * @param cmpConfig
      *            ComponentConfiguration to be initialized
@@ -93,8 +97,9 @@ public abstract class ComponentConfiguration {
     public static void initialize(final ComponentConfiguration cmpConfig, final ContentRepository repository,
             final TemplateConfiguration tmplConf, final UIConfiguration uiConf, final MessageConfiguration messConf,
             final RenderKitConfiguration renderConf) {
-        cmpConfig.initConfiguration(tmplConf, repository);
+        cmpConfig.changeValid();
         cmpConfig.initConfiguration(repository);
+        cmpConfig.initConfiguration(tmplConf);
         cmpConfig.initConfiguration(uiConf);
         cmpConfig.initConfiguration(messConf);
         cmpConfig.initConfiguration(renderConf);
@@ -104,6 +109,23 @@ public abstract class ComponentConfiguration {
         }
         for (final FragmentConfiguration fragment : cmpConfig.getTemplates().values()) {
             ComponentConfiguration.initialize(fragment, repository, tmplConf, uiConf, messConf, renderConf);
+        }
+        cmpConfig.setReady();
+    }
+
+    /**
+     * only used by initialization routine finalizes the configuration
+     */
+    private void setReady() {
+        ready = true;
+    }
+
+    /**
+     * method checks if the config already is finalized and throws an exception
+     */
+    private void changeValid() {
+        if (ready) {
+            throw new IllegalStateException("Component already finalized no further changes possible");
         }
     }
 
@@ -141,6 +163,7 @@ public abstract class ComponentConfiguration {
      * @param id
      */
     private void setId(final String id) {
+        changeValid();
         this.id = id;
         updateComponentPath();
     }
@@ -169,6 +192,7 @@ public abstract class ComponentConfiguration {
      * @param parent
      */
     final private void setParent(final ComponentConfiguration parent) {
+        changeValid();
         this.parent = parent;
         updateComponentPath();
     }
@@ -177,6 +201,7 @@ public abstract class ComponentConfiguration {
      * triggers an component path update
      */
     final protected void updateComponentPath() {
+        changeValid();
         if (parent != null) {
             final StringBuilder key = new StringBuilder(parent.getComponentPath());
             if (StringUtils.isNotEmpty(key.toString())) {
@@ -225,6 +250,7 @@ public abstract class ComponentConfiguration {
      * @param config
      */
     final protected void addChildren(final String id, final ComponentConfiguration child) {
+        changeValid();
         child.setParent(this);
         child.setId(id);
         children.put(id, child);
@@ -238,6 +264,7 @@ public abstract class ComponentConfiguration {
      * @return value
      */
     public ComponentConfiguration addComponent(final String id, final IComponent component) {
+        changeValid();
         final ComponentConfiguration config = component.getConfiguration();
         addChildren(id, config);
         return config;
@@ -247,7 +274,7 @@ public abstract class ComponentConfiguration {
      * init child retrieval proccess recursively
      */
     private void getChildConfiguration(final ContentRepository repository) {
-        final ComponentConfiguration[] childs = prepareChildren(repository);
+        final ComponentConfiguration[] childs = prepareChildren(Collections.unmodifiableMap(content));
         if (childs != null) {
             for (final ComponentConfiguration child : childs) {
                 child.getId();
@@ -258,11 +285,20 @@ public abstract class ComponentConfiguration {
     }
 
     /**
+     * returns un unmodifiable list of the childrens
+     * 
+     * @return unmodifiable value
+     */
+    public List<String> getChildList() {
+        return Collections.unmodifiableList(new ArrayList<String>(children.keySet()));
+    }
+
+    /**
      * prepare and collect the child configuration
      * 
      * @return value
      */
-    protected abstract ComponentConfiguration[] prepareChildren(final ContentRepository repository);
+    protected abstract ComponentConfiguration[] prepareChildren(final Map<String, Object> content);
 
     /**
      * get an single child configuration
@@ -385,13 +421,13 @@ public abstract class ComponentConfiguration {
     }
 
     /**
-     * method to configure childs ui config aggregation. Only usefull in the
-     * aggregation phase.
+     * method to configure childs ui config aggregation. Only usefull in the aggregation phase.
      * 
      * @param key
      * @param value
      */
     public void setUIConfig(final String key, final Object value) {
+        changeValid();
         uiconfig.put(key, value);
     }
 
@@ -438,8 +474,8 @@ public abstract class ComponentConfiguration {
      */
     private final Map<String, FragmentConfiguration> templates = new HashMap<String, FragmentConfiguration>();
 
-    private void initConfiguration(final TemplateConfiguration config, final ContentRepository repository) {
-        final String[] prepare = prepareTemplates(repository);
+    private void initConfiguration(final TemplateConfiguration config) {
+        final String[] prepare = prepareTemplates(Collections.unmodifiableMap(content));
         if (prepare != null) {
             for (final String name : prepare) {
                 if (!templates.containsKey(name)) {
@@ -455,7 +491,7 @@ public abstract class ComponentConfiguration {
         }
     }
 
-    protected abstract String[] prepareTemplates(final ContentRepository repository);
+    protected abstract String[] prepareTemplates(final Map<String, Object> content);
 
     private FragmentConfiguration getTemplate(final String name) {
         final FragmentConfiguration tmpl = templates.get(name);
@@ -473,7 +509,7 @@ public abstract class ComponentConfiguration {
      */
     public void renderTemplate(final String name, final IOutWriter out) {
         if (StringUtils.isNotBlank(name)) {
-            getTemplate(name).render(out);
+            ((ComponentConfiguration) getTemplate(name)).getCompInstance().render(out, getTemplate(name));
         }
     }
 
@@ -513,6 +549,14 @@ public abstract class ComponentConfiguration {
                 }
             }
         }
+    }
+
+    /**
+     * sets an content object to this child
+     */
+    public void setContent(final String key, final Object obj) {
+        changeValid();
+        content.put(key, obj);
     }
 
     protected abstract Map<String, Class<?>> prepareContent();

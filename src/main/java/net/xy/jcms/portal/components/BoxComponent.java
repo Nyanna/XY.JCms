@@ -15,7 +15,6 @@ package net.xy.jcms.portal.components;
 import java.util.Map;
 
 import net.xy.jcms.controller.configurations.ComponentConfiguration;
-import net.xy.jcms.controller.configurations.ContentRepository;
 import net.xy.jcms.controller.configurations.UIConfiguration.UI;
 import net.xy.jcms.portal.renderer.IBoxRenderer;
 import net.xy.jcms.shared.AbstractComponent;
@@ -40,7 +39,7 @@ public class BoxComponent extends AbstractComponent {
             }
 
             @Override
-            protected String[] prepareTemplates(final ContentRepository repository) {
+            protected String[] prepareTemplates(final Map<String, Object> content) {
                 return null;
             }
 
@@ -56,7 +55,7 @@ public class BoxComponent extends AbstractComponent {
             }
 
             @Override
-            protected ComponentConfiguration[] prepareChildren(final ContentRepository repository) {
+            protected ComponentConfiguration[] prepareChildren(final Map<String, Object> content) {
                 return null;
             }
 

@@ -54,4 +54,35 @@ public class BaseRenderer implements IBaseRenderer {
         return new StringBuilder("<script src=\"").append("scriptUri").append("\" type=\"text/javascript\"></script>");
     }
 
+    @Override
+    public StringBuilder renderLinkStart(final String href, final String title, final String rel) {
+        final StringBuilder ret = new StringBuilder("<a").append(" href=\"").append(href).append("\"");
+        if (title != null) {
+            ret.append(" title=\"").append(title).append("\"");
+        }
+        if (rel != null) {
+            ret.append(" rel=\"").append(title).append("\"");
+        }
+        return ret.append("/>");
+    }
+
+    @Override
+    public StringBuilder renderLinkEnd() {
+        return renderEndTag("a");
+    }
+
+    @Override
+    public StringBuilder renderImage(final String src, final String alt, final String title) {
+        final String ialt = alt != null ? alt : title;
+        final String ititle = title != null ? title : alt;
+        final StringBuilder ret = new StringBuilder("<img src=\"").append(src).append("\"");
+        if (ialt != null) {
+            ret.append(" alt=\"").append(ialt).append("\"");
+        }
+        if (ititle != null) {
+            ret.append(" title=\"").append(title).append("\"");
+        }
+        return ret.append("/>");
+    }
+
 }

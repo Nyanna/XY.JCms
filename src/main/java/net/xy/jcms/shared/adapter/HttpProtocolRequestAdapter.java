@@ -47,19 +47,6 @@ public class HttpProtocolRequestAdapter {
     }
 
     /**
-     * appends http protocol request parameters in ?key=val&... style
-     * 
-     * @param path
-     *            an human readable already translated path
-     * @param parameters
-     * @return value
-     */
-    public static String appendParametersToPath(final String path, final Map<Object, Object> parameters) {
-        // TODO [LOW] implement logic to append ?name=value&...
-        return path;
-    }
-
-    /**
      * extracts an clientstore out from the http request, for http it fills the
      * store always with all cookies
      * 
