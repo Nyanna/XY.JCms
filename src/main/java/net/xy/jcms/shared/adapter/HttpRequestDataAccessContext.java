@@ -47,12 +47,29 @@ public class HttpRequestDataAccessContext implements IDataAccessContext {
      */
     private String sessionId = null;
 
+    /**
+     * holds the servletcontainer path
+     */
+    private String contextPath = "";
+
+    /**
+     * hold the initial independent request path
+     */
+    private final String requestPath;
+
     public HttpRequestDataAccessContext(final HttpServletRequest request) throws MalformedURLException,
             URISyntaxException {
         // gets cappsubrand default locale and various other jj related
         // informations mendatory to retrieve jj configuration
         // request.getRequestURI().substring(0,
         // request.getRequestURI().lastIndexOf("/") + 1)
+        try {
+            request.setCharacterEncoding("UTF-8");
+        } catch (final UnsupportedEncodingException e) {
+        }
+        contextPath = request.getContextPath() + "/";
+        requestPath = request.getPathInfo().length() > 0 && request.getPathInfo().charAt(0) == '/' ? request.getPathInfo()
+                .substring(1) : request.getPathInfo();
         rootUrl = new URI(request.getProtocol().split("/", 2)[0], null, request.getLocalName(), request.getLocalPort(),
                 "/", null, null);
     }
@@ -79,8 +96,9 @@ public class HttpRequestDataAccessContext implements IDataAccessContext {
                     path, buildQuery(parameters), build.getFragment());
             final URI relBuild = rootUrl.relativize(build);
             if (!relBuild.isAbsolute()) {
-                // because we relativate it always to docroot
-                return "/" + relBuild.toASCIIString();
+                // because we relativate it always to docroot, which is the
+                // servlet container in JEE
+                return contextPath + relBuild.toASCIIString();
             } else {
                 return relBuild.toASCIIString();
             }
@@ -129,5 +147,10 @@ public class HttpRequestDataAccessContext implements IDataAccessContext {
      */
     public void setSessionId(final String sessionId) {
         this.sessionId = sessionId;
+    }
+
+    @Override
+    public String getRequestPath() {
+        return requestPath;
     }
 }

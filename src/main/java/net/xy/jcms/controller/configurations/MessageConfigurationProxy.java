@@ -63,7 +63,28 @@ public class MessageConfigurationProxy extends MessageConfiguration {
             presentKeys.put(value.getPath(), value.getValue());
             return value.getValue();
         } else {
-            missingKeys.add(ConfigurationIterationStrategy.fullPath(config, key));
+            final String full = ConfigurationIterationStrategy.fullPath(config, key);
+            if (!missingKeys.contains(full)) {
+                missingKeys.add(full);
+            }
+            return "dummy";
+        }
+    }
+
+    @Override
+    public String getMessage(final String key) {
+        String ret = null;
+        try {
+            ret = super.getMessage(key);
+        } catch (final IllegalArgumentException ex) {
+        }
+        if (ret != null) {
+            presentKeys.put(key, ret);
+            return ret;
+        } else {
+            if (!missingKeys.contains(key)) {
+                missingKeys.add(key);
+            }
             return "dummy";
         }
     }

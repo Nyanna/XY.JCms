@@ -19,6 +19,9 @@ package net.xy.jcms.controller;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.xy.jcms.controller.TranslationConfiguration.GroupCouldNotBeFilled;
+import net.xy.jcms.controller.TranslationConfiguration.InvalidBuildRule;
+import net.xy.jcms.controller.TranslationConfiguration.TranslationRule;
 import net.xy.jcms.shared.IDataAccessContext;
 
 /**
@@ -140,7 +143,35 @@ public class NavigationAbstractionLayer {
      *            "you_wanna_got_to_ringtones?"
      * @return Key[Contentgroup,Subcategory]
      */
-    public static NALKey translatePathToKey(final String path, final IDataAccessContext dac) {
-        return TranslationConfiguration.find(path, dac);
+    public static NALKey translatePathToKey(final IDataAccessContext dac) {
+        return TranslationConfiguration.find(dac.getRequestPath(), dac);
+    }
+
+    /**
+     * generates an path with an rule out from an key. protected for unit
+     * testing
+     * 
+     * @param key
+     * @param rule
+     * @return the ready translated path elsewhere it rises an
+     *         GroupCouldNotBeFilled
+     * @throws GroupCouldNotBeFilled
+     *             in case parameter replacement failures
+     * @throws InvalidBuildRule
+     *             in case the buildrule can't be applied
+     */
+    public static String translateKeyWithRule(final NALKey key, final TranslationRule rule) throws GroupCouldNotBeFilled,
+            InvalidBuildRule {
+        return TranslationConfiguration.translateKeyWithRule(key, rule);
+    }
+
+    /**
+     * finds the to an key corresponding rule
+     * 
+     * @param struct
+     * @return null or the rule
+     */
+    public static TranslationRule findRuleForKey(final NALKey struct, final IDataAccessContext dac) {
+        return TranslationConfiguration.findRuleForKey(struct, dac);
     }
 }

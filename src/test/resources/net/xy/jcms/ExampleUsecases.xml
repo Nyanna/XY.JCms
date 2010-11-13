@@ -45,7 +45,7 @@
 	        <!--configuration type="TemplateConfiguration" include="class://de.jj.fragmentspool.myarea.loginPage"/-->
         </configurations>
     </usecase>
-    
+
     <usecase id="contentgroup">
     	<description> sld ead asd alksdas dliasudish ad asd asuzd uas ukdza sdzas dkuuas dzsaukdz  ku</description>
         <parameter>
@@ -57,18 +57,18 @@
             <!-- checks if an login is needed and performs an usecase redirect with lvp parameter which is the actual NALKeyList-->
             <class path="net.xyan.controller.UserController"/>
             <!-- Controller maybe redirects to an content not supported usecase -->
-            <class path="net.xyan.controller.ClientSupportsContentController" obmitConfig="ContentConfiguration,Parameters"/>
+            <class path="net.xyan.controller.ClientSupportsContentController" obmitConfig="ControllerConfiguration,Parameters"/>
             <!-- Controller uses bindconfig to fill the ContentRepository -->
-            <class path="net.xyan.controller.ContentAggregationController" obmitConfig="ContentConfiguration,Parameters"/>
+            <class path="net.xyan.controller.ContentAggregationController" obmitConfig="ControllerConfiguration,Parameters"/>
             <!-- Controller reacts on missing content and alters the usecase -->
-            <class path="net.xyan.controller.ContentUnavailableController" obmitConfig="ContentConfiguration"/>
+            <class path="net.xyan.controller.ContentUnavailableController" obmitConfig="ControllerConfiguration"/>
         </controller>
         <configurations>
-	        <!--configuration type="ContentConfiguration" include="class://de.jamba.config.GlobalBindConfig"/-->
-	        <configuration type="ContentConfiguration">
+	        <!--configuration type="ControllerConfiguration" include="class://de.jamba.config.GlobalBindConfig"/-->
+	        <configuration type="ControllerConfiguration">
 	            bind_maincontentbox1 = ...
 	        </configuration>
-	
+
 	        <!--configuration type="UIConfiguration" include="class://de.jamba.config.CTypeUIConfig"/-->
 	        <configuration type="UIConfiguration">
 	        	<![CDATA[
@@ -88,7 +88,7 @@
 	            id_contentboxXYZ.content = bind_maincontentbox1;
 	            ]]>
 	        </configuration>
-	
+
 	        <configuration type="TemplateConfiguration">
 	        	<![CDATA[
 	        	root = net.xy.jcms.portal.templates.ExampleMainLayout

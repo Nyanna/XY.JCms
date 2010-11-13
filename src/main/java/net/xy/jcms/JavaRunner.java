@@ -13,6 +13,7 @@
 package net.xy.jcms;
 
 import java.util.Map;
+import java.util.Map.Entry;
 
 import net.xy.jcms.controller.NavigationAbstractionLayer;
 import net.xy.jcms.controller.UsecaseAgent;
@@ -48,7 +49,7 @@ public class JavaRunner {
      * @throws ExecutionException
      */
     public static String execute(final String request) throws ExecutionException {
-        return execute(request, null, null);
+        return execute(request, null, new JavaDataAccessContext(request));
     }
 
     /**
@@ -60,7 +61,7 @@ public class JavaRunner {
      * @throws ExecutionException
      */
     public static String execute(final String request, final Map<String, Object> params) throws ExecutionException {
-        return execute(request, params, null);
+        return execute(request, params, new JavaDataAccessContext(request));
     }
 
     /**
@@ -72,16 +73,22 @@ public class JavaRunner {
      * @return value
      * @throws ExecutionException
      */
-    public static String execute(final String request, final Map<String, Object> params, final IDataAccessContext dac)
+    public static String execute(final String request, final Map<String, Object> params, IDataAccessContext dac)
             throws ExecutionException {
         /**
          * DAC would be obmitted
          */
+        if (dac == null) {
+            dac = new JavaDataAccessContext(request);
+        }
 
         /**
          * first convert the call string to an navigation/usecasestruct
          */
-        final NALKey firstForward = NavigationAbstractionLayer.translatePathToKey(request, dac);
+        final NALKey firstForward = NavigationAbstractionLayer.translatePathToKey(dac);
+        if (firstForward == null) {
+            new IllegalArgumentException("Request path could not be translated to an NALKey.");
+        }
 
         // run the protocol adapter which fills the struct with parameters from
         // console parameters & environment vars
@@ -193,5 +200,44 @@ public class JavaRunner {
         public String toString() {
             return hold.toString();
         }
+    }
+
+    /**
+     * simple context for java calls
+     * 
+     * @author Xyan
+     * 
+     */
+    public static class JavaDataAccessContext implements IDataAccessContext {
+        /**
+         * the initial request
+         */
+        private final String request;
+
+        /**
+         * default constructor
+         * 
+         * @param request
+         */
+        JavaDataAccessContext(final String request) {
+            this.request = request;
+        }
+
+        @Override
+        public String buildUriWithParams(final String path, final Map<Object, Object> parameters) {
+            final StringBuilder cmd = new StringBuilder(path);
+            if (parameters != null && !parameters.isEmpty()) {
+                for (final Entry<Object, Object> entry : parameters.entrySet()) {
+                    cmd.append(" ").append(entry.getKey()).append("=").append(entry.getValue());
+                }
+            }
+            return cmd.toString();
+        }
+
+        @Override
+        public String getRequestPath() {
+            return request;
+        }
+
     }
 }

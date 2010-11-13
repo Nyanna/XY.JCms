@@ -38,6 +38,7 @@ import net.xy.jcms.controller.configurations.UIConfiguration;
 import net.xy.jcms.controller.configurations.UIConfiguration.UI;
 import net.xy.jcms.controller.configurations.UIConfigurationProxy;
 import net.xy.jcms.shared.IDataAccessContext;
+import net.xy.jcms.JavaRunner.JavaDataAccessContext;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -60,15 +61,21 @@ public class JavaConfigCollector {
      * @throws ExecutionException
      */
     public static Configuration<?>[] getConfig(final String request, final Map<String, Object> params,
-            final IDataAccessContext dac) throws ExecutionException {
+            IDataAccessContext dac) throws ExecutionException {
         /**
          * DAC would be obmitted
          */
+        if (dac == null) {
+            dac = new JavaDataAccessContext(request);
+        }
 
         /**
          * first convert the call string to an navigation/usecasestruct
          */
-        final NALKey firstForward = NavigationAbstractionLayer.translatePathToKey(request, dac);
+        final NALKey firstForward = NavigationAbstractionLayer.translatePathToKey(dac);
+        if (firstForward == null) {
+            new IllegalArgumentException("Request path could not be translated to an NALKey.");
+        }
 
         // run the protocol adapter which fills the struct with parameters from
         // console parameters & environment vars
@@ -88,6 +95,12 @@ public class JavaConfigCollector {
             }
 
             /**
+             * inject Proxy configs
+             */
+            usecase = new Usecase(usecase.getId(), usecase.getDescription(), usecase.getParameterList(),
+                    usecase.getControllerList(), getProxyConfigs(usecase));
+
+            /**
              * run the controllers for the usecase, maybe redirect to another
              * usecase.
              */
@@ -103,7 +116,7 @@ public class JavaConfigCollector {
          * get the configurationtree for the usecase from an empty run through
          * the componenttree
          */
-        final Configuration<?>[] viewConfig = getDummyConfigs(usecase);
+        final Configuration<?>[] viewConfig = usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE);
         @SuppressWarnings("unused")
         final ComponentConfiguration confTree = ViewRunner.runConfiguration(viewConfig);
         return viewConfig;
@@ -117,7 +130,10 @@ public class JavaConfigCollector {
      * @param dac
      */
     public static String getConsoleConfigString(final String request, final Map<String, Object> params,
-            final IDataAccessContext dac) {
+            IDataAccessContext dac) {
+        if (dac == null) {
+            dac = new JavaDataAccessContext(request);
+        }
         final boolean getAll = params != null && params.containsKey("getAll") ? true : false;
         final StringBuilder ret = new StringBuilder();
         boolean isMissingConfig = false;
@@ -253,7 +269,7 @@ public class JavaConfigCollector {
      * @param usecase
      * @return
      */
-    private static Configuration<?>[] getDummyConfigs(final Usecase usecase) {
+    private static Configuration<?>[] getProxyConfigs(final Usecase usecase) {
         final List<Configuration<?>> configs = new ArrayList<Configuration<?>>();
         configs.add(new UIConfigurationProxy((UIConfiguration) usecase.getConfiguration(ConfigurationType.UIConfiguration)));
         try {
@@ -268,6 +284,8 @@ public class JavaConfigCollector {
                 .getConfiguration(ConfigurationType.RenderKitConfiguration)));
         configs.add(new TemplateConfigurationProxy((TemplateConfiguration) usecase
                 .getConfiguration(ConfigurationType.TemplateConfiguration)));
+        configs.add(usecase
+                .getConfiguration(ConfigurationType.ControllerConfiguration));
         return configs.toArray(new Configuration<?>[configs.size()]);
     }
 

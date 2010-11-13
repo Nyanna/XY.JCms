@@ -123,6 +123,12 @@ public abstract class TranslationConfiguration {
         }
     }
 
+    /**
+     * specifies an parameter
+     * 
+     * @author Xyan
+     * 
+     */
     final public static class RuleParameter {
         /**
          * holds the name of the parameter applied for
@@ -207,7 +213,7 @@ public abstract class TranslationConfiguration {
     }
 
     /**
-     * generates an patch with an rule out from an key. protected for unit
+     * generates an path with an rule out from an key. protected for unit
      * testing
      * 
      * @param key
@@ -412,7 +418,7 @@ public abstract class TranslationConfiguration {
     }
 
     /**
-     * actually only used for the mock configuration.
+     * gets rulelist from adapter
      * 
      * @param level
      * @return value

@@ -36,6 +36,8 @@ public class HttpProtocolResponseAdapter {
      * @param model
      */
     public static void apply(final HttpServletResponse response, final Configuration<?>[] model) {
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("text/html;charset=utf-8");
     }
 
     /**

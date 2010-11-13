@@ -13,6 +13,8 @@
 package net.xy.jcms.shared.adapter;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+
 import javax.servlet.ServletOutputStream;
 import org.apache.log4j.Logger;
 import net.xy.jcms.shared.IOutWriter;
@@ -29,15 +31,46 @@ public class ServletOutputStreamAdapter implements IOutWriter {
     private final ServletOutputStream outStream;
 
     /**
+     * outwriter
+     */
+    private final PrintWriter writer;
+
+    /**
      * internal buffer needed for caching of the complete output
      */
     private final StringBuilder internalBuffer = new StringBuilder();
 
+    /**
+     * constructor for binary output
+     * 
+     * @param outStream
+     */
+    public ServletOutputStreamAdapter(final ServletOutputStream outStream) {
+        this.outStream = outStream;
+        writer = null;
+    }
+
+    /**
+     * constructor for writter
+     * 
+     * @param writer
+     */
+    public ServletOutputStreamAdapter(final PrintWriter writer) {
+        this.writer = writer;
+        outStream = null;
+    }
+
     @Override
     public void append(final StringBuilder buffer) {
         try {
-            outStream.print(buffer.toString());
-            outStream.print("\n");
+            if (outStream != null) {
+                outStream.print(buffer.toString());
+                outStream.print("\n");
+            }
+            if (writer != null) {
+                writer.append(buffer);
+                writer.append("\n");
+            }
             internalBuffer.append(buffer);
             internalBuffer.append("\n");
         } catch (final IOException e) {
@@ -45,15 +78,17 @@ public class ServletOutputStreamAdapter implements IOutWriter {
         }
     }
 
-    public ServletOutputStreamAdapter(final ServletOutputStream outStream) {
-        this.outStream = outStream;
-    }
-
     @Override
     public void append(final String buffer) {
         try {
-            outStream.print(buffer);
-            outStream.print("\n");
+            if (outStream != null) {
+                outStream.print(buffer);
+                outStream.print("\n");
+            }
+            if (writer != null) {
+                writer.append(buffer);
+                writer.append("\n");
+            }
             internalBuffer.append(buffer);
             internalBuffer.append("\n");
         } catch (final IOException e) {

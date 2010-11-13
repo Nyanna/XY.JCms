@@ -88,28 +88,20 @@ public class CLIRunner {
         /**
          * first get portal configuration out from call information
          */
-        // final IDataAccessContext dac = new CLIDataAccessContext(request);
-        final IDataAccessContext dac = new IDataAccessContext() {
-
-            @Override
-            public String buildUriWithParams(final String path, final Map<Object, Object> parameters) {
-                final StringBuilder cli = new StringBuilder(path);
-                for (final Entry<Object, Object> entry : parameters.entrySet()) {
-                    cli.append(" ").append(entry.getKey()).append("=").append("\"").append(entry.getValue()).append("\"");
-                }
-                return cli.toString();
-            }
-        };
-
-        /**
-         * first convert the call string to an navigation/usecasestruct
-         */
         if (args.length < 1 || StringUtils.isBlank(args[0])) {
             System.out.append("You have to specify at least one request String.");
             return;
         }
+        final IDataAccessContext dac = new CLIDataAccessContext(args[0]);
+
+        /**
+         * first convert the call string to an navigation/usecasestruct
+         */
         LOG.info("Run on Console: " + DebugUtils.printFields(args[0]));
-        final NALKey firstForward = NavigationAbstractionLayer.translatePathToKey(args[0], dac);
+        final NALKey firstForward = NavigationAbstractionLayer.translatePathToKey(dac);
+        if (firstForward == null) {
+            new IllegalArgumentException("Request path could not be translated to an NALKey.");
+        }
 
         // run the protocol adapter which fills the struct with parameters from
         // console parameters & environment vars
@@ -214,5 +206,44 @@ public class CLIRunner {
         }
 
     }
+
+    /**
+     * implements an simple access contest from the console
+     * 
+     * @author Xyan
+     * 
+     */
+    public static class CLIDataAccessContext implements IDataAccessContext {
+        /**
+         * the initial request
+         */
+        private final String request;
+
+        /**
+         * default constructor
+         * 
+         * @param request
+         */
+        public CLIDataAccessContext(final String request) {
+            this.request = request;
+        }
+
+        @Override
+        public String buildUriWithParams(final String path, final Map<Object, Object> parameters) {
+            final StringBuilder cli = new StringBuilder(path);
+            if (parameters != null && !parameters.isEmpty()) {
+                for (final Entry<Object, Object> entry : parameters.entrySet()) {
+                    cli.append(" ").append(entry.getKey()).append("=").append("\"").append(entry.getValue()).append("\"");
+                }
+            }
+            return cli.toString();
+        }
+
+        @Override
+        public String getRequestPath() {
+            return request;
+        }
+
+    };
 
 }

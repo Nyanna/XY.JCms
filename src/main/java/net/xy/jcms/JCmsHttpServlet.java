@@ -41,8 +41,9 @@ import net.xy.jcms.shared.adapter.HttpRequestDataAccessContext;
 import net.xy.jcms.shared.adapter.ServletOutputStreamAdapter;
 
 /**
- * The following injections have to be made: ITranslationConfigurationAdapter - to get translations based on dac,
- * IUsecaseConfigurationAdapter - to get the usecases based on dac
+ * The following injections have to be made: ITranslationConfigurationAdapter -
+ * to get translations based on dac, IUsecaseConfigurationAdapter - to get the
+ * usecases based on dac
  * 
  * @author xyan
  * 
@@ -82,7 +83,10 @@ public class JCmsHttpServlet extends HttpServlet {
         /**
          * first convert the request to an navigation/usecasestruct
          */
-        final NALKey firstForward = NavigationAbstractionLayer.translatePathToKey(request.getRequestURI(), dac);
+        final NALKey firstForward = NavigationAbstractionLayer.translatePathToKey(dac);
+        if (firstForward == null) {
+            new ServletException("Request path could not be translated to an NALKey.");
+        }
 
         // run the protocol adapter which fills the struct with parameters from
         // the request: cookie data, header data,
@@ -103,8 +107,9 @@ public class JCmsHttpServlet extends HttpServlet {
             }
 
             /**
-             * run the controllers for the usecase, maybe redirect to another usecase. there should also be an
-             * expiration contoller for http tu use client caching feature.
+             * run the controllers for the usecase, maybe redirect to another
+             * usecase. there should also be an expiration contoller for http tu
+             * use client caching feature.
              */
             try {
                 // sets the clientstore retrieved from protocol adapter
@@ -124,8 +129,9 @@ public class JCmsHttpServlet extends HttpServlet {
                 usecase.getConfigurationList(ConfigurationType.CONTROLLERAPPLICABLE));
 
         /**
-         * at this point caching takes effect by the safe asumption that the same configuration leads to the same
-         * result. realized through hashing and persistance.
+         * at this point caching takes effect by the safe asumption that the
+         * same configuration leads to the same result. realized through hashing
+         * and persistance.
          */
         final String output = UsecaseAgent
                 .applyCaching(usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE), null);
@@ -134,15 +140,17 @@ public class JCmsHttpServlet extends HttpServlet {
             response.getWriter().append(output);
         } else {
             /**
-             * get the configurationtree for the usecase from an empty run through the componenttree
+             * get the configurationtree for the usecase from an empty run
+             * through the componenttree
              */
             final Configuration<?>[] viewConfig = usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE);
             final ComponentConfiguration confTree = ViewRunner.runConfiguration(viewConfig);
 
             /**
-             * run and return the rendering tree through streamprocessing to the client
+             * run and return the rendering tree through streamprocessing to the
+             * client
              */
-            final ServletOutputStreamAdapter out = new ServletOutputStreamAdapter(response.getOutputStream());
+            final ServletOutputStreamAdapter out = new ServletOutputStreamAdapter(response.getWriter());
             ViewRunner.runView(out, confTree);
 
             /**

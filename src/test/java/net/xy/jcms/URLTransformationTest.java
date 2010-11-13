@@ -265,7 +265,7 @@ public class URLTransformationTest {
 
             @Override
             public String getPathInfo() {
-                return null;
+                return "";
             }
 
             @Override
@@ -305,7 +305,7 @@ public class URLTransformationTest {
 
             @Override
             public String getContextPath() {
-                return null;
+                return "/test-web";
             }
 
             @Override
@@ -317,15 +317,15 @@ public class URLTransformationTest {
         String res;
 
         res = dac.buildUriWithParams("sdfhjsdfhsdh", null);
-        Assert.assertEquals(res, "/sdfhjsdfhsdh");
+        Assert.assertEquals(res, "/test-web/sdfhjsdfhsdh");
         System.out.append(res + "\n");
 
         res = dac.buildUriWithParams("/sdfhjsdfhsdh", null);
-        Assert.assertEquals(res, "/sdfhjsdfhsdh");
+        Assert.assertEquals(res, "/test-web/sdfhjsdfhsdh");
         System.out.append(res + "\n");
 
         res = dac.buildUriWithParams("sdfhjs dfh sdh", null);
-        Assert.assertEquals(res, "/sdfhjs+dfh+sdh");
+        Assert.assertEquals(res, "/test-web/sdfhjs+dfh+sdh");
         System.out.append(res + "\n");
 
         final Map<Object, Object> param = new HashMap<Object, Object>();
@@ -334,11 +334,11 @@ public class URLTransformationTest {
         param.put("test", "this");
 
         res = dac.buildUriWithParams("sdfh jsdf hsdf h", param);
-        Assert.assertEquals(res, "/sdfh+jsdf+hsdf+h?test1=this2&test=this");
+        Assert.assertEquals(res, "/test-web/sdfh+jsdf+hsdf+h?test1=this2&test=this");
         System.out.append(res + "\n");
 
         res = dac.buildUriWithParams("www.google.de", param);
-        Assert.assertEquals(res, "/www.google.de?test1=this2&test=this");
+        Assert.assertEquals(res, "/test-web/www.google.de?test1=this2&test=this");
         System.out.append(res + "\n");
 
         res = dac.buildUriWithParams("http://www.google.de", param);
@@ -350,11 +350,11 @@ public class URLTransformationTest {
         System.out.append(res + "\n");
 
         res = dac.buildUriWithParams("test?pest=hoho", param);
-        Assert.assertEquals(res, "/test?test1=this2&test=this");
+        Assert.assertEquals(res, "/test-web/test?test1=this2&test=this");
         System.out.append(res + "\n");
 
         res = dac.buildUriWithParams("www.testus.com/test", param);
-        Assert.assertEquals(res, "/www.testus.com/test?test1=this2&test=this");
+        Assert.assertEquals(res, "/test-web/www.testus.com/test?test1=this2&test=this");
         System.out.append(res + "\n");
 
         res = dac.buildUriWithParams("http://www.testus.com/test", param);

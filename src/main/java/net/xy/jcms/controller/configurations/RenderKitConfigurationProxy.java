@@ -61,8 +61,14 @@ public class RenderKitConfigurationProxy extends RenderKitConfiguration {
                     .getName());
             return value.getValue();
         } else {
-            missingIfaces.add(ConfigurationIterationStrategy.fullPath(config, rInterface.getSimpleName()));
-            missingIfaces.add(rInterface.getSimpleName());
+            final String full = ConfigurationIterationStrategy.fullPath(config, rInterface.getSimpleName());
+            if (!missingIfaces.contains(full)) {
+                missingIfaces.add(full);
+            }
+            final String simple = rInterface.getSimpleName();
+            if (!missingIfaces.contains(simple)) {
+                missingIfaces.add(simple);
+            }
             return new IRenderer() {
             };
         }

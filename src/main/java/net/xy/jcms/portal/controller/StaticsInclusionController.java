@@ -1,28 +1,21 @@
 /**
- *  This file is part of XY.JCms, Copyright 2010 (C) Xyan Kruse, Xyan@gmx.net, Xyan.kilu.de
- *
- *  XY.JCms is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  XY.JCms is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with XY.JCms.  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of XY.JCms, Copyright 2010 (C) Xyan Kruse, Xyan@gmx.net, Xyan.kilu.de
+ * 
+ * XY.JCms is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * 
+ * XY.JCms is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with XY.JCms. If not, see
+ * <http://www.gnu.org/licenses/>.
  */
 package net.xy.jcms.portal.controller;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -38,7 +31,7 @@ import net.xy.jcms.shared.types.StringMap;
 
 public class StaticsInclusionController implements IController {
 
-    private static final Pattern instruction = Pattern.compile("^include:([a-zA-Z0-9]*)$");
+    private static final String INSTRUCTION_SECTION = "include";
 
     @Override
     public NALKey invoke(final IDataAccessContext dac, final Configuration<?>[] configuration) {
@@ -65,67 +58,74 @@ public class StaticsInclusionController implements IController {
      * @param configK
      * @param configC
      */
+    @SuppressWarnings("unchecked")
     private static void proccess(final ControllerConfiguration configK, final ContentRepository configC) {
-        final Map<String, String> ownC = configK.getControllerConfig(StaticsInclusionController.class);
-        // check for instructions
-        final List<String> binVars = new ArrayList<String>();
-        for (final String key : ownC.keySet()) {
-            final Matcher match = instruction.matcher(key);
-            if (match.matches()) {
-                binVars.add(match.group(1));
+        final Map<String, Object> ownC = configK.getControllerConfig(StaticsInclusionController.class);
+        if (ownC.get(INSTRUCTION_SECTION) instanceof List) {
+            for (final Map<Object, String> instruction : (List<Map<Object, String>>) ownC.get(INSTRUCTION_SECTION)) {
+                // get domain in case of one exists
+                final String domain = (String) getPreciseOrGlobal("domain", ownC, instruction);
+                // get path prefix
+                final String prefix;
+                if (domain != null) {
+                    prefix = domain + (String) getPreciseOrGlobal("prefix", ownC, instruction);
+                } else {
+                    prefix = (String) getPreciseOrGlobal("prefix", ownC, instruction);
+                }
+                // get type
+                final String type = (String) getPreciseOrGlobal("type", ownC, instruction);
+
+                Object finalContent = null;
+                final Object firstContent = instruction.get("content");
+                if (String.class.isInstance(firstContent)) {
+                    final String strContent = (String) firstContent;
+                    // get content in right object
+                    if ("StringList".equalsIgnoreCase(type)) {
+                        // get url list
+                        final StringList contentList = new StringList(strContent);
+                        // prefix if configured
+                        if (StringUtils.isNotBlank(prefix)) {
+                            final ListIterator<String> it = contentList.listIterator();
+                            while (it.hasNext()) {
+                                final String content = it.next();
+                                it.set(prefix + content.trim());
+                            }
+                        }
+                        finalContent = contentList;
+                    } else if ("StringMap".equalsIgnoreCase(type)) {
+                        finalContent = new StringMap(strContent);
+                    } else if ("String".equalsIgnoreCase(type)) {
+                        finalContent = prefix + strContent;
+                    }
+                } else {
+                    finalContent = firstContent;
+                }
+
+                // put in targets
+                if (finalContent != null) {
+                    for (final String target : new StringList(instruction.get("target"))) {
+                        configC.putContent(target, finalContent);
+                    }
+                }
             }
         }
-        proccessBinVars(binVars, ownC, configC);
     }
 
     /**
-     * proccesses each single binvar and fills the content
+     * gets an config either from the section or instruction config or from the controller globals
      * 
-     * @param binVars
-     * @param ownC
-     * @param configC
+     * @param key
+     * @param globals
+     * @param section
+     * @return value can be null
      */
-    private static void proccessBinVars(final List<String> binVars, final Map<String, String> ownC,
-            final ContentRepository configC) {
-        for (final String binVar : binVars) {
-            // get domain in case of one
-            final String domain = ownC.containsKey(binVar + "." + "domain") ? ownC.get(binVar + "." + "domain") : ownC
-                    .get("domain");
-
-            // get path prefix
-            final String prefix = domain
-                    + (ownC.containsKey(binVar + "." + "prefix") ? ownC.get(binVar + "." + "prefix") : ownC
-                            .get("prefix"));
-            // get type
-            final String type = (ownC.containsKey(binVar + "." + "type") ? ownC.get(binVar + "." + "type") : ownC
-                    .get("type")).trim();
-
-            Object finalContent = null;
-            // get content in right object
-            if ("StringList".equalsIgnoreCase(type)) {
-                // get url list
-                final StringList contentList = new StringList(ownC.get(binVar + "." + "content"));
-                // prefix if configured
-                if (StringUtils.isNotBlank(prefix)) {
-                    final ListIterator<String> it = contentList.listIterator();
-                    while (it.hasNext()) {
-                        final String content = it.next();
-                        it.set(prefix + content.trim());
-                    }
-                }
-                finalContent = contentList;
-            } else if ("StringMap".equalsIgnoreCase(type)) {
-                finalContent = new StringMap(ownC.get(binVar + "." + "content"));
-            } else if ("String".equalsIgnoreCase(type)) {
-                finalContent = prefix + ownC.get(binVar + "." + "content");
-            }
-
-            // put in targets
-            if (finalContent != null) {
-                for (final String target : new StringList(ownC.get(binVar + "." + "target"))) {
-                    configC.putContent(target, finalContent);
-                }
-            }
+    private static Object getPreciseOrGlobal(final Object key, final Map<String, Object> globals,
+            final Map<Object, String> section) {
+        final Object fromSection = section.get(key);
+        if (fromSection != null) {
+            return fromSection;
         }
+        return globals.get(key);
     }
+
 }

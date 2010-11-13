@@ -15,10 +15,12 @@ package net.xy.jcms.shared;
 import java.util.Map;
 
 /**
- * a context in which all information are provided who are vital to access external resources. Formaly known as portal
- * context, request context, portal configuration, cappsubrand and vice versa. It will be filled by an factory injected
- * and configured with spring or/and with request information. Access to the containing data is only made in the
- * aggregator layer who knows which underlying service need what for information to provide data.
+ * a context in which all information are provided who are vital to access
+ * external resources. Formaly known as portal context, request context, portal
+ * configuration, cappsubrand and vice versa. It will be filled by an factory
+ * injected and configured with spring or/and with request information. Access
+ * to the containing data is only made in the aggregator layer who knows which
+ * underlying service need what for information to provide data.
  * 
  * @author xyan
  * 
@@ -26,7 +28,8 @@ import java.util.Map;
 public interface IDataAccessContext {
 
     /**
-     * builds protocol dependent references for the client, URL for http, commandlines with args for CLI
+     * builds protocol dependent references for the client, URL for http,
+     * commandlines with args for CLI
      * 
      * @param path
      * @param parameters
@@ -34,4 +37,10 @@ public interface IDataAccessContext {
      */
     public String buildUriWithParams(final String path, Map<Object, Object> parameters);
 
+    /**
+     * returns the protocoll independent request path to be proccessed by NAL
+     * 
+     * @return
+     */
+    public String getRequestPath();
 }

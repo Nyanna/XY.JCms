@@ -17,7 +17,6 @@
 package net.xy.jcms;
 
 import java.util.EnumSet;
-import java.util.Map;
 import java.util.Properties;
 
 import net.xy.jcms.controller.UsecaseAgent;
@@ -31,6 +30,7 @@ import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
 import net.xy.jcms.controller.configurations.IUsecaseConfigurationAdapter;
 import net.xy.jcms.controller.configurations.MessageConfiguration;
 import net.xy.jcms.shared.IDataAccessContext;
+import net.xy.jcms.CLIRunner.CLIDataAccessContext;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -47,13 +47,7 @@ public class UsecaseConfigurationTest {
     public void testFindUsecase() {
         final NALKey key = new NALKey("contentgroup");
         key.addParameter("contentgroup", "Cars");
-        final Usecase uCase = UsecaseConfiguration.findUsecaseForStruct(key, new IDataAccessContext() {
-
-            @Override
-            public String buildUriWithParams(final String path, final Map<Object, Object> parameters) {
-                return null;
-            }
-        });
+        final Usecase uCase = UsecaseConfiguration.findUsecaseForStruct(key, new CLIDataAccessContext("test"));
         Assert.assertNotNull(uCase);
         System.out.append(uCase.toString());
     }
@@ -62,13 +56,7 @@ public class UsecaseConfigurationTest {
     public void testFindUsecaseNotId() {
         final NALKey key = new NALKey("contentgroupNot");
         key.addParameter("contentgroup", "Cars");
-        final Usecase uCase = UsecaseConfiguration.findUsecaseForStruct(key, new IDataAccessContext() {
-
-            @Override
-            public String buildUriWithParams(final String path, final Map<Object, Object> parameters) {
-                return null;
-            }
-        });
+        final Usecase uCase = UsecaseConfiguration.findUsecaseForStruct(key, new CLIDataAccessContext("test"));
         Assert.assertNull(uCase);
     }
 
@@ -76,13 +64,7 @@ public class UsecaseConfigurationTest {
     public void testFindUsecaseNotParameter() {
         final NALKey key = new NALKey("contentgroupt");
         key.addParameter("contentgroupNot", "Cars");
-        final Usecase uCase = UsecaseConfiguration.findUsecaseForStruct(key, new IDataAccessContext() {
-
-            @Override
-            public String buildUriWithParams(final String path, final Map<Object, Object> parameters) {
-                return null;
-            }
-        });
+        final Usecase uCase = UsecaseConfiguration.findUsecaseForStruct(key, new CLIDataAccessContext("test"));
         Assert.assertNull(uCase);
     }
 
@@ -115,21 +97,9 @@ public class UsecaseConfigurationTest {
         // begin test
         final NALKey key = new NALKey("contentgroup");
         key.addParameter("contentgroup", "Cars");
-        final Usecase uCase = UsecaseConfiguration.findUsecaseForStruct(key, new IDataAccessContext() {
-
-            @Override
-            public String buildUriWithParams(final String path, final Map<Object, Object> parameters) {
-                return null;
-            }
-        });
+        final Usecase uCase = UsecaseConfiguration.findUsecaseForStruct(key, new CLIDataAccessContext("test"));
         Assert.assertNotNull(uCase);
-        final NALKey forward = UsecaseAgent.executeController(uCase, new IDataAccessContext() {
-
-            @Override
-            public String buildUriWithParams(final String path, final Map<Object, Object> parameters) {
-                return null;
-            }
-        }, null);
+        final NALKey forward = UsecaseAgent.executeController(uCase, new CLIDataAccessContext("test"), null);
         Assert.assertNotNull(forward);
         System.out.append(forward.toString());
     }

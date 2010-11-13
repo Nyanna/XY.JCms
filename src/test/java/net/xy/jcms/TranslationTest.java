@@ -17,6 +17,7 @@ import static org.junit.Assert.*;
 import net.xy.jcms.controller.NavigationAbstractionLayer;
 import net.xy.jcms.controller.NavigationAbstractionLayer.NALKey;
 import net.xy.jcms.controller.TranslationConfiguration;
+import net.xy.jcms.CLIRunner.CLIDataAccessContext;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -32,7 +33,8 @@ public class TranslationTest {
     public void testFind() {
         final NALKey exspected = new NALKey("contentgroup");
         exspected.addParameter("contentgroup", "Ringtones");
-        final NALKey result = NavigationAbstractionLayer.translatePathToKey("du willst wohl zu Ringtones", null);
+        final NALKey result = NavigationAbstractionLayer.translatePathToKey(new CLIDataAccessContext(
+                "du willst wohl zu Ringtones"));
         assertEquals(exspected.toString(), result.toString());
     }
 
@@ -40,7 +42,8 @@ public class TranslationTest {
     public void testFind1() {
         final NALKey exspected = new NALKey("contentgroup");
         exspected.addParameter("contentgroup", "Funsounds");
-        final NALKey result = NavigationAbstractionLayer.translatePathToKey("du willst wohl zu Funsounds", null);
+        final NALKey result = NavigationAbstractionLayer.translatePathToKey(new CLIDataAccessContext(
+                "du willst wohl zu Funsounds"));
         assertEquals(exspected.toString(), result.toString());
     }
 
@@ -48,7 +51,8 @@ public class TranslationTest {
     public void testFind2() {
         final NALKey exspected = new NALKey("contentgroup");
         exspected.addParameter("contentgroup", "Funsounds");
-        final NALKey result = NavigationAbstractionLayer.translatePathToKey("du willst wohl zu Nirgendwo", null);
+        final NALKey result = NavigationAbstractionLayer.translatePathToKey(new CLIDataAccessContext(
+                "du willst wohl zu Nirgendwo"));
         assertNull(result);
     }
 

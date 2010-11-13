@@ -1,18 +1,14 @@
 /**
- *  This file is part of XY.JCms, Copyright 2010 (C) Xyan Kruse, Xyan@gmx.net, Xyan.kilu.de
- *
- *  XY.JCms is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  XY.JCms is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with XY.JCms.  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of XY.JCms, Copyright 2010 (C) Xyan Kruse, Xyan@gmx.net, Xyan.kilu.de
+ * 
+ * XY.JCms is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * 
+ * XY.JCms is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with XY.JCms. If not, see
+ * <http://www.gnu.org/licenses/>.
  */
 package net.xy.jcms.controller.configurations;
 
@@ -28,9 +24,8 @@ import net.xy.jcms.shared.DebugUtils;
 import org.apache.log4j.Logger;
 
 /**
- * All configuration not dedicated to the clients request instead supplied or
- * retrieved by other sources to name a few options, db, uiconfig, messages,
- * content, cms.
+ * All configuration not dedicated to the clients request instead supplied or retrieved by other sources to name a few
+ * options, db, uiconfig, messages, content, cms.
  * 
  * @author Xyan
  * 
@@ -43,48 +38,37 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
     static final Logger LOG = Logger.getLogger(Configuration.class);
 
     /**
-     * typesation of config this triggers the appropriated parser and config
-     * readers
+     * typesation of config this triggers the appropriated parser and config readers
      * 
      * @author Xyan
      * 
      */
     public static enum ConfigurationType {
         /**
-         * ContentConfiguration will be used for the most content aggregating
-         * controllers. there output is added to the ContentRepository and it
-         * will be droped after controllerphase.
-         */
-        ContentConfiguration,
-        /**
-         * the repository contains all to the view obmitted content would empty
-         * initialized and is the result of the proccesing the
-         * ContentConfiguration
+         * the repository contains all to the view obmitted content would empty initialized and is the result of the
+         * proccesing the ControllerConfiguration
          */
         ContentRepository,
         /**
-         * this configuration gots refilled in the components tree configuration
-         * objects it will not be used but can be altered by controllers.
+         * this configuration gots refilled in the components tree configuration objects it will not be used but can be
+         * altered by controllers.
          */
         UIConfiguration,
         /**
-         * this configuration gots refilled into cinfiguration objects for the
-         * include fragments components building the componenttree.
+         * this configuration gots refilled into cinfiguration objects for the include fragments components building the
+         * componenttree.
          */
         TemplateConfiguration,
         /**
-         * the message configuration gots refilled into the component
-         * configuration objects
+         * the message configuration gots refilled into the component configuration objects
          */
         MessageConfiguration,
         /**
-         * configuration only used in the controllers, would not be taken into
-         * account when hashing the datamodel
+         * configuration only used in the controllers, would not be taken into account when hashing the datamodel
          */
         ControllerConfiguration,
         /**
-         * usually an renderfactory which provides the renderer for the
-         * component configuration
+         * usually an renderfactory which provides the renderer for the component configuration
          */
         RenderKitConfiguration,
         /**
@@ -93,8 +77,7 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
         Parameters;
 
         /**
-         * these configuration are obmittedt to the view and therefore will be
-         * hashed to determine view changes.
+         * these configuration are obmittedt to the view and therefore will be hashed to determine view changes.
          */
         public static final EnumSet<ConfigurationType> VIEWAPPLICABLE = EnumSet.of(ContentRepository, UIConfiguration,
                 MessageConfiguration, RenderKitConfiguration, TemplateConfiguration);
@@ -111,14 +94,12 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
     private final ConfigurationType configurationType;
 
     /**
-     * value of the configuration can be anything from an string to an dto or
-     * complete db dump.
+     * value of the configuration can be anything from an string to an dto or complete db dump.
      */
     private final CONFIGURATION_OBJECT configurationValue;
 
     /**
-     * alternatively an source can be specified to load an already existing
-     * configuration.
+     * alternatively an source can be specified to load an already existing configuration.
      */
     private final String configurationSource;
 
@@ -138,8 +119,8 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
     }
 
     /**
-     * constructor with an additional source origin. note configuration will be
-     * parsed and retrieved before object initiliazation.
+     * constructor with an additional source origin. note configuration will be parsed and retrieved before object
+     * initiliazation.
      * 
      * @param configurationType
      * @param configurationValue
@@ -190,9 +171,8 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
     public abstract void mergeConfiguration(final Configuration<CONFIGURATION_OBJECT> otherConfig);
 
     /**
-     * for hashing each view configuration has to implement there own hashing
-     * alghorhytm which returns the same hash for equal configuration based on
-     * its own sight.
+     * for hashing each view configuration has to implement there own hashing alghorhytm which returns the same hash for
+     * equal configuration based on its own sight.
      * 
      * @return value
      */
@@ -200,8 +180,7 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
     public abstract int hashCode();
 
     /**
-     * each configuration musst also implent equals to figure out if two
-     * configurations express the same.
+     * each configuration musst also implent equals to figure out if two configurations express the same.
      */
     @Override
     public abstract boolean equals(Object object);
@@ -212,8 +191,7 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
     }
 
     /**
-     * initialises an configuration with an string. only for specific types
-     * available.
+     * initialises an configuration with an string. only for specific types available.
      * 
      * @param type
      * @param in
@@ -227,8 +205,6 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
             return UIConfiguration.initByString(in);
         case MessageConfiguration:
             return MessageConfiguration.initByString(in);
-        case ContentConfiguration:
-            return ContentConfiguration.initByString(in);
         case RenderKitConfiguration:
             return RenderKitConfiguration.initByString(in);
         case ControllerConfiguration:
@@ -236,14 +212,14 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
         case ContentRepository:
             return new ContentRepository(new HashMap<String, Object>());
         default:
-            throw new UnsupportedOperationException("Configurationtype is not implemented to be initialized by stream. "
-                    + DebugUtils.printFields(type));
+            throw new UnsupportedOperationException(
+                    "Configurationtype is not implemented to be initialized by stream. "
+                            + DebugUtils.printFields(type));
         }
     }
 
     /**
-     * initializes an configuration with an input stream resource. only for
-     * certain configuration available.
+     * initializes an configuration with an input stream resource. only for certain configuration available.
      * 
      * @param type
      * @param stream

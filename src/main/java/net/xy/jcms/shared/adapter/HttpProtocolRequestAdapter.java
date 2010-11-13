@@ -38,6 +38,9 @@ public class HttpProtocolRequestAdapter {
      */
     @SuppressWarnings("unchecked")
     public static NALKey apply(final HttpServletRequest request, final NALKey key) {
+        if (request == null || key == null) {
+            throw new IllegalArgumentException("Either request or NALKey object is null.");
+        }
         final Map<Object, Object> params = new HashMap<Object, Object>();
         params.putAll(getCookieParams(request));
         params.putAll(key.getParameters()); // get old ones
@@ -74,14 +77,16 @@ public class HttpProtocolRequestAdapter {
      */
     private static final Map<String, Object> getCookieParams(final HttpServletRequest request) {
         final Map<String, Object> params = new HashMap<String, Object>();
-        for (final Cookie cookie : request.getCookies()) {
-            params.put(cookie.getName(), cookie.getValue());
-            params.put(cookie.getName() + ".maxage", cookie.getMaxAge());
-            params.put(cookie.getName() + ".domain", cookie.getDomain());
-            params.put(cookie.getName() + ".path", cookie.getPath());
-            params.put(cookie.getName() + ".comment", cookie.getComment());
-            params.put(cookie.getName() + ".version", cookie.getVersion());
-            params.put(cookie.getName() + ".secure", cookie.getSecure());
+        if (request.getCookies() != null && request.getCookies().length > 0) {
+            for (final Cookie cookie : request.getCookies()) {
+                params.put(cookie.getName(), cookie.getValue());
+                params.put(cookie.getName() + ".maxage", cookie.getMaxAge());
+                params.put(cookie.getName() + ".domain", cookie.getDomain());
+                params.put(cookie.getName() + ".path", cookie.getPath());
+                params.put(cookie.getName() + ".comment", cookie.getComment());
+                params.put(cookie.getName() + ".version", cookie.getVersion());
+                params.put(cookie.getName() + ".secure", cookie.getSecure());
+            }
         }
         return params;
     }

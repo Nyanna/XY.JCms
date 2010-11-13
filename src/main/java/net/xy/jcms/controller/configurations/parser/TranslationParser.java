@@ -18,6 +18,7 @@ package net.xy.jcms.controller.configurations.parser;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.stream.XMLInputFactory;
@@ -69,7 +70,7 @@ public class TranslationParser {
      * @throws XMLStreamException
      */
     private static TranslationRule[] parseRules(final XMLStreamReader parser) throws XMLStreamException {
-        final List<TranslationRule> rules = new ArrayList<TranslationRule>();
+        final List<TranslationRule> rules = new LinkedList<TranslationRule>();
         while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
             if (parser.getLocalName().equals("rule")) {
                 rules.add(parseRule(parser));

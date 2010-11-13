@@ -71,10 +71,25 @@ public class MessageConfiguration extends AbstractPropertyBasedConfiguration {
         }
         if (value.getValue() != null) {
             return value;
-        } else {
-            throw new IllegalArgumentException("An mendatory message configuration was missing! "
-                    + DebugUtils.printFields(key, retrievalStack));
         }
+        throw new IllegalArgumentException("An mendatory message configuration was missing! "
+                    + DebugUtils.printFields(key, retrievalStack));
+    }
+
+    /**
+     * gets an straight message without path iteration and config processing
+     * 
+     * @param key
+     * @return never null instead it throws an IllegalArgumentException
+     *         exception
+     */
+    public String getMessage(final String key) {
+        final String value = getConfigurationValue().getProperty(key);
+        if (value != null) {
+            return value;
+        }
+        throw new IllegalArgumentException("An mendatory message configuration was missing! "
+                    + DebugUtils.printFields(key));
     }
 
     /**

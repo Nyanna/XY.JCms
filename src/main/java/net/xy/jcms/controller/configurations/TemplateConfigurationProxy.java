@@ -60,7 +60,10 @@ public class TemplateConfigurationProxy extends TemplateConfiguration {
                     .getName());
             return value.getValue();
         } else {
-            missingTmpls.add(ConfigurationIterationStrategy.fullPath(config, tmplName));
+            final String full = ConfigurationIterationStrategy.fullPath(config, tmplName);
+            if (!missingTmpls.contains(full)) {
+                missingTmpls.add(full);
+            }
             return Empty.getInstance();
         }
     }

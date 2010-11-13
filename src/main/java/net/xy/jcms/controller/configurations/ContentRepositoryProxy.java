@@ -58,7 +58,14 @@ public class ContentRepositoryProxy extends ContentRepository {
             return value.getValue();
         } else {
             missingContent.put(ConfigurationIterationStrategy.fullPath(config, key), type);
-            return new Object();
+            if (type != null) {
+                try {
+                    return type.newInstance();
+                } catch (final InstantiationException e) {
+                } catch (final IllegalAccessException e) {
+                }
+            }
+            return null;
         }
     }
 
