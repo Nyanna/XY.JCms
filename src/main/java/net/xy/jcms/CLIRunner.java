@@ -12,6 +12,8 @@
  */
 package net.xy.jcms;
 
+import java.text.DecimalFormat;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -44,12 +46,6 @@ public class CLIRunner {
      */
     static final Logger LOG = Logger.getLogger(CLIRunner.class);
 
-    // TODO [LOW] implement options to run CLI configuration display
-    // -check=missing|all
-    // -usecase=*.xml
-    // -translation=*.xml
-    // param=value
-
     /**
      * main entry point for the console
      * 
@@ -72,13 +68,14 @@ public class CLIRunner {
      */
     public CLIRunner(final String[] args) {
         final long start = System.nanoTime();
-        LOG.info("Execution started: " + start);
+        // LOG.info("Execution started: " + start);
         try {
             Main(args);
         } finally {
             XYCache.destroy();
         }
-        LOG.info("Execution succeeded in nanoseconds " + (System.nanoTime() - start));
+        LOG.info("Execution succeeded in nanoseconds "
+                + new DecimalFormat("###,###,### \u039C").format((System.nanoTime() - start) / 1000));
     }
 
     /**
@@ -102,6 +99,9 @@ public class CLIRunner {
         if (firstForward == null) {
             new IllegalArgumentException("Request path could not be translated to an NALKey.");
         }
+        @SuppressWarnings("unchecked")
+        final long cacheTimeout = firstForward.getParameter("cache") != null ? new Long(
+                ((List<String>) firstForward.getParameter("cache")).get(0)) : -1;
 
         // run the protocol adapter which fills the struct with parameters from
         // console parameters & environment vars
@@ -139,8 +139,8 @@ public class CLIRunner {
          * same configuration leads to the same result. realized through hashing
          * and persistance.
          */
-        final String output = UsecaseAgent
-                .applyCaching(usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE), null);
+        final String output = UsecaseAgent.applyCaching(usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE),
+                firstForward, null, cacheTimeout);
 
         if (output != null) {
             System.out.append(output);
@@ -162,8 +162,8 @@ public class CLIRunner {
             /**
              * caches the ouput for the future
              */
-            UsecaseAgent
-                    .applyCaching(usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE), out.getBuffer().toString());
+            UsecaseAgent.applyCaching(usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE), firstForward, out
+                    .getBuffer().toString(), cacheTimeout);
         }
 
     }

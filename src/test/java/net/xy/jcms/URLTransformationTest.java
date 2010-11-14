@@ -124,7 +124,7 @@ public class URLTransformationTest {
             }
 
             @Override
-            public Map<String, String> getParameterMap() {
+            public Map<String, String[]> getParameterMap() {
                 return null;
             }
 
@@ -325,7 +325,7 @@ public class URLTransformationTest {
         System.out.append(res + "\n");
 
         res = dac.buildUriWithParams("sdfhjs dfh sdh", null);
-        Assert.assertEquals(res, "/test-web/sdfhjs+dfh+sdh");
+        Assert.assertEquals(res, "/test-web/sdfhjs%20dfh%20sdh");
         System.out.append(res + "\n");
 
         final Map<Object, Object> param = new HashMap<Object, Object>();
@@ -334,7 +334,7 @@ public class URLTransformationTest {
         param.put("test", "this");
 
         res = dac.buildUriWithParams("sdfh jsdf hsdf h", param);
-        Assert.assertEquals(res, "/test-web/sdfh+jsdf+hsdf+h?test1=this2&test=this");
+        Assert.assertEquals(res, "/test-web/sdfh%20jsdf%20hsdf%20h?test1=this2&test=this");
         System.out.append(res + "\n");
 
         res = dac.buildUriWithParams("www.google.de", param);

@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -128,15 +129,14 @@ public class TranslationParser {
      * @throws XMLStreamException
      */
     private static List<RuleParameter> parseParameter(final XMLStreamReader parser) throws XMLStreamException {
-        // TODO [LOW] type conversion maybe via callback
         final List<RuleParameter> params = new ArrayList<RuleParameter>();
         while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
             String parameterName = null, converter = null;
             Integer aplicatesToGroup = null;
-            if (parser.getAttributeCount() != 3) {
+            if (parser.getAttributeCount() != 3 && parser.getAttributeCount() != 2) {
                 throw new IllegalArgumentException("There are to much or few attributes specified for parameter.");
             }
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < parser.getAttributeCount(); i++) {
                 if (parser.getAttributeLocalName(i).equals("name")) {
                     parameterName = parser.getAttributeValue(i);
                 } else if (parser.getAttributeLocalName(i).equals("convert")) {
@@ -146,6 +146,27 @@ public class TranslationParser {
                 }
             }
 
+            boolean goEnd = true;
+            final Properties mappings = new Properties();
+            if (parser.next() == XMLStreamConstants.CHARACTERS) {
+                final String mappingStr = parser.getText();
+                // get integrated mapping body
+                converter = "java.util.Map";
+                if (StringUtils.isNotBlank(mappingStr)) {
+                    final String[] lines = mappingStr.split("\n");
+                    for (String line : lines) {
+                        line = line.trim();
+                        if (StringUtils.isBlank(line) || line.startsWith("#")) {
+                            continue;
+                        }
+                        final String[] pair = line.split("=", 2);
+                        mappings.put(pair[0].trim(), pair[1].trim());
+                    }
+                }
+            } else {
+                goEnd = false; // allready on end
+            }
+
             if (StringUtils.isBlank(parameterName)) {
                 throw new IllegalArgumentException("Parameter name has to be set");
             } else if (StringUtils.isBlank(converter)) {
@@ -153,9 +174,11 @@ public class TranslationParser {
             } else if (aplicatesToGroup == null) {
                 throw new IllegalArgumentException("Applicates to regex group has to be set");
             } else {
-                params.add(new RuleParameter(parameterName, aplicatesToGroup, converter));
+                params.add(new RuleParameter(parameterName, aplicatesToGroup, converter, mappings));
             }
-            parser.nextTag(); // gets endtag
+            if (goEnd) {
+                parser.nextTag(); // gets endtag
+            }
         }
         return params;
     }

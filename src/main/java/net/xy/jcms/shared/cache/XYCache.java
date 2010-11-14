@@ -119,12 +119,13 @@ public class XYCache {
      * @param region
      * @param key
      * @param maxAge
+     *            in seconds
      * @return
      */
-    public Object get(final String region, final String key, final int maxAge) {
+    public Object get(final String region, final String key, final long maxAge) {
         if (base.containsKey(region)) {
             if (base.get(region).containsKey(key)) {
-                final long maxOld = System.nanoTime() - maxAge;
+                final long maxOld = System.nanoTime() - maxAge * 1000 * 1000 * 1000;
                 final CacheObj obj = base.get(region).get(key);
                 if (obj != null && obj.getTimeStamp() > maxOld) {
                     return obj.getObj();
@@ -136,7 +137,8 @@ public class XYCache {
     }
 
     /**
-     * put an object to the cash or more precisely put send an request to the manager
+     * put an object to the cash or more precisely put send an request to the
+     * manager
      * 
      * @param region
      * @param key
@@ -277,7 +279,8 @@ public class XYCache {
         }
 
         /**
-         * implements an incremental cleanup until threshhold is reached or cache is empty
+         * implements an incremental cleanup until threshhold is reached or
+         * cache is empty
          */
         private void incrementalClean() {
             // TODO [LOW] implement incremental cache cleanup and trigger

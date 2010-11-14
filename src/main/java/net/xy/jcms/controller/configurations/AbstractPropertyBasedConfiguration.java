@@ -63,21 +63,29 @@ public abstract class AbstractPropertyBasedConfiguration extends Configuration<P
     protected static Properties initPropertiesByString(final String configString) {
         final Properties properties = new Properties();
         final String[] lines = configString.split("\n");
+        String lastValue = null; // to append additional data
+        String lastKey = null; // to append additional data
         for (final String line : lines) {
             if (StringUtils.isBlank(line) || line.trim().startsWith("#")) {
                 continue;
             }
-            final String[] parsed = line.trim().split("=", 2);
-            try {
-                final String key = parsed[0].trim();
-                final String value = parsed[1].trim();
-                properties.setProperty(key, value);
-            } catch (final IndexOutOfBoundsException ex) {
-                throw new IllegalArgumentException("Error by parsing body configuration line. "
-                        + DebugUtils.printFields(line));
+            if (!line.contains("=")) {
+                // append line to the last one
+                lastValue = lastValue + line;
+                properties.setProperty(lastKey, lastValue);
+            } else {
+                // read an new key
+                final String[] parsed = line.trim().split("=", 2);
+                try {
+                    lastKey = parsed[0].trim();
+                    lastValue = parsed[1].trim();
+                    properties.setProperty(lastKey, lastValue);
+                } catch (final IndexOutOfBoundsException ex) {
+                    throw new IllegalArgumentException("Error by parsing body configuration line. "
+                            + DebugUtils.printFields(line));
+                }
             }
         }
         return properties;
     }
-
 }

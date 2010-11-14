@@ -12,6 +12,7 @@
  */
 package net.xy.jcms;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -93,8 +94,11 @@ public class JavaRunner {
         // run the protocol adapter which fills the struct with parameters from
         // console parameters & environment vars
         // NALKey forward = fillWithParams(firstForward,parrams);
-        NALKey forward = firstForward;
+        @SuppressWarnings("unchecked")
+        final long cacheTimeout = firstForward.getParameter("cache") != null ? new Long(
+                ((List<String>) firstForward.getParameter("cache")).get(0)) : -1;
 
+        NALKey forward = firstForward;
         Usecase usecase;
         do {
             /**
@@ -126,8 +130,8 @@ public class JavaRunner {
          * same configuration leads to the same result. realized through hashing
          * and persistance.
          */
-        final String output = UsecaseAgent
-                .applyCaching(usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE), null);
+        final String output = UsecaseAgent.applyCaching(usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE),
+                firstForward, null, cacheTimeout);
 
         if (output != null) {
             return output;
@@ -147,8 +151,8 @@ public class JavaRunner {
             ViewRunner.runView(buffer, confTree);
 
             final String strBuffer = buffer.toString();
-            UsecaseAgent
-                    .applyCaching(usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE), strBuffer);
+            UsecaseAgent.applyCaching(usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE), firstForward,
+                    strBuffer, cacheTimeout);
             return strBuffer;
         }
     }

@@ -27,7 +27,7 @@
  	usecase		CDATA		#REQUIRED
  >
  
- <!ELEMENT parameter EMPTY>
+ <!ELEMENT parameter (#PCDATA)>
  
  <!ATTLIST parameter
 	name		CDATA	#REQUIRED

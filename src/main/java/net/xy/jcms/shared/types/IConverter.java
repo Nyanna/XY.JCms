@@ -31,4 +31,11 @@ public interface IConverter {
      * @param str
      */
     public void fromString(final String str);
+
+    /**
+     * can return an object from an given string
+     * 
+     * @return
+     */
+    public Object convert(final String str);
 }

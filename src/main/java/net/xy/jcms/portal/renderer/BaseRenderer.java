@@ -15,6 +15,8 @@ package net.xy.jcms.portal.renderer;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang.StringUtils;
+
 public class BaseRenderer implements IBaseRenderer {
 
     @Override
@@ -24,7 +26,11 @@ public class BaseRenderer implements IBaseRenderer {
 
     @Override
     public StringBuilder renderStartTag(final String tag, final String style) {
-        return new StringBuilder("<").append(tag).append(" class=\"").append(style).append("\" >");
+        final StringBuilder ret = new StringBuilder("<").append(tag);
+        if (StringUtils.isNotBlank(style)) {
+            ret.append(" class=\"").append(style.trim()).append("\"");
+        }
+        return ret.append(" >");
     }
 
     @Override

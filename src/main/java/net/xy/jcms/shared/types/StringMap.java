@@ -44,4 +44,9 @@ public class StringMap extends HashMap<String, String> implements IConverter {
     public StringMap(final String str) {
         fromString(str);
     }
+
+    @Override
+    public Object convert(final String str) {
+        return new StringMap(str);
+    }
 }

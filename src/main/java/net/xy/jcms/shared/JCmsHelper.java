@@ -16,7 +16,11 @@
  */
 package net.xy.jcms.shared;
 
+import java.text.DecimalFormat;
+
 import javax.xml.stream.XMLStreamException;
+
+import org.apache.log4j.Logger;
 
 import net.xy.jcms.controller.TranslationConfiguration;
 import net.xy.jcms.controller.UsecaseConfiguration;
@@ -38,6 +42,10 @@ import net.xy.jcms.controller.configurations.parser.XMLValidator.XMLValidationEx
  * 
  */
 public class JCmsHelper {
+    /**
+     * logger
+     */
+    private final static Logger LOG = Logger.getLogger(JCmsHelper.class);
 
     /**
      * sets the configuration via two obmitted xml resource names, via thread
@@ -60,10 +68,12 @@ public class JCmsHelper {
                     return cache;
                 }
                 try {
+                    final long start = System.nanoTime();
                     cache = TranslationParser.parse(Thread.currentThread().getContextClassLoader()
                             .getResourceAsStream(translationConfigXml));
+                    LOG.info("Parsing and converting of Translationrule xml config tok:  "
+                            + new DecimalFormat("###,###,### \u039C").format((System.nanoTime() - start) / 1000));
                 } catch (final XMLStreamException e) {
-                    e.printStackTrace();
                 }
                 return cache;
             }
@@ -79,10 +89,12 @@ public class JCmsHelper {
                     return cache;
                 }
                 try {
+                    final long start = System.nanoTime();
                     cache = UsecaseParser.parse(Thread.currentThread().getContextClassLoader()
                             .getResourceAsStream(usecaseConfigurationXml));
+                    LOG.info("Parsing and converting of Usecase xml config tok:   "
+                            + new DecimalFormat("###,###,### \u039C").format((System.nanoTime() - start) / 1000));
                 } catch (final XMLStreamException e) {
-                    e.printStackTrace();
                 }
                 return cache;
             }

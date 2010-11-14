@@ -26,6 +26,7 @@ import net.xy.jcms.controller.UsecaseConfiguration.Controller;
 import net.xy.jcms.controller.UsecaseConfiguration.Usecase;
 import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
+import net.xy.jcms.shared.DebugUtils;
 import net.xy.jcms.shared.IDataAccessContext;
 import net.xy.jcms.shared.cache.XYCache;
 
@@ -57,17 +58,16 @@ public class UsecaseAgent {
     private static final String CACHE_REGION = "USECASE_CACHE";
 
     /**
-     * in seconds
-     */
-    private static final int OUTPUT_EXPIRATION_TIME = 60;
-
-    /**
      * exception marker
      * 
      * @author Xyan
      * 
      */
     public static class NoUsecaseFound extends Exception {
+        public NoUsecaseFound(final String string) {
+            super(string);
+        }
+
         private static final long serialVersionUID = -5460169217069698404L;
     }
 
@@ -85,7 +85,7 @@ public class UsecaseAgent {
             final Usecase foundErrorCase = UsecaseConfiguration.findUsecaseForStruct(new NALKey(ERROR_USECASE_ID, struct),
                     dac);
             if (foundErrorCase == null) {
-                throw new NoUsecaseFound();
+                throw new NoUsecaseFound("No usecase were found for the request. " + DebugUtils.printFields(struct));
             }
             return foundErrorCase;
         }
@@ -123,25 +123,57 @@ public class UsecaseAgent {
 
     /**
      * These methods implements the caching of view output based on an hashing
-     * alghorythm applied on the Model.
+     * alghorythm applied on the Model. or NALKey
      * 
-     * @param usecase
-     * @return null or the cached ouput
+     * @param configs
+     * @param key
+     * @param content
+     * @param cacheTimeout
+     * @return
      */
-    public static String applyCaching(final Configuration<?>[] configs, final String toStore) {
+    public static String applyCaching(final Configuration<?>[] configs, final NALKey key, final String content,
+            final long cacheTimeout) {
+        /**
+         * caching should support two modes after an specified timeout e.g. 60
+         * seconds ofter after config changes e.g. onChange
+         */
+        final long timeout;
         final StringBuilder hashKey = new StringBuilder();
-        for (final Configuration<?> config : configs) {
-            hashKey.append(config.hashCode());
+        if (cacheTimeout <= -1) {
+            // -1 disabled
+            return null;
+        } else if (cacheTimeout == 0) {
+            // 0 means hash the whole configs
+            // TODO [HIGH] implement proper equals for the configurations
+            if (configs == null) {
+                return null;
+            }
+            timeout = 0;
+            for (final Configuration<?> config : configs) {
+                hashKey.append(config.hashCode());
+            }
+        } else {
+            // 0> timeout in seconds, hash the NALKey
+            if (key == null) {
+                return null;
+            }
+            timeout = cacheTimeout;
+            hashKey.append(key.hashCode());
         }
-        if (toStore == null) {
-            final String result = (String) XYCache.getInstance(USECASE_OUPUT_CACHE_ID).get(CACHE_REGION, hashKey.toString(),
-                    OUTPUT_EXPIRATION_TIME);
+        if (content == null) { // get
+            final String result;
+            if (timeout > 0) {
+                result = (String) XYCache.getInstance(USECASE_OUPUT_CACHE_ID).get(CACHE_REGION, hashKey.toString(), timeout);
+            } else {
+                result = (String) XYCache.getInstance(USECASE_OUPUT_CACHE_ID).get(CACHE_REGION, hashKey.toString());
+            }
             if (result != null) {
-                LOG.info("Cache object was found! Yeah.");
+                LOG.info("Cache object was found! Yeah. " + hashKey);
             }
             return result;
-        } else {
-            XYCache.getInstance(USECASE_OUPUT_CACHE_ID).put(CACHE_REGION, hashKey.toString(), toStore);
+        } else { // put
+            XYCache.getInstance(USECASE_OUPUT_CACHE_ID).put(CACHE_REGION, hashKey.toString(), content);
+            LOG.info("Cache object was stored " + hashKey);
             return null;
         }
     }

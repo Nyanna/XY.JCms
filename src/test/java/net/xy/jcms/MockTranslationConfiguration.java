@@ -35,7 +35,7 @@ public class MockTranslationConfiguration implements ITranslationConfigurationAd
                     private static final long serialVersionUID = 5628166066449993901L;
 
                     {
-                        add(new RuleParameter("contentgroup", 1, " de.jamba.ContentGroupConverter"));
+                        add(new RuleParameter("contentgroup", 1, " java.lang.String"));
                     }
                 });
         con0[1] = new TranslationRule("^Hm du willst dich also Einloggen", "Hm du willst dich also Einloggen", "userLogin",
@@ -45,8 +45,8 @@ public class MockTranslationConfiguration implements ITranslationConfigurationAd
                     private static final long serialVersionUID = -5034726752873057109L;
 
                     {
-                        add(new RuleParameter("contentgroup", 1, " de.jamba.ContentGroupConverter"));
-                        add(new RuleParameter("catalogid", 2, "net.xyan.SimpleDataTypeConverter"));
+                        add(new RuleParameter("contentgroup", 1, "java.lang.String"));
+                        add(new RuleParameter("catalogid", 2, "java.lang.String"));
                     }
                 });
         return con0;

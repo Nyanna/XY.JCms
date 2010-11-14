@@ -23,7 +23,6 @@ import java.util.Map.Entry;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.log4j.Logger;
 
 import net.xy.jcms.shared.DebugUtils;
 import net.xy.jcms.shared.IDataAccessContext;
@@ -35,17 +34,11 @@ import net.xy.jcms.shared.IDataAccessContext;
  * 
  */
 public class HttpRequestDataAccessContext implements IDataAccessContext {
-    private final static Logger LOG = Logger.getLogger(IDataAccessContext.class);
 
     /**
      * represents the root url of this app
      */
     private final URI rootUrl;
-
-    /**
-     * if an session id should be stored on every link
-     */
-    private String sessionId = null;
 
     /**
      * holds the servletcontainer path
@@ -61,8 +54,6 @@ public class HttpRequestDataAccessContext implements IDataAccessContext {
             URISyntaxException {
         // gets cappsubrand default locale and various other jj related
         // informations mendatory to retrieve jj configuration
-        // request.getRequestURI().substring(0,
-        // request.getRequestURI().lastIndexOf("/") + 1)
         try {
             request.setCharacterEncoding("UTF-8");
         } catch (final UnsupportedEncodingException e) {
@@ -95,13 +86,15 @@ public class HttpRequestDataAccessContext implements IDataAccessContext {
             build = new URI(build.getScheme(), build.getUserInfo(), build.getHost(), build.getPort(),
                     path, buildQuery(parameters), build.getFragment());
             final URI relBuild = rootUrl.relativize(build);
+            final String ret;
             if (!relBuild.isAbsolute()) {
                 // because we relativate it always to docroot, which is the
                 // servlet container in JEE
-                return contextPath + relBuild.toASCIIString();
+                ret = contextPath + relBuild.toASCIIString().replace("+", "%20");
             } else {
-                return relBuild.toASCIIString();
+                ret = relBuild.toASCIIString();
             }
+            return ret;
         } catch (final URISyntaxException e) {
             throw new IllegalArgumentException("URL couldn't be build from given parameters. "
                     + DebugUtils.printFields(requestString, parameters), e);
@@ -129,24 +122,6 @@ public class HttpRequestDataAccessContext implements IDataAccessContext {
             query.append(entry.getKey()).append("=").append(entry.getValue());
         }
         return query.toString();
-    }
-
-    /**
-     * gets the session id string
-     * 
-     * @return value
-     */
-    public String getSessionId() {
-        return sessionId;
-    }
-
-    /**
-     * sets an session id
-     * 
-     * @param sessionId
-     */
-    public void setSessionId(final String sessionId) {
-        this.sessionId = sessionId;
     }
 
     @Override

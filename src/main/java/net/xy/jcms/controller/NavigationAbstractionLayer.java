@@ -19,6 +19,8 @@ package net.xy.jcms.controller;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import net.xy.jcms.controller.TranslationConfiguration.GroupCouldNotBeFilled;
 import net.xy.jcms.controller.TranslationConfiguration.InvalidBuildRule;
 import net.xy.jcms.controller.TranslationConfiguration.TranslationRule;
@@ -33,6 +35,10 @@ import net.xy.jcms.shared.IDataAccessContext;
  * @author xyan
  */
 public class NavigationAbstractionLayer {
+    /**
+     * logger
+     */
+    static final Logger LOG = Logger.getLogger(NavigationAbstractionLayer.class);
 
     /**
      * Each Key korresponds to one usecase
@@ -116,12 +122,36 @@ public class NavigationAbstractionLayer {
          * @param parameters
          */
         public void setParameters(final Map<Object, Object> parameters) {
-            this.parameters = parameters;
+            if (parameters == null) {
+                this.parameters = new HashMap<Object, Object>();
+            } else {
+                this.parameters = parameters;
+            }
         }
 
         @Override
         public String toString() {
             return "NALKey[ id=" + id + " parameters=" + parameters.toString() + "]";
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (!NALKey.class.isInstance(obj)) {
+                return false;
+            }
+            final NALKey otherObj = (NALKey) obj;
+            return id.equals(otherObj.id) && parameters.equals(otherObj.parameters);
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 25;
+            hash = hash * 3 + id.hashCode();
+            hash = hash * 3 + parameters.hashCode();
+            return hash;
         }
     }
 
@@ -144,7 +174,21 @@ public class NavigationAbstractionLayer {
      * @return Key[Contentgroup,Subcategory]
      */
     public static NALKey translatePathToKey(final IDataAccessContext dac) {
-        return TranslationConfiguration.find(dac.getRequestPath(), dac);
+        Exception ex = null;
+        try {
+            return TranslationConfiguration.find(dac.getRequestPath(), dac);
+        } catch (final InstantiationException e) {
+            ex = e;
+        } catch (final IllegalAccessException e) {
+            ex = e;
+        } catch (final ClassNotFoundException e) {
+            ex = e;
+        } finally {
+            if (ex != null) {
+                LOG.error("An key was found but an error occured on converting it param values", ex);
+            }
+        }
+        return null;
     }
 
     /**

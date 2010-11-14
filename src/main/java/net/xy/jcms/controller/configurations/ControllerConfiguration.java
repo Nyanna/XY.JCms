@@ -19,8 +19,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-
-import net.xy.jcms.controller.configurations.stores.ClientStore;
 import net.xy.jcms.controller.usecase.IController;
 
 /**
@@ -87,26 +85,6 @@ public class ControllerConfiguration extends Configuration<Map<String, Map<Strin
     @Override
     public boolean equals(final Object object) {
         return getConfigurationValue().equals(object);
-    }
-
-    private ClientStore store = null;
-
-    /**
-     * returns an clientStore
-     * 
-     * @return value never null
-     */
-    public ClientStore getClientStore() {
-        return store;
-    }
-
-    /**
-     * sets an new client store
-     * 
-     * @param store
-     */
-    public void setClientStore(final ClientStore store) {
-        this.store = store;
     }
 
     /**

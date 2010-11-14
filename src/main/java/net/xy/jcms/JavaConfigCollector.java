@@ -12,6 +12,7 @@
  */
 package net.xy.jcms;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -139,9 +140,10 @@ public class JavaConfigCollector {
         boolean isMissingConfig = false;
         try {
             final long start = System.nanoTime();
-            LOG.info("Configuration aggregation started: " + start);
+            // LOG.info("Configuration aggregation started: " + start);
             final Configuration<?>[] configs = getConfig(request, params, dac);
-            LOG.info("Configuration aggregation succeeded in nanoseconds " + (System.nanoTime() - start));
+            LOG.info("Execution succeeded in nanoseconds "
+                    + new DecimalFormat("###,###,### \u039C").format((System.nanoTime() - start) / 1000));
             for (final Configuration<?> config : configs) {
                 switch (config.getConfigurationType()) {
                 case UIConfiguration:

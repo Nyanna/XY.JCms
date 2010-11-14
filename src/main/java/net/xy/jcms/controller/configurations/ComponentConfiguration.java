@@ -15,6 +15,7 @@ package net.xy.jcms.controller.configurations;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -40,12 +41,14 @@ public abstract class ComponentConfiguration {
     public final static String COMPONENT_PATH_SEPARATOR = ".";
 
     /**
-     * holds the mendatory component id. On every added component id got set on every fragment not.
+     * holds the mendatory component id. On every added component id got set on
+     * every fragment not.
      */
     private String id = "";
 
     /**
-     * holds an id stacked component path. On every added component path got set on every fragment not.
+     * holds an id stacked component path. On every added component path got set
+     * on every fragment not.
      */
     private String componentPath = "";
 
@@ -55,12 +58,14 @@ public abstract class ComponentConfiguration {
     private ComponentConfiguration parent = null;
 
     /**
-     * holds the appropriated components instance, which requests and renders these configuration
+     * holds the appropriated components instance, which requests and renders
+     * these configuration
      */
     private final IComponent compInstance;
 
     /**
-     * flag stores if the config were already initialized and if further configs are possible
+     * flag stores if the config were already initialized and if further configs
+     * are possible
      */
     private boolean ready = false;
 
@@ -81,7 +86,8 @@ public abstract class ComponentConfiguration {
     }
 
     /**
-     * initializes the complete component configuration in case of an missconfiguration it throws an exception
+     * initializes the complete component configuration in case of an
+     * missconfiguration it throws an exception
      * 
      * @param cmpConfig
      *            ComponentConfiguration to be initialized
@@ -232,7 +238,7 @@ public abstract class ComponentConfiguration {
     /**
      * holds the references to the children
      */
-    private final Map<String, ComponentConfiguration> children = new HashMap<String, ComponentConfiguration>();
+    private final Map<String, ComponentConfiguration> children = new LinkedHashMap<String, ComponentConfiguration>();
 
     /**
      * gets all childrens
@@ -421,7 +427,8 @@ public abstract class ComponentConfiguration {
     }
 
     /**
-     * method to configure childs ui config aggregation. Only usefull in the aggregation phase.
+     * method to configure childs ui config aggregation. Only usefull in the
+     * aggregation phase.
      * 
      * @param key
      * @param value
@@ -570,7 +577,7 @@ public abstract class ComponentConfiguration {
     public Object getContent(final String key) {
         final Object contentObj = content.get(key);
         if (contentObj == null) {
-            throw new IllegalArgumentException("An not cprepared content object were requested!");
+            throw new IllegalArgumentException("An not prepared content object were requested!");
         }
         return contentObj;
     }

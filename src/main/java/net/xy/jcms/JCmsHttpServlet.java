@@ -14,6 +14,8 @@ package net.xy.jcms;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.text.DecimalFormat;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -33,8 +35,6 @@ import net.xy.jcms.controller.ViewRunner;
 import net.xy.jcms.controller.configurations.ComponentConfiguration;
 import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
-import net.xy.jcms.controller.configurations.ControllerConfiguration;
-import net.xy.jcms.controller.configurations.stores.ClientStore;
 import net.xy.jcms.shared.adapter.HttpProtocolRequestAdapter;
 import net.xy.jcms.shared.adapter.HttpProtocolResponseAdapter;
 import net.xy.jcms.shared.adapter.HttpRequestDataAccessContext;
@@ -60,9 +60,10 @@ public class JCmsHttpServlet extends HttpServlet {
     public void service(final ServletRequest req, final ServletResponse res) throws ServletException, IOException {
         if (req instanceof HttpServletRequest && res instanceof HttpServletResponse) {
             final long start = System.nanoTime();
-            LOG.info("Execution started: " + start);
+            // LOG.info("Execution started: " + start);
             service((HttpServletRequest) req, (HttpServletResponse) res);
-            LOG.info("Execution succeeded in nanoseconds " + (System.nanoTime() - start));
+            LOG.info("Execution succeeded in nanoseconds "
+                    + new DecimalFormat("###,###,### \u039C").format((System.nanoTime() - start) / 1000));
         }
     }
 
@@ -83,7 +84,7 @@ public class JCmsHttpServlet extends HttpServlet {
         /**
          * first convert the request to an navigation/usecasestruct
          */
-        final NALKey firstForward = NavigationAbstractionLayer.translatePathToKey(dac);
+        NALKey firstForward = NavigationAbstractionLayer.translatePathToKey(dac);
         if (firstForward == null) {
             new ServletException("Request path could not be translated to an NALKey.");
         }
@@ -91,9 +92,12 @@ public class JCmsHttpServlet extends HttpServlet {
         // run the protocol adapter which fills the struct with parameters from
         // the request: cookie data, header data,
         // post data
-        NALKey forward = HttpProtocolRequestAdapter.apply(request, firstForward);
-        final ClientStore store = HttpProtocolRequestAdapter.initClientStore(request, dac);
+        firstForward = HttpProtocolRequestAdapter.apply(request, firstForward);
+        @SuppressWarnings("unchecked")
+        final long cacheTimeout = firstForward.getParameter("cache") != null ? new Long(
+                ((List<String>) firstForward.getParameter("cache")).get(0)) : -1;
 
+        NALKey forward = firstForward;
         Usecase usecase;
         do {
             /**
@@ -112,14 +116,10 @@ public class JCmsHttpServlet extends HttpServlet {
              * use client caching feature.
              */
             try {
-                // sets the clientstore retrieved from protocol adapter
-                final ControllerConfiguration cConfig = (ControllerConfiguration) usecase
-                        .getConfiguration(ConfigurationType.ControllerConfiguration);
-                cConfig.setClientStore(store);
+                // clientstore is one of the parameters
                 forward = UsecaseAgent.executeController(usecase, dac, forward.getParameters());
             } catch (final ClassNotFoundException ex) {
-                LOG.error(ex);
-                throw new ServletException("Couldn't load an Usecase controller");
+                throw new ServletException("Couldn't load an Usecase controller", ex);
             }
         } while (forward != null);
 
@@ -127,14 +127,17 @@ public class JCmsHttpServlet extends HttpServlet {
         // the headers
         HttpProtocolResponseAdapter.apply(response,
                 usecase.getConfigurationList(ConfigurationType.CONTROLLERAPPLICABLE));
+        // TODO: [LOW] implement caching also of response headers corelated to
+        // the request first testwise via binary outstream with headers
+        // TODO [LAST] check and profile performance, check timestams in nano
 
         /**
          * at this point caching takes effect by the safe asumption that the
          * same configuration leads to the same result. realized through hashing
          * and persistance.
          */
-        final String output = UsecaseAgent
-                .applyCaching(usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE), null);
+        final String output = UsecaseAgent.applyCaching(usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE),
+                firstForward, null, cacheTimeout);
 
         if (output != null) {
             response.getWriter().append(output);
@@ -156,8 +159,8 @@ public class JCmsHttpServlet extends HttpServlet {
             /**
              * caches the ouput for the future
              */
-            UsecaseAgent.applyCaching(usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE), out.getBuffer()
-                    .toString());
+            UsecaseAgent.applyCaching(usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE), firstForward, out
+                    .getBuffer().toString(), cacheTimeout);
         }
 
     }

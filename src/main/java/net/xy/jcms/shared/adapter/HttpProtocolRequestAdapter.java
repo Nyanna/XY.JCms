@@ -12,8 +12,10 @@
  */
 package net.xy.jcms.shared.adapter;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -44,7 +46,15 @@ public class HttpProtocolRequestAdapter {
         final Map<Object, Object> params = new HashMap<Object, Object>();
         params.putAll(getCookieParams(request));
         params.putAll(key.getParameters()); // get old ones
-        params.putAll(request.getParameterMap());
+        for (final Entry<String, String[]> entry : ((Map<String, String[]>) request.getParameterMap()).entrySet()) {
+            if (entry.getValue() == null || entry.getValue().length < 1) {
+                params.put(entry.getKey(), null);
+            } else {
+                params.put(entry.getKey(), Arrays.asList(entry.getValue()));
+            }
+        }
+        params.put(ClientStore.class.getName(), initClientStore(request));
+        // dac.setSessionId(request.getSession().getId());
         key.setParameters(params);
         return key;
     }
@@ -56,13 +66,12 @@ public class HttpProtocolRequestAdapter {
      * @param request
      * @return returns an -1 limited store if the client don't supports an store
      */
-    public static ClientStore initClientStore(final HttpServletRequest request, final HttpRequestDataAccessContext dac) {
+    private static ClientStore initClientStore(final HttpServletRequest request) {
         if (supportsCookies(request)) {
             // 20 per domain * 4 kb each calculated from the headerline RFC 2109
             return new ClientStore(4000, ClientStore.Type.ONCLIENT);
         } else if (request.getSession() != null) {
             // session present read from there
-            dac.setSessionId(request.getSession().getId());
             return new ClientStore(-1, ClientStore.Type.ONSERVER);
         } else {
             return new ClientStore(0, ClientStore.Type.NONE);

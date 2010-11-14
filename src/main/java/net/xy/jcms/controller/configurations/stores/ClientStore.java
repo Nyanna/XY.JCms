@@ -24,6 +24,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 /**
  * provides an mechanism to store informations on the client in http it would be
  * an cookie
@@ -32,6 +34,11 @@ import java.util.Map;
  * 
  */
 public class ClientStore {
+    /**
+     * logger
+     */
+    static final Logger LOG = Logger.getLogger(ClientStore.class);
+
     /**
      * limit in bytes -1 means not limit
      */
@@ -51,6 +58,28 @@ public class ClientStore {
      * stores the type of saving and reading mechanism
      */
     private final Type type;
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!ClientStore.class.isInstance(obj)) {
+            return false;
+        }
+        final ClientStore oo = (ClientStore) obj;
+        return limit == oo.limit && actualUsage == oo.actualUsage && type.equals(oo.type) && store.equals(oo.store);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 34;
+        hash = hash * 3 + limit;
+        hash = hash * 3 + actualUsage;
+        hash = hash * 3 + type.ordinal();
+        hash = hash * 3 + store.hashCode();
+        return hash;
+    }
 
     /**
      * triggers the method used for saving the store
