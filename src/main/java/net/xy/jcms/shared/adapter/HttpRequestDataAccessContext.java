@@ -17,6 +17,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -50,6 +51,11 @@ public class HttpRequestDataAccessContext implements IDataAccessContext {
      */
     private final String requestPath;
 
+    /**
+     * stores DAC properties only
+     */
+    private final Map<Object, Object> properties = new HashMap<Object, Object>();
+
     public HttpRequestDataAccessContext(final HttpServletRequest request) throws MalformedURLException,
             URISyntaxException {
         // gets cappsubrand default locale and various other jj related
@@ -59,10 +65,16 @@ public class HttpRequestDataAccessContext implements IDataAccessContext {
         } catch (final UnsupportedEncodingException e) {
         }
         contextPath = request.getContextPath() + "/";
-        requestPath = request.getPathInfo().length() > 0 && request.getPathInfo().charAt(0) == '/' ? request.getPathInfo()
+        requestPath = request.getPathInfo().length() > 0 && request.getPathInfo().charAt(0) == '/' ? request
+                .getPathInfo()
                 .substring(1) : request.getPathInfo();
         rootUrl = new URI(request.getProtocol().split("/", 2)[0], null, request.getLocalName(), request.getLocalPort(),
                 "/", null, null);
+
+        // properties
+        if (request.getParameter("flushConfig") != null) {
+            properties.put("flushConfig", true);
+        }
     }
 
     @Override
@@ -127,5 +139,10 @@ public class HttpRequestDataAccessContext implements IDataAccessContext {
     @Override
     public String getRequestPath() {
         return requestPath;
+    }
+
+    @Override
+    public Object getProperty(final Object key) {
+        return properties.get(key);
     }
 }

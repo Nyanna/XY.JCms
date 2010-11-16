@@ -86,6 +86,7 @@ public class XYCache {
     }
 
     // Cache part
+    // TODO [HIGH] replace with an better timestamp than nanotime, doesnt fits, random hops
 
     /**
      * cache instance
@@ -137,8 +138,7 @@ public class XYCache {
     }
 
     /**
-     * put an object to the cash or more precisely put send an request to the
-     * manager
+     * put an object to the cash or more precisely put send an request to the manager
      * 
      * @param region
      * @param key
@@ -279,8 +279,7 @@ public class XYCache {
         }
 
         /**
-         * implements an incremental cleanup until threshhold is reached or
-         * cache is empty
+         * implements an incremental cleanup until threshhold is reached or cache is empty
          */
         private void incrementalClean() {
             // TODO [LOW] implement incremental cache cleanup and trigger

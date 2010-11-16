@@ -58,8 +58,7 @@ public class CLIRunner {
     /**
      * sole constructor
      */
-    public CLIRunner() {
-    }
+    public CLIRunner() {}
 
     /**
      * constructor automaticly initiates the programm
@@ -121,8 +120,7 @@ public class CLIRunner {
             }
 
             /**
-             * run the controllers for the usecase, maybe redirect to another
-             * usecase.
+             * run the controllers for the usecase, maybe redirect to another usecase.
              */
             try {
                 forward = UsecaseAgent.executeController(usecase, dac, forward.getParameters());
@@ -135,9 +133,8 @@ public class CLIRunner {
         // no response adapter for the console is needed
 
         /**
-         * at this point caching takes effect by the safe asumption that the
-         * same configuration leads to the same result. realized through hashing
-         * and persistance.
+         * at this point caching takes effect by the safe asumption that the same configuration leads to the same
+         * result. realized through hashing and persistance.
          */
         final String output = UsecaseAgent.applyCaching(usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE),
                 firstForward, null, cacheTimeout);
@@ -146,15 +143,13 @@ public class CLIRunner {
             System.out.append(output);
         } else {
             /**
-             * get the configurationtree for the usecase from an empty run
-             * through the componenttree
+             * get the configurationtree for the usecase from an empty run through the componenttree
              */
             final Configuration<?>[] viewConfig = usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE);
             final ComponentConfiguration confTree = ViewRunner.runConfiguration(viewConfig);
 
             /**
-             * run and return the rendering tree through streamprocessing to the
-             * client
+             * run and return the rendering tree through streamprocessing to the client
              */
             final ConsoleOutWriter out = new ConsoleOutWriter();
             ViewRunner.runView(out, confTree);
@@ -233,7 +228,8 @@ public class CLIRunner {
             final StringBuilder cli = new StringBuilder(path);
             if (parameters != null && !parameters.isEmpty()) {
                 for (final Entry<Object, Object> entry : parameters.entrySet()) {
-                    cli.append(" ").append(entry.getKey()).append("=").append("\"").append(entry.getValue()).append("\"");
+                    cli.append(" ").append(entry.getKey()).append("=").append("\"").append(entry.getValue())
+                            .append("\"");
                 }
             }
             return cli.toString();
@@ -242,6 +238,12 @@ public class CLIRunner {
         @Override
         public String getRequestPath() {
             return request;
+        }
+
+        @Override
+        public Object getProperty(final Object key) {
+            // TODO [LOW] parse and save setting from cmdline, param should not be saved in NAL or usecase
+            return null;
         }
 
     };

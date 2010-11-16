@@ -1,21 +1,19 @@
 /**
- *  This file is part of XY.JCms, Copyright 2010 (C) Xyan Kruse, Xyan@gmx.net, Xyan.kilu.de
- *
- *  XY.JCms is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  XY.JCms is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with XY.JCms.  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of XY.JCms, Copyright 2010 (C) Xyan Kruse, Xyan@gmx.net, Xyan.kilu.de
+ * 
+ * XY.JCms is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * 
+ * XY.JCms is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with XY.JCms. If not, see
+ * <http://www.gnu.org/licenses/>.
  */
 package net.xy.jcms.shared;
 
+import java.io.IOException;
+import java.net.URLConnection;
 import java.text.DecimalFormat;
 
 import javax.xml.stream.XMLStreamException;
@@ -48,8 +46,7 @@ public class JCmsHelper {
     private final static Logger LOG = Logger.getLogger(JCmsHelper.class);
 
     /**
-     * sets the configuration via two obmitted xml resource names, via thread
-     * classloader
+     * sets the configuration via two obmitted xml resource names, via thread classloader
      * 
      * @param translationConfigXml
      * @param usecaseConfigurationXml
@@ -64,16 +61,21 @@ public class JCmsHelper {
 
             @Override
             public TranslationRule[] getRuleList(final IDataAccessContext dac) {
-                if (cache != null) {
+                if (dac.getProperty("flushConfig") == null && cache != null) {
                     return cache;
                 }
                 try {
                     final long start = System.nanoTime();
-                    cache = TranslationParser.parse(Thread.currentThread().getContextClassLoader()
-                            .getResourceAsStream(translationConfigXml));
+                    final URLConnection con = Thread.currentThread().getContextClassLoader()
+                            .getResource(translationConfigXml).openConnection();
+                    con.setUseCaches(false);
+                    con.setDefaultUseCaches(false);
+                    con.addRequestProperty("seed", new Long(System.nanoTime()).toString());
+                    cache = TranslationParser.parse(con.getInputStream());
                     LOG.info("Parsing and converting of Translationrule xml config tok:  "
                             + new DecimalFormat("###,###,### \u039C").format((System.nanoTime() - start) / 1000));
                 } catch (final XMLStreamException e) {
+                } catch (final IOException e) {
                 }
                 return cache;
             }
@@ -85,16 +87,21 @@ public class JCmsHelper {
 
             @Override
             public Usecase[] getUsecaseList(final IDataAccessContext dac) {
-                if (cache != null) {
+                if (dac.getProperty("flushConfig") == null && cache != null) {
                     return cache;
                 }
                 try {
                     final long start = System.nanoTime();
-                    cache = UsecaseParser.parse(Thread.currentThread().getContextClassLoader()
-                            .getResourceAsStream(usecaseConfigurationXml));
+                    final URLConnection con = Thread.currentThread().getContextClassLoader()
+                            .getResource(usecaseConfigurationXml).openConnection();
+                    con.setUseCaches(false);
+                    con.setDefaultUseCaches(false);
+                    con.addRequestProperty("seed", new Long(System.nanoTime()).toString());
+                    cache = UsecaseParser.parse(con.getInputStream());
                     LOG.info("Parsing and converting of Usecase xml config tok:   "
                             + new DecimalFormat("###,###,### \u039C").format((System.nanoTime() - start) / 1000));
                 } catch (final XMLStreamException e) {
+                } catch (final IOException e) {
                 }
                 return cache;
             }
