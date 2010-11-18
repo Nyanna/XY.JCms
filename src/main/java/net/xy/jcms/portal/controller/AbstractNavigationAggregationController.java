@@ -1,18 +1,14 @@
 /**
- *  This file is part of XY.JCms, Copyright 2010 (C) Xyan Kruse, Xyan@gmx.net, Xyan.kilu.de
- *
- *  XY.JCms is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  XY.JCms is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with XY.JCms.  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of XY.JCms, Copyright 2010 (C) Xyan Kruse, Xyan@gmx.net, Xyan.kilu.de
+ * 
+ * XY.JCms is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * 
+ * XY.JCms is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with XY.JCms. If not, see
+ * <http://www.gnu.org/licenses/>.
  */
 package net.xy.jcms.portal.controller;
 
@@ -103,14 +99,7 @@ public abstract class AbstractNavigationAggregationController<LINKOBJECT> implem
                             targetUsecase = split[0];
                             messageKey = split[1];
                         }
-                        final NALKey key = parseKeyString(targetUsecase);
-                        final TranslationRule rule = NavigationAbstractionLayer.findRuleForKey(key, dac);
-                        if (rule == null) {
-                            throw new IllegalArgumentException("No usecase could be found for the configured key. "
-                                    + DebugUtils.printFields(key));
-                        }
-                        final String path = NavigationAbstractionLayer.translateKeyWithRule(key, rule);
-                        final String url = dac.buildUriWithParams(path, null);
+                        final String url = buildUriForUsecase(targetUsecase, dac);
                         contents.add(getLinkDTO(url, messageKey, configuration, parameters));
                     } else if (navItem.getKey().startsWith("url")) {
                         String url = navItem.getValue().trim();
@@ -125,13 +114,12 @@ public abstract class AbstractNavigationAggregationController<LINKOBJECT> implem
     }
 
     /**
-     * parses an NALKey definition from string in form usecaseid[param = value,
-     * ...]
+     * parses an NALKey definition from string in form usecaseid[param = value, ...]
      * 
      * @param str
-     * @return
+     * @return value
      */
-    protected NALKey parseKeyString(String str) {
+    public static NALKey parseKeyString(String str) {
         str = str.trim();
         // first get id
         NALKey key;
@@ -147,6 +135,29 @@ public abstract class AbstractNavigationAggregationController<LINKOBJECT> implem
             key = new NALKey(str);
         }
         return key;
+    }
+
+    /**
+     * Builds an uri out from an parsed usecase string representation in format of #UsecaseId[param=value]:messageKey
+     * 
+     * @param targetUsecaseStr
+     *            #UsecaseId[param=value]:messageKey
+     * @param dac
+     * @return the ready parameter appended URI/URL
+     * @throws GroupCouldNotBeFilled
+     * @throws InvalidBuildRule
+     */
+    public static String buildUriForUsecase(final String targetUsecaseStr, final IDataAccessContext dac)
+            throws GroupCouldNotBeFilled, InvalidBuildRule {
+        final NALKey key = parseKeyString(targetUsecaseStr);
+        final TranslationRule rule = NavigationAbstractionLayer.findRuleForKey(key, dac);
+        if (rule == null) {
+            throw new IllegalArgumentException("No usecase could be found for the configured key. "
+                    + DebugUtils.printFields(key));
+        }
+        final String path = NavigationAbstractionLayer.translateKeyWithRule(key, rule);
+        final String url = dac.buildUriWithParams(path, null);
+        return url;
     }
 
     /**

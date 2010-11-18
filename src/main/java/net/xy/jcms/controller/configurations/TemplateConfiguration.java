@@ -22,9 +22,8 @@ import net.xy.jcms.shared.DebugUtils;
 import net.xy.jcms.shared.IFragment;
 
 /**
- * describes the connection of differend page components/fragements/templates.
- * Template inclusion is performed to an simple stacking of subsequent component
- * tree's or component configuration trees.
+ * describes the connection of differend page components/fragements/templates. Template inclusion is performed to an
+ * simple stacking of subsequent component tree's or component configuration trees.
  * 
  * @author xyan
  * 
@@ -79,8 +78,7 @@ public class TemplateConfiguration extends Configuration<Map<String, IFragment>>
     }
 
     /**
-     * retrieves an global non component template configuration mainly used to
-     * retrieve the root fragment.
+     * retrieves an global non component template configuration mainly used to retrieve the root fragment.
      * 
      * @param tmplName
      * @return value
@@ -153,12 +151,14 @@ public class TemplateConfiguration extends Configuration<Map<String, IFragment>>
      * @throws IllegalAccessException
      * @throws ClassNotFoundException
      */
-    public static IFragment fragmentCachePool(final String classPath) throws InstantiationException, IllegalAccessException,
+    public static IFragment fragmentCachePool(final String classPath) throws InstantiationException,
+            IllegalAccessException,
             ClassNotFoundException {
         if (cachePool.containsKey(classPath)) {
             return cachePool.get(classPath);
         } else {
-            final Object fragment = Thread.currentThread().getContextClassLoader().loadClass(classPath).newInstance();
+            // TODO [LOW] replace with callers classloader
+            final Object fragment = TemplateConfiguration.class.getClassLoader().loadClass(classPath).newInstance();
             if (IFragment.class.isInstance(fragment)) {
                 cachePool.put(classPath, (IFragment) fragment);
                 return (IFragment) fragment;

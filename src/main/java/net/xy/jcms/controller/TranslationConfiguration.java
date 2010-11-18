@@ -42,8 +42,7 @@ public abstract class TranslationConfiguration {
     static final Logger LOG = Logger.getLogger(TranslationConfiguration.class);
 
     /**
-     * describes an path translation rule to convert human readable pathes in an
-     * semantic navigation hierarchy
+     * describes an path translation rule to convert human readable pathes in an semantic navigation hierarchy
      * 
      * @author xyan
      * 
@@ -140,20 +139,17 @@ public abstract class TranslationConfiguration {
         private final String parameterName;
 
         /**
-         * if an regexp substitution is needed stores the pattern subgroup which
-         * will be transformed to an parameter
+         * if an regexp substitution is needed stores the pattern subgroup which will be transformed to an parameter
          */
         private final Integer aplicatesToGroup;
 
         /**
-         * hold the typeconverter which converts the string value to an
-         * programatic type
+         * hold the typeconverter which converts the string value to an programatic type
          */
         private final String converter;
 
         /**
-         * provides an builtin mapping for abstraction of language specific
-         * string values
+         * provides an builtin mapping for abstraction of language specific string values
          */
         private final Properties mapping;
 
@@ -246,19 +242,18 @@ public abstract class TranslationConfiguration {
     }
 
     /**
-     * generates an path with an rule out from an key. protected for unit
-     * testing
+     * generates an path with an rule out from an key. protected for unit testing
      * 
      * @param key
      * @param rule
-     * @return the ready translated path elsewhere it rises an
-     *         GroupCouldNotBeFilled
+     * @return the ready translated path elsewhere it rises an GroupCouldNotBeFilled
      * @throws GroupCouldNotBeFilled
      *             in case parameter replacement failures
      * @throws InvalidBuildRule
      *             in case the buildrule can't be applied
      */
-    protected static String translateKeyWithRule(final NALKey key, final TranslationRule rule) throws GroupCouldNotBeFilled,
+    protected static String translateKeyWithRule(final NALKey key, final TranslationRule rule)
+            throws GroupCouldNotBeFilled,
             InvalidBuildRule {
         String buildKey = rule.getBuildOff();
         Matcher matcher = rule.getReacton().matcher(buildKey);
@@ -375,8 +370,7 @@ public abstract class TranslationConfiguration {
     }
 
     /**
-     * compares the params of an key against the rules and returns the most
-     * matching one
+     * compares the params of an key against the rules and returns the most matching one
      * 
      * @param list
      * @param struct
@@ -461,8 +455,7 @@ public abstract class TranslationConfiguration {
     }
 
     /**
-     * helper which converts an string with an type specifier to an object maybe
-     * with the usage of an mapping
+     * helper which converts an string with an type specifier to an object maybe with the usage of an mapping
      * 
      * @param paramValue
      * @param type

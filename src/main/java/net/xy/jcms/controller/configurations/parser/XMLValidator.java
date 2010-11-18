@@ -20,6 +20,7 @@ import java.io.InputStream;
 
 import net.xy.jcms.shared.DebugUtils;
 
+import org.apache.log4j.Logger;
 import org.xml.sax.DTDHandler;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.ErrorHandler;
@@ -37,6 +38,11 @@ import org.xml.sax.helpers.XMLReaderFactory;
  * 
  */
 public class XMLValidator {
+    /**
+     * logger
+     */
+    private final static Logger LOG = Logger.getLogger(XMLValidator.class);
+
     // TODO research in the gnu java bug when running console
 
     /**
@@ -46,7 +52,8 @@ public class XMLValidator {
      * @throws XMLValidationException
      */
     public static void validate(final String xml) throws XMLValidationException {
-        validate(Thread.currentThread().getContextClassLoader()
+        // TODO [LOW] replace with callers classloader
+        validate(XMLValidator.class.getClassLoader()
                             .getResourceAsStream(xml));
     }
 
@@ -59,6 +66,7 @@ public class XMLValidator {
     public static void validate(final InputStream xml) throws XMLValidationException {
         try {
             final XMLReader parser = XMLReaderFactory.createXMLReader();
+            LOG.info("XMLReader loaded: " + parser.getClass().getName());
             final SAXReactor handler = new SAXReactor();
             parser.setFeature("http://xml.org/sax/features/validation", Boolean.TRUE);
             parser.setDTDHandler(handler);
@@ -161,13 +169,13 @@ public class XMLValidator {
                 }
             }
             try {
-                final InputStream st = Thread.currentThread().getContextClassLoader()
+                final InputStream st = this.getClass().getClassLoader()
                         .getResourceAsStream(systemId);
                 st.available();
                 return new InputSource(st);
             } catch (final Exception ex) {
                 try {
-                    final InputStream st = Thread.currentThread().getContextClassLoader()
+                    final InputStream st = this.getClass().getClassLoader()
                             .getResourceAsStream("dtd/" + systemId);
                     st.available();
                     return new InputSource(st);

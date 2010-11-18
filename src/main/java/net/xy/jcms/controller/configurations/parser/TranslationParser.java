@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 
 import net.xy.jcms.controller.TranslationConfiguration.RuleParameter;
 import net.xy.jcms.controller.TranslationConfiguration.TranslationRule;
@@ -39,6 +40,10 @@ import net.xy.jcms.controller.TranslationConfiguration.TranslationRule;
  * 
  */
 public class TranslationParser {
+    /**
+     * logger
+     */
+    private final static Logger LOG = Logger.getLogger(TranslationParser.class);
 
     /**
      * parses an xml configuration from an input streams. throwes
@@ -49,7 +54,9 @@ public class TranslationParser {
      * @throws XMLStreamException
      */
     public static TranslationRule[] parse(final InputStream in) throws XMLStreamException {
-        final XMLInputFactory factory = XMLInputFactory.newInstance();
+        final XMLInputFactory factory = XMLInputFactory.newFactory("com.sun.xml.internal.stream.XMLInputFactoryImpl",
+                TranslationParser.class.getClassLoader());
+        LOG.info("XMLInputFactory loaded: " + factory.getClass().getName());
         factory.setProperty("javax.xml.stream.isCoalescing", true);
         // not supported be the reference implementation
         // factory.setProperty(XMLInputFactory.IS_VALIDATING, Boolean.TRUE);

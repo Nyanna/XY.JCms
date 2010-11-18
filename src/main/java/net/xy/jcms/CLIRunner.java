@@ -41,10 +41,14 @@ import net.xy.jcms.shared.cache.XYCache;
  * 
  */
 public class CLIRunner {
+
     /**
      * logger
      */
     static final Logger LOG = Logger.getLogger(CLIRunner.class);
+    static {
+        LOG.info("CLIRunner was loaded by " + CLIRunner.class.getClassLoader().getClass().getName());
+    }
 
     /**
      * main entry point for the console
@@ -57,6 +61,8 @@ public class CLIRunner {
 
     /**
      * sole constructor
+     * 
+     * @throws IOException
      */
     public CLIRunner() {}
 
@@ -64,6 +70,7 @@ public class CLIRunner {
      * constructor automaticly initiates the programm
      * 
      * @param args
+     * @throws IOException
      */
     public CLIRunner(final String[] args) {
         final long start = System.nanoTime();
@@ -194,7 +201,7 @@ public class CLIRunner {
         /**
          * returns the buffer stored for putput caching
          * 
-         * @return
+         * @return value
          */
         public StringBuilder getBuffer() {
             return internalBuffer;

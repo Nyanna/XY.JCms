@@ -25,8 +25,7 @@ import net.xy.jcms.shared.DebugUtils;
 import net.xy.jcms.shared.IRenderer;
 
 /**
- * is like the baserenderfactory an configuration delivering renderer instances
- * described by an interface
+ * is like the baserenderfactory an configuration delivering renderer instances described by an interface
  * 
  * @author Xyan
  * 
@@ -63,7 +62,8 @@ public class RenderKitConfiguration extends Configuration<Map<?, IRenderer>> {
      * @param config
      * @return
      */
-    public Match<String, IRenderer> getMatch(final Class<? extends IRenderer> rInterface, final ComponentConfiguration config) {
+    public Match<String, IRenderer> getMatch(final Class<? extends IRenderer> rInterface,
+            final ComponentConfiguration config) {
         Match<String, IRenderer> value = new Match<String, IRenderer>(null, null);
         final ClimbUp strategy = new ClimbUp(config, rInterface.getSimpleName());
         final List<String> retrievalStack = new ArrayList<String>();
@@ -175,7 +175,8 @@ public class RenderKitConfiguration extends Configuration<Map<?, IRenderer>> {
         if (cachePool.containsKey(classPath)) {
             return cachePool.get(classPath);
         } else {
-            final Object renderer = Thread.currentThread().getContextClassLoader().loadClass(classPath).newInstance();
+            // TODO [LOW] replace with callers classloader
+            final Object renderer = RenderKitConfiguration.class.getClassLoader().loadClass(classPath).newInstance();
             if (IRenderer.class.isInstance(renderer)) {
                 cachePool.put(classPath, (IRenderer) renderer);
                 return (IRenderer) renderer;

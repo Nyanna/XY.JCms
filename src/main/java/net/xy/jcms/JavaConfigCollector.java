@@ -49,11 +49,10 @@ public class JavaConfigCollector {
     /**
      * logger
      */
-    static final Logger LOG = Logger.getLogger(JCmsHttpServlet.class);
+    static final Logger LOG = Logger.getLogger(JavaConfigCollector.class);
 
     /**
-     * does an configuration aggregation only run and returns an dummy config
-     * list containing all requested configs
+     * does an configuration aggregation only run and returns an dummy config list containing all requested configs
      * 
      * @param request
      * @param params
@@ -102,8 +101,7 @@ public class JavaConfigCollector {
                     usecase.getControllerList(), getProxyConfigs(usecase));
 
             /**
-             * run the controllers for the usecase, maybe redirect to another
-             * usecase.
+             * run the controllers for the usecase, maybe redirect to another usecase.
              */
             try {
                 forward = UsecaseAgent.executeController(usecase, dac, forward.getParameters());
@@ -114,8 +112,7 @@ public class JavaConfigCollector {
         } while (forward != null);
 
         /**
-         * get the configurationtree for the usecase from an empty run through
-         * the componenttree
+         * get the configurationtree for the usecase from an empty run through the componenttree
          */
         final Configuration<?>[] viewConfig = usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE);
         @SuppressWarnings("unused")
@@ -163,7 +160,8 @@ public class JavaConfigCollector {
                             if (StringUtils.isNotBlank(entry.getValue().getDescription())) {
                                 ret.append(" # ").append(entry.getValue().getDescription()).append("\n");
                             }
-                            ret.append(entry.getKey()).append(" = ").append(entry.getValue().getDefaultValue()).append("\n");
+                            ret.append(entry.getKey()).append(" = ").append(entry.getValue().getDefaultValue())
+                                    .append("\n");
                         }
                         ret.append("\n");
                     }
@@ -182,7 +180,8 @@ public class JavaConfigCollector {
                     ret.append("##### Content configuration:\n\n");
                     if (!content.isEmpty()) {
                         for (final Entry<String, Class<?>> entry : content.entrySet()) {
-                            ret.append(entry.getKey()).append(" - ").append(entry.getValue().getSimpleName()).append("\n");
+                            ret.append(entry.getKey()).append(" - ").append(entry.getValue().getSimpleName())
+                                    .append("\n");
                         }
                         ret.append("\n");
                     }
@@ -273,7 +272,8 @@ public class JavaConfigCollector {
      */
     private static Configuration<?>[] getProxyConfigs(final Usecase usecase) {
         final List<Configuration<?>> configs = new ArrayList<Configuration<?>>();
-        configs.add(new UIConfigurationProxy((UIConfiguration) usecase.getConfiguration(ConfigurationType.UIConfiguration)));
+        configs.add(new UIConfigurationProxy((UIConfiguration) usecase
+                .getConfiguration(ConfigurationType.UIConfiguration)));
         try {
             configs.add(new ContentRepositoryProxy((ContentRepository) usecase
                     .getConfiguration(ConfigurationType.ContentRepository)));

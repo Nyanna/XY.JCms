@@ -64,9 +64,10 @@ public class JCmsHelper {
                 if (dac.getProperty("flushConfig") == null && cache != null) {
                     return cache;
                 }
+                Exception ex = null;
                 try {
                     final long start = System.nanoTime();
-                    final URLConnection con = Thread.currentThread().getContextClassLoader()
+                    final URLConnection con = this.getClass().getClassLoader()
                             .getResource(translationConfigXml).openConnection();
                     con.setUseCaches(false);
                     con.setDefaultUseCaches(false);
@@ -75,7 +76,13 @@ public class JCmsHelper {
                     LOG.info("Parsing and converting of Translationrule xml config tok:  "
                             + new DecimalFormat("###,###,### \u039C").format((System.nanoTime() - start) / 1000));
                 } catch (final XMLStreamException e) {
+                    ex = e;
                 } catch (final IOException e) {
+                    ex = e;
+                } finally {
+                    if (ex != null) {
+                        throw new IllegalArgumentException("Error on parsing the TranslationRules.", ex);
+                    }
                 }
                 return cache;
             }
@@ -90,9 +97,10 @@ public class JCmsHelper {
                 if (dac.getProperty("flushConfig") == null && cache != null) {
                     return cache;
                 }
+                Exception ex = null;
                 try {
                     final long start = System.nanoTime();
-                    final URLConnection con = Thread.currentThread().getContextClassLoader()
+                    final URLConnection con = this.getClass().getClassLoader()
                             .getResource(usecaseConfigurationXml).openConnection();
                     con.setUseCaches(false);
                     con.setDefaultUseCaches(false);
@@ -101,7 +109,13 @@ public class JCmsHelper {
                     LOG.info("Parsing and converting of Usecase xml config tok:   "
                             + new DecimalFormat("###,###,### \u039C").format((System.nanoTime() - start) / 1000));
                 } catch (final XMLStreamException e) {
+                    ex = e;
                 } catch (final IOException e) {
+                    ex = e;
+                } finally {
+                    if (ex != null) {
+                        throw new IllegalArgumentException("Error on parsing the UsecaseConfiguration.", ex);
+                    }
                 }
                 return cache;
             }
