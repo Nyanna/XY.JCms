@@ -60,7 +60,7 @@ public class ViewRunnerTest {
 
                 @Override
                 protected ComponentConfiguration[] prepareChildren(final Map<String, Object> content) {
-                    addComponent("testus", TextComponent.getInstance());
+                    addComponent("testus", TextComponent.class);
                     return null;
                 }
             };

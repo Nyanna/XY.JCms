@@ -23,6 +23,7 @@ import java.util.Map.Entry;
 import org.apache.commons.lang.StringUtils;
 
 import net.xy.jcms.controller.configurations.UIConfiguration.UI;
+import net.xy.jcms.controller.configurations.pool.ComponentPool;
 import net.xy.jcms.shared.DebugUtils;
 import net.xy.jcms.shared.IComponent;
 import net.xy.jcms.shared.IOutWriter;
@@ -269,9 +270,15 @@ public abstract class ComponentConfiguration {
      * @param component
      * @return value
      */
-    public ComponentConfiguration addComponent(final String id, final IComponent component) {
+    public ComponentConfiguration addComponent(final String id, final Class<? extends IComponent> component) {
         changeValid();
-        final ComponentConfiguration config = component.getConfiguration();
+        IComponent compInst;
+        try {
+            compInst = ComponentPool.get(component);
+        } catch (final ClassNotFoundException e) {
+            throw new IllegalArgumentException("Given class couldn't be loaded.", e);
+        }
+        final ComponentConfiguration config = compInst.getConfiguration();
         addChildren(id, config);
         return config;
     }
@@ -577,7 +584,8 @@ public abstract class ComponentConfiguration {
     public Object getContent(final String key) {
         final Object contentObj = content.get(key);
         if (contentObj == null) {
-            throw new IllegalArgumentException("An not prepared content object were requested!");
+            throw new IllegalArgumentException("An not prepared content object were requested! "
+                    + DebugUtils.printFields(key, componentPath, compInstance));
         }
         return contentObj;
     }

@@ -55,7 +55,7 @@ public class MessageConfiguration extends AbstractPropertyBasedConfiguration {
      * 
      * @param key
      * @param config
-     * @return
+     * @return value
      */
     public Match<String, String> getMessageMatch(final String key, final ComponentConfiguration config) {
         Match<String, String> value = new Match<String, String>(null, null);

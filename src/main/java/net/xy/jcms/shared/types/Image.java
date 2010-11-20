@@ -20,9 +20,9 @@ import org.apache.commons.lang.StringUtils;
 
 /**
  * specifies an image transfer object
- *
+ * 
  * @author xyan
- *
+ * 
  */
 public class Image {
 
@@ -48,7 +48,7 @@ public class Image {
 
     /**
      * default constructor, object is immutable
-     *
+     * 
      * @param reqStr
      * @param width
      * @param height
@@ -66,7 +66,7 @@ public class Image {
 
     /**
      * get the request string to get the image
-     *
+     * 
      * @return value
      */
     public String getReqStr() {
@@ -75,7 +75,7 @@ public class Image {
 
     /**
      * gets the estimated width of the image
-     *
+     * 
      * @return value
      */
     public int getWidth() {
@@ -84,7 +84,7 @@ public class Image {
 
     /**
      * gets the estimated height of the image
-     *
+     * 
      * @return value
      */
     public int getHeight() {
@@ -93,12 +93,34 @@ public class Image {
 
     /**
      * gets an optional title of the image
-     *
+     * 
      * @return value
      */
     public String getTitle() {
         return title;
     }
 
-    // TODO [LOW] implement hashcode and equals
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!Image.class.isInstance(obj)) {
+            return false;
+        }
+        final Image oo = (Image) obj;
+        return reqStr.equals(reqStr) && width == oo.width && height == oo.height && StringUtils.equals(title, oo.title);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 32;
+        hash = hash * 3 + reqStr.hashCode();
+        hash = hash * 3 + width;
+        hash = hash * 3 + height;
+        if (title != null) {
+            hash = hash * 3 + title.hashCode();
+        }
+        return hash;
+    }
 }

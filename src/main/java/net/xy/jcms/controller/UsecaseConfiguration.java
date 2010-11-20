@@ -23,8 +23,7 @@ import net.xy.jcms.controller.NavigationAbstractionLayer.NALKey;
 import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
 import net.xy.jcms.controller.configurations.IUsecaseConfigurationAdapter;
-import net.xy.jcms.controller.usecase.ControllerPool;
-import net.xy.jcms.controller.usecase.IController;
+import net.xy.jcms.shared.IController;
 import net.xy.jcms.shared.IDataAccessContext;
 
 /**
@@ -159,7 +158,7 @@ public class UsecaseConfiguration {
             final List<Configuration<?>> returnedConfig = new ArrayList<Configuration<?>>();
             for (final ConfigurationType type : types) {
                 if (!configurationList.containsKey(type)) {
-                    final Configuration<?> emptyConf = Configuration.initByString(type, StringUtils.EMPTY);
+                    final Configuration<?> emptyConf = Configuration.initByString(type, StringUtils.EMPTY, null);
                     configurationList.put(type, emptyConf);
                 }
                 returnedConfig.add(configurationList.get(type));
@@ -177,7 +176,7 @@ public class UsecaseConfiguration {
         public Configuration<?> getConfiguration(final ConfigurationType type) {
             final Configuration<?>[] config = getConfigurationList(EnumSet.of(type));
             if (config == null || config.length <= 0) {
-                final Configuration<?> emptyConf = Configuration.initByString(type, StringUtils.EMPTY);
+                final Configuration<?> emptyConf = Configuration.initByString(type, StringUtils.EMPTY, null);
                 configurationList.put(type, emptyConf);
                 return emptyConf;
             } else {
@@ -265,7 +264,7 @@ public class UsecaseConfiguration {
         /**
          * an controler id
          */
-        private final String controllerId;
+        private final IController controllerId;
 
         /**
          * configuration types wich should be obmitted to the controller
@@ -278,7 +277,7 @@ public class UsecaseConfiguration {
          * @param controllerId
          * @param obmitedConfigurations
          */
-        public Controller(final String controllerId, final EnumSet<ConfigurationType> obmitedConfigurations) {
+        public Controller(final IController controllerId, final EnumSet<ConfigurationType> obmitedConfigurations) {
             this.controllerId = controllerId;
             this.obmitedConfigurations = obmitedConfigurations;
         }
@@ -288,7 +287,7 @@ public class UsecaseConfiguration {
          * 
          * @return value
          */
-        final public String getControllerId() {
+        final public IController getControllerId() {
             return controllerId;
         }
 
@@ -325,11 +324,10 @@ public class UsecaseConfiguration {
          */
         public NALKey invoke(final IDataAccessContext dac, final Configuration<?>[] configuration,
                 final Map<Object, Object> parameters) throws ClassNotFoundException {
-            final IController controller = ControllerPool.get(getControllerId(), this.getClass().getClassLoader());
             if (parameters != null) {
-                return controller.invoke(dac, configuration, parameters);
+                return controllerId.invoke(dac, configuration, parameters);
             } else {
-                return controller.invoke(dac, configuration);
+                return controllerId.invoke(dac, configuration);
             }
         }
 

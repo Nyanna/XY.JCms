@@ -15,17 +15,13 @@ package net.xy.jcms.shared;
 import net.xy.jcms.controller.configurations.ComponentConfiguration;
 import net.xy.jcms.controller.configurations.FragmentConfiguration;
 
+/**
+ * common implementation of an fragment
+ * 
+ * @author Xyan
+ * 
+ */
 public abstract class AbstractFragment extends AbstractComponent implements IFragment {
-
-    /**
-     * must be called to ensure that no default constructor will be used
-     * 
-     * @param skip
-     */
-    public AbstractFragment() {
-        super(true);
-    }
-
     @Override
     public abstract FragmentConfiguration getConfiguration();
 

@@ -52,12 +52,13 @@ public class JavaConfigCollector {
     static final Logger LOG = Logger.getLogger(JavaConfigCollector.class);
 
     /**
-     * does an configuration aggregation only run and returns an dummy config list containing all requested configs
+     * does an configuration aggregation only run and returns an dummy config
+     * list containing all requested configs
      * 
      * @param request
      * @param params
      * @param dac
-     * @return
+     * @return value
      * @throws ExecutionException
      */
     public static Configuration<?>[] getConfig(final String request, final Map<String, Object> params,
@@ -101,7 +102,8 @@ public class JavaConfigCollector {
                     usecase.getControllerList(), getProxyConfigs(usecase));
 
             /**
-             * run the controllers for the usecase, maybe redirect to another usecase.
+             * run the controllers for the usecase, maybe redirect to another
+             * usecase.
              */
             try {
                 forward = UsecaseAgent.executeController(usecase, dac, forward.getParameters());
@@ -112,7 +114,8 @@ public class JavaConfigCollector {
         } while (forward != null);
 
         /**
-         * get the configurationtree for the usecase from an empty run through the componenttree
+         * get the configurationtree for the usecase from an empty run through
+         * the componenttree
          */
         final Configuration<?>[] viewConfig = usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE);
         @SuppressWarnings("unused")
@@ -136,11 +139,11 @@ public class JavaConfigCollector {
         final StringBuilder ret = new StringBuilder();
         boolean isMissingConfig = false;
         try {
-            final long start = System.nanoTime();
+            final long start = System.currentTimeMillis();
             // LOG.info("Configuration aggregation started: " + start);
             final Configuration<?>[] configs = getConfig(request, params, dac);
-            LOG.info("Execution succeeded in nanoseconds "
-                    + new DecimalFormat("###,###,### \u039C").format((System.nanoTime() - start) / 1000));
+            LOG.info("Execution succeeded in milliseconds "
+                    + new DecimalFormat("###,###,### \u039C").format((System.currentTimeMillis() - start)));
             for (final Configuration<?> config : configs) {
                 switch (config.getConfigurationType()) {
                 case UIConfiguration:

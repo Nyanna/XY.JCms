@@ -43,18 +43,16 @@ public class XMLValidator {
      */
     private final static Logger LOG = Logger.getLogger(XMLValidator.class);
 
-    // TODO research in the gnu java bug when running console
-
     /**
-     * delegate which loads the inputstream from string in current thread context
+     * delegate which loads the inputstream from string in current thread
+     * context
      * 
      * @param xml
      * @throws XMLValidationException
      */
-    public static void validate(final String xml) throws XMLValidationException {
+    public static void validate(final String xml, final ClassLoader loader) throws XMLValidationException {
         // TODO [LOW] replace with callers classloader
-        validate(XMLValidator.class.getClassLoader()
-                            .getResourceAsStream(xml));
+        validate(loader.getResourceAsStream(xml));
     }
 
     /**
@@ -187,11 +185,13 @@ public class XMLValidator {
         }
 
         @Override
-        public void notationDecl(final String name, final String publicId, final String systemId) throws SAXException {}
+        public void notationDecl(final String name, final String publicId, final String systemId) throws SAXException {
+        }
 
         @Override
         public void unparsedEntityDecl(final String name, final String publicId, final String systemId,
                 final String notationName)
-                throws SAXException {}
+                throws SAXException {
+        }
     }
 }

@@ -18,6 +18,7 @@ import net.xy.jcms.controller.TranslationConfiguration.RuleParameter;
 import net.xy.jcms.controller.TranslationConfiguration.TranslationRule;
 import net.xy.jcms.controller.configurations.ITranslationConfigurationAdapter;
 import net.xy.jcms.shared.IDataAccessContext;
+import net.xy.jcms.shared.types.StringWrapper;
 
 /**
  * Mock translation configuration in lack of an configuration reader
@@ -35,18 +36,19 @@ public class MockTranslationConfiguration implements ITranslationConfigurationAd
                     private static final long serialVersionUID = 5628166066449993901L;
 
                     {
-                        add(new RuleParameter("contentgroup", 1, " java.lang.String"));
+                        add(new RuleParameter("contentgroup", 1, new StringWrapper()));
                     }
                 });
-        con0[1] = new TranslationRule("^Hm du willst dich also Einloggen", "Hm du willst dich also Einloggen", "userLogin",
+        con0[1] = new TranslationRule("^Hm du willst dich also Einloggen", "Hm du willst dich also Einloggen",
+                "userLogin",
                 new ArrayList<RuleParameter>());
         con0[2] = new TranslationRule("^du willst wohl zu (Ringtones|Funsounds) zur Unterkategorie ([0-9]+)",
                 "du willst wohl zu Funsounds zur Unterkategorie 1270", "subcategory", new ArrayList<RuleParameter>() {
                     private static final long serialVersionUID = -5034726752873057109L;
 
                     {
-                        add(new RuleParameter("contentgroup", 1, "java.lang.String"));
-                        add(new RuleParameter("catalogid", 2, "java.lang.String"));
+                        add(new RuleParameter("contentgroup", 1, new StringWrapper()));
+                        add(new RuleParameter("catalogid", 2, new StringWrapper()));
                     }
                 });
         return con0;

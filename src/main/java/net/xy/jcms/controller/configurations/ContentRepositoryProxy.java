@@ -72,7 +72,7 @@ public class ContentRepositoryProxy extends ContentRepository {
     /**
      * gets the map of requested content
      * 
-     * @return
+     * @return value
      */
     public Map<String, Class<?>> getReqContent() {
         final Map<String, Class<?>> merge = new TreeMap<String, Class<?>>(String.CASE_INSENSITIVE_ORDER);
@@ -84,7 +84,7 @@ public class ContentRepositoryProxy extends ContentRepository {
     /**
      * returns only missing content
      * 
-     * @return
+     * @return value
      */
     public Map<String, Class<?>> getMissingContent() {
         return missingContent;
@@ -93,7 +93,7 @@ public class ContentRepositoryProxy extends ContentRepository {
     /**
      * returns present content
      * 
-     * @return
+     * @return value
      */
     public Map<String, Class<?>> getPresentContent() {
         return presentContent;
@@ -102,7 +102,7 @@ public class ContentRepositoryProxy extends ContentRepository {
     /**
      * returns true if a config is missing
      * 
-     * @return
+     * @return value
      */
     public boolean isMissing() {
         return missingContent.isEmpty() ? false : true;

@@ -59,11 +59,11 @@ public class JCmsHttpServlet extends HttpServlet {
     @Override
     public void service(final ServletRequest req, final ServletResponse res) throws ServletException, IOException {
         if (req instanceof HttpServletRequest && res instanceof HttpServletResponse) {
-            final long start = System.nanoTime();
+            final long start = System.currentTimeMillis();
             // LOG.info("Execution started: " + start);
             service((HttpServletRequest) req, (HttpServletResponse) res);
-            LOG.info("Execution succeeded in nanoseconds "
-                    + new DecimalFormat("###,###,### \u039C").format((System.nanoTime() - start) / 1000));
+            LOG.info("Execution succeeded in milliseconds "
+                    + new DecimalFormat("###,###,### \u039C").format((System.currentTimeMillis() - start)));
         }
     }
 

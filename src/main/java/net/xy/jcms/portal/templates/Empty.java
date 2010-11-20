@@ -20,13 +20,13 @@ import net.xy.jcms.shared.AbstractFragment;
 import net.xy.jcms.shared.IOutWriter;
 
 /**
- * an simple empty fragment as an implicite null value for filling template slots
+ * an simple empty fragment as an implicite null value for filling template
+ * slots
  * 
  * @author xyan
  * 
  */
 public class Empty extends AbstractFragment {
-
     @Override
     public FragmentConfiguration getConfiguration() {
         return new FragmentConfiguration(this) {
@@ -53,14 +53,4 @@ public class Empty extends AbstractFragment {
     public void render(final IOutWriter out, final FragmentConfiguration config) {
         // do nothing
     }
-
-    /**
-     * singleton pattern
-     */
-    private final static Empty INSTANCE = new Empty();
-
-    public static Empty getInstance() {
-        return INSTANCE;
-    }
-
 }

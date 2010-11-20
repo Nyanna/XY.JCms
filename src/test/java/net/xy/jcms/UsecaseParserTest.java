@@ -27,11 +27,11 @@ import org.junit.Assert;
 public class UsecaseParserTest {
 
     @Test
-    public void tesParser() {
+    public void tesParser() throws ClassNotFoundException {
         Usecase[] cases = null;
         try {
             cases = UsecaseParser.parse(Thread.currentThread().getContextClassLoader()
-                    .getResourceAsStream("net/xy/jcms/ExampleUsecases.xml"));
+                    .getResourceAsStream("net/xy/jcms/ExampleUsecases.xml"), Thread.currentThread().getContextClassLoader());
         } catch (final XMLStreamException e) {
             e.printStackTrace();
         }

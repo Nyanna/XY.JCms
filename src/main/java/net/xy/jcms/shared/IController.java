@@ -14,13 +14,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with XY.JCms.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.xy.jcms.controller.usecase;
+package net.xy.jcms.shared;
 
 import java.util.Map;
 
 import net.xy.jcms.controller.NavigationAbstractionLayer.NALKey;
 import net.xy.jcms.controller.configurations.Configuration;
-import net.xy.jcms.shared.IDataAccessContext;
 
 /**
  * interface the dynamicly loaded controllers

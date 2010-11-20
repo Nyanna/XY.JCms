@@ -76,7 +76,7 @@ public class UsecaseConfigurationTest {
                 return new Usecase[] {
                         new Usecase("contentgroup", "first test", new Parameter[] { new Parameter("contentgroup",
                                 "de.jamba.ContentGroup") }, new Controller[] { new Controller(
-                                "net.xy.jcms.MockController",
+                                new MockController(),
                                 EnumSet.of(ConfigurationType.MessageConfiguration))
 
                         }, new Configuration[] { new MessageConfiguration(new Properties() {

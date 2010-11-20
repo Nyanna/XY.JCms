@@ -15,13 +15,13 @@ package net.xy.jcms.shared;
 import net.xy.jcms.controller.configurations.FragmentConfiguration;
 
 /**
- * general fragment interface
+ * general fragment interface. in general fragments got compiled from xml files
+ * and are so editable as WYSIWYG editors.
  * 
  * @author Xyan
  * 
  */
 public interface IFragment extends IComponent {
-
     /**
      * returns the fragments configuration preparing alghorhythms
      * 

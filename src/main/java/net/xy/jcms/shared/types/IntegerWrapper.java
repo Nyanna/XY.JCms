@@ -16,54 +16,24 @@
  */
 package net.xy.jcms.shared.types;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import net.xy.jcms.shared.IConverter;
 
 /**
- * simpele typesation
+ * simply wrapps and returns an Integer
  * 
  * @author xyan
  * 
  */
-public class StringMap extends HashMap<String, String> implements IConverter {
-    private static final long serialVersionUID = 6126913995340768165L;
-
-    /**
-     * initializes an empty instance
-     */
-    public StringMap() {}
-
-    /**
-     * accepts an map and copies it values
-     * 
-     * @param map
-     */
-    public StringMap(final Map<String, String> map) {
-        putAll(map);
-    }
-
-    /**
-     * creates an instance based on an string
-     */
-    public StringMap(final String str) {
-        fromString(str);
-    }
+public class IntegerWrapper implements IConverter {
 
     @Override
     public void fromString(final String str) {
-        if (str != null) {
-            final String[] pairs = str.trim().split(",");
-            for (final String pair : pairs) {
-                final String[] ppair = pair.split(":", 2);
-                put(ppair[0], ppair[1]);
-            }
-        }
+        return;
     }
 
     @Override
     public Object convert(final String str) {
-        return new StringMap(str);
+        return new Integer(str);
     }
+
 }

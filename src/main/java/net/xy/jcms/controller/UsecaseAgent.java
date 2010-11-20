@@ -1,18 +1,18 @@
 /**
- *  This file is part of XY.JCms, Copyright 2010 (C) Xyan Kruse, Xyan@gmx.net, Xyan.kilu.de
- *
- *  XY.JCms is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  XY.JCms is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with XY.JCms.  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of XY.JCms, Copyright 2010 (C) Xyan Kruse, Xyan@gmx.net, Xyan.kilu.de
+ * 
+ * XY.JCms is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * XY.JCms is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with XY.JCms. If not, see <http://www.gnu.org/licenses/>.
  */
 package net.xy.jcms.controller;
 
@@ -82,7 +82,8 @@ public class UsecaseAgent {
         final Usecase foundCase = UsecaseConfiguration.findUsecaseForStruct(struct, dac);
         if (foundCase == null) {
             // try to find most general error usecase
-            final Usecase foundErrorCase = UsecaseConfiguration.findUsecaseForStruct(new NALKey(ERROR_USECASE_ID, struct),
+            final Usecase foundErrorCase = UsecaseConfiguration.findUsecaseForStruct(new NALKey(ERROR_USECASE_ID,
+                    struct),
                     dac);
             if (foundErrorCase == null) {
                 throw new NoUsecaseFound("No usecase were found for the request. " + DebugUtils.printFields(struct));
@@ -129,7 +130,7 @@ public class UsecaseAgent {
      * @param key
      * @param content
      * @param cacheTimeout
-     * @return
+     * @return value
      */
     public static String applyCaching(final Configuration<?>[] configs, final NALKey key, final String content,
             final long cacheTimeout) {
@@ -163,7 +164,8 @@ public class UsecaseAgent {
         if (content == null) { // get
             final String result;
             if (timeout > 0) {
-                result = (String) XYCache.getInstance(USECASE_OUPUT_CACHE_ID).get(CACHE_REGION, hashKey.toString(), timeout);
+                result = (String) XYCache.getInstance(USECASE_OUPUT_CACHE_ID).get(CACHE_REGION, hashKey.toString(),
+                        timeout);
             } else {
                 result = (String) XYCache.getInstance(USECASE_OUPUT_CACHE_ID).get(CACHE_REGION, hashKey.toString());
             }

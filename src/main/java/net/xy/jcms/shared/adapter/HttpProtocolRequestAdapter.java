@@ -104,7 +104,7 @@ public class HttpProtocolRequestAdapter {
      * checks if client supports cookies based on if he has send at least one
      * 
      * @param request
-     * @return
+     * @return value
      */
     public static boolean supportsCookies(final HttpServletRequest request) {
         return request.getCookies() != null && request.getCookies().length > 0;

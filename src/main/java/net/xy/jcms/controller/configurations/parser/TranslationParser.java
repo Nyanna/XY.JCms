@@ -1,26 +1,27 @@
 /**
- *  This file is part of XY.JCms, Copyright 2010 (C) Xyan Kruse, Xyan@gmx.net, Xyan.kilu.de
- *
- *  XY.JCms is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  XY.JCms is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with XY.JCms.  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of XY.JCms, Copyright 2010 (C) Xyan Kruse, Xyan@gmx.net, Xyan.kilu.de
+ * 
+ * XY.JCms is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * XY.JCms is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with XY.JCms. If not, see <http://www.gnu.org/licenses/>.
  */
 package net.xy.jcms.controller.configurations.parser;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Properties;
+import java.util.Map;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -32,6 +33,8 @@ import org.apache.log4j.Logger;
 
 import net.xy.jcms.controller.TranslationConfiguration.RuleParameter;
 import net.xy.jcms.controller.TranslationConfiguration.TranslationRule;
+import net.xy.jcms.controller.configurations.pool.ConverterPool;
+import net.xy.jcms.shared.types.StringMap;
 
 /**
  * parser for translation rules xml configuration files
@@ -52,9 +55,13 @@ public class TranslationParser {
      * @param in
      * @return value
      * @throws XMLStreamException
+     * @throws ClassNotFoundException
+     * @throws IllegalAccessException
+     * @throws InstantiationException
      */
-    public static TranslationRule[] parse(final InputStream in) throws XMLStreamException {
-        final XMLInputFactory factory = XMLInputFactory.newFactory("com.sun.xml.internal.stream.XMLInputFactoryImpl",
+    public static TranslationRule[] parse(final InputStream in, final ClassLoader loader) throws XMLStreamException,
+             ClassNotFoundException {
+        final XMLInputFactory factory = XMLInputFactory.newInstance("com.sun.xml.internal.stream.XMLInputFactoryImpl",
                 TranslationParser.class.getClassLoader());
         LOG.info("XMLInputFactory loaded: " + factory.getClass().getName());
         factory.setProperty("javax.xml.stream.isCoalescing", true);
@@ -64,7 +71,7 @@ public class TranslationParser {
         while (parser.hasNext()) {
             final int event = parser.next();
             if (event == XMLStreamConstants.START_ELEMENT && parser.getName().getLocalPart().equals("rules")) {
-                return parseRules(parser);
+                return parseRules(parser, loader);
             }
         }
         throw new IllegalArgumentException("No rules section found.");
@@ -76,12 +83,16 @@ public class TranslationParser {
      * @param parser
      * @return value
      * @throws XMLStreamException
+     * @throws ClassNotFoundException
+     * @throws IllegalAccessException
+     * @throws InstantiationException
      */
-    private static TranslationRule[] parseRules(final XMLStreamReader parser) throws XMLStreamException {
+    private static TranslationRule[] parseRules(final XMLStreamReader parser, final ClassLoader loader)
+            throws XMLStreamException, ClassNotFoundException {
         final List<TranslationRule> rules = new LinkedList<TranslationRule>();
         while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
             if (parser.getLocalName().equals("rule")) {
-                rules.add(parseRule(parser));
+                rules.add(parseRule(parser, loader));
             } else {
                 throw new IllegalArgumentException("Syntax error nothing allowed between rule sections.");
             }
@@ -96,8 +107,12 @@ public class TranslationParser {
      * @param parser
      * @return value
      * @throws XMLStreamException
+     * @throws ClassNotFoundException
+     * @throws IllegalAccessException
+     * @throws InstantiationException
      */
-    private static TranslationRule parseRule(final XMLStreamReader parser) throws XMLStreamException {
+    private static TranslationRule parseRule(final XMLStreamReader parser, final ClassLoader loader)
+            throws XMLStreamException, ClassNotFoundException {
         String reactOn = null, buildOff = null, usecase = null;
         List<RuleParameter> parameters = null;
         if (parser.getAttributeCount() != 3) {
@@ -112,7 +127,7 @@ public class TranslationParser {
                 usecase = parser.getAttributeValue(i);
             }
         }
-        parameters = parseParameter(parser);
+        parameters = parseParameter(parser, loader);
 
         if (StringUtils.isBlank(reactOn)) {
             throw new IllegalArgumentException("ReactOn has to be set");
@@ -134,8 +149,12 @@ public class TranslationParser {
      * @param parser
      * @return value
      * @throws XMLStreamException
+     * @throws ClassNotFoundException
+     * @throws IllegalAccessException
+     * @throws InstantiationException
      */
-    private static List<RuleParameter> parseParameter(final XMLStreamReader parser) throws XMLStreamException {
+    private static List<RuleParameter> parseParameter(final XMLStreamReader parser, final ClassLoader loader)
+            throws XMLStreamException, ClassNotFoundException {
         final List<RuleParameter> params = new ArrayList<RuleParameter>();
         while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
             String parameterName = null, converter = null;
@@ -154,12 +173,13 @@ public class TranslationParser {
             }
 
             boolean goEnd = true;
-            final Properties mappings = new Properties();
+            Map<String, String> mappings = null;
             if (parser.next() == XMLStreamConstants.CHARACTERS) {
                 final String mappingStr = parser.getText();
                 // get integrated mapping body
-                converter = "java.util.Map";
+                converter = "net.xy.jcms.shared.types.StringMap";
                 if (StringUtils.isNotBlank(mappingStr)) {
+                    mappings = new HashMap<String, String>();
                     final String[] lines = mappingStr.split("\n");
                     for (String line : lines) {
                         line = line.trim();
@@ -181,7 +201,13 @@ public class TranslationParser {
             } else if (aplicatesToGroup == null) {
                 throw new IllegalArgumentException("Applicates to regex group has to be set");
             } else {
-                params.add(new RuleParameter(parameterName, aplicatesToGroup, converter, mappings));
+                if (mappings != null) {
+                    // get special mapping converter
+                    params.add(new RuleParameter(parameterName, aplicatesToGroup, new StringMap(mappings)));
+                } else {
+                    // get normal converter
+                    params.add(new RuleParameter(parameterName, aplicatesToGroup, ConverterPool.get(converter, loader)));
+                }
             }
             if (goEnd) {
                 parser.nextTag(); // gets endtag

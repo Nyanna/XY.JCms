@@ -92,7 +92,7 @@ public class MessageConfigurationProxy extends MessageConfiguration {
     /**
      * get the collected keys
      * 
-     * @return
+     * @return value
      */
     public Map<String, String> getKeys() {
         final Map<String, String> merge = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
@@ -106,7 +106,7 @@ public class MessageConfigurationProxy extends MessageConfiguration {
     /**
      * returns only missing keys
      * 
-     * @return
+     * @return value
      */
     public List<String> getMissingKeys() {
         Collections.sort(missingKeys, String.CASE_INSENSITIVE_ORDER);
@@ -116,7 +116,7 @@ public class MessageConfigurationProxy extends MessageConfiguration {
     /**
      * returns only present keys
      * 
-     * @return
+     * @return value
      */
     public Map<String, String> getPresentKeys() {
         return presentKeys;
@@ -125,7 +125,7 @@ public class MessageConfigurationProxy extends MessageConfiguration {
     /**
      * returns true if a config is missing
      * 
-     * @return
+     * @return value
      */
     public boolean isMissing() {
         return missingKeys.isEmpty() ? false : true;

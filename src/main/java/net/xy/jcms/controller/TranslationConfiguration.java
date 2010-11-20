@@ -13,11 +13,8 @@
 package net.xy.jcms.controller;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,8 +23,9 @@ import org.apache.log4j.Logger;
 import net.xy.jcms.controller.NavigationAbstractionLayer.NALKey;
 import net.xy.jcms.controller.configurations.ITranslationConfigurationAdapter;
 import net.xy.jcms.shared.DebugUtils;
+import net.xy.jcms.shared.IConverter;
 import net.xy.jcms.shared.IDataAccessContext;
-import net.xy.jcms.shared.types.IConverter;
+import net.xy.jcms.shared.types.StringMap;
 
 /**
  * describes the configuration used to translate pathes in KeyChains
@@ -42,7 +40,8 @@ public abstract class TranslationConfiguration {
     static final Logger LOG = Logger.getLogger(TranslationConfiguration.class);
 
     /**
-     * describes an path translation rule to convert human readable pathes in an semantic navigation hierarchy
+     * describes an path translation rule to convert human readable pathes in an
+     * semantic navigation hierarchy
      * 
      * @author xyan
      * 
@@ -139,19 +138,16 @@ public abstract class TranslationConfiguration {
         private final String parameterName;
 
         /**
-         * if an regexp substitution is needed stores the pattern subgroup which will be transformed to an parameter
+         * if an regexp substitution is needed stores the pattern subgroup which
+         * will be transformed to an parameter
          */
         private final Integer aplicatesToGroup;
 
         /**
-         * hold the typeconverter which converts the string value to an programatic type
+         * hold the typeconverter which converts the string value to an
+         * programatic type
          */
-        private final String converter;
-
-        /**
-         * provides an builtin mapping for abstraction of language specific string values
-         */
-        private final Properties mapping;
+        private final IConverter converter;
 
         /**
          * default constructor
@@ -160,24 +156,10 @@ public abstract class TranslationConfiguration {
          * @param aplicatesToGroup
          * @param converter
          */
-        public RuleParameter(final String parameterName, final int aplicatesToGroup, final String converter) {
-            this(parameterName, aplicatesToGroup, converter, new Properties());
-        }
-
-        /**
-         * constructor accepting value mapping
-         * 
-         * @param parameterName
-         * @param aplicatesToGroup
-         * @param converter
-         * @param mapping
-         */
-        public RuleParameter(final String parameterName, final int aplicatesToGroup, final String converter,
-                final Properties mapping) {
+        public RuleParameter(final String parameterName, final int aplicatesToGroup, final IConverter converter) {
             this.parameterName = parameterName;
             this.aplicatesToGroup = aplicatesToGroup;
             this.converter = converter;
-            this.mapping = mapping;
         }
 
         /**
@@ -203,17 +185,8 @@ public abstract class TranslationConfiguration {
          * 
          * @return value
          */
-        public String getConverter() {
+        public IConverter getConverter() {
             return converter;
-        }
-
-        /**
-         * gets the mapping
-         * 
-         * @return
-         */
-        public Properties getMapping() {
-            return mapping;
         }
     }
 
@@ -242,11 +215,13 @@ public abstract class TranslationConfiguration {
     }
 
     /**
-     * generates an path with an rule out from an key. protected for unit testing
+     * generates an path with an rule out from an key. protected for unit
+     * testing
      * 
      * @param key
      * @param rule
-     * @return the ready translated path elsewhere it rises an GroupCouldNotBeFilled
+     * @return the ready translated path elsewhere it rises an
+     *         GroupCouldNotBeFilled
      * @throws GroupCouldNotBeFilled
      *             in case parameter replacement failures
      * @throws InvalidBuildRule
@@ -266,7 +241,7 @@ public abstract class TranslationConfiguration {
 
                 // type reversion
                 final String paramFromKey = convertType2String(key.getParameter(ruleParam.getParameterName()),
-                        ruleParam.getConverter(), ruleParam.getMapping());
+                        ruleParam.getConverter());
                 if (paramFromKey != null) {
                     final int group = ruleParam.getAplicatesToGroup();
                     try {
@@ -370,7 +345,8 @@ public abstract class TranslationConfiguration {
     }
 
     /**
-     * compares the params of an key against the rules and returns the most matching one
+     * compares the params of an key against the rules and returns the most
+     * matching one
      * 
      * @param list
      * @param struct
@@ -420,7 +396,8 @@ public abstract class TranslationConfiguration {
      * @throws IllegalAccessException
      * @throws InstantiationException
      */
-    public static NALKey find(final String path, final IDataAccessContext dac) throws InstantiationException,
+    public static NALKey find(final String path, final IDataAccessContext dac)
+            throws InstantiationException,
             IllegalAccessException, ClassNotFoundException {
         final NALKey key = null;
         for (final TranslationRule rule : getRuleList(dac)) {
@@ -442,20 +419,22 @@ public abstract class TranslationConfiguration {
      * @throws IllegalAccessException
      * @throws InstantiationException
      */
-    private static NALKey createKey(final TranslationRule rule, final Matcher matcher) throws InstantiationException,
+    private static NALKey createKey(final TranslationRule rule, final Matcher matcher)
+            throws InstantiationException,
             IllegalAccessException, ClassNotFoundException {
         final NALKey key = new NALKey(rule.getUsecase());
         for (final RuleParameter parameterRule : rule.getParameters()) {
             final String paramValue = matcher.group(parameterRule.getAplicatesToGroup());
-            final String type = parameterRule.getConverter();
+            final IConverter type = parameterRule.getConverter();
             key.addParameter(parameterRule.getParameterName(),
-                    convertParam2Type(paramValue, type.trim(), parameterRule.getMapping()));
+                    convertParam2Type(paramValue, type));
         }
         return key;
     }
 
     /**
-     * helper which converts an string with an type specifier to an object maybe with the usage of an mapping
+     * helper which converts an string with an type specifier to an object maybe
+     * with the usage of an mapping
      * 
      * @param paramValue
      * @param type
@@ -465,15 +444,15 @@ public abstract class TranslationConfiguration {
      * @throws IllegalAccessException
      * @throws ClassNotFoundException
      */
-    private static Object convertParam2Type(final String paramValue, final String type,
-            final Map<Object, Object> simpleMapping) throws InstantiationException, IllegalAccessException,
+    private static Object convertParam2Type(final String paramValue, final IConverter type)
+            throws InstantiationException,
+            IllegalAccessException,
             ClassNotFoundException {
-        Object converted = null; // cant never be null aka final
-        if ("java.lang.String".equalsIgnoreCase(type)) {
-            converted = paramValue;
-        } else if ("java.util.Map".equalsIgnoreCase(type)) {
-            if (simpleMapping.containsValue(paramValue)) {
-                for (final Entry<Object, Object> entry : simpleMapping.entrySet()) {
+        Object converted = null; // aka final
+        if (type instanceof StringMap) {
+            final StringMap strMap = (StringMap) type;
+            if (strMap.containsValue(paramValue)) {
+                for (final Entry<String, String> entry : strMap.entrySet()) {
                     if (entry.getValue().equals(paramValue)) {
                         converted = entry.getKey();
                         break;
@@ -482,12 +461,8 @@ public abstract class TranslationConfiguration {
             } else {
                 converted = paramValue;
             }
-        } else if ("java.lang.Integer".equalsIgnoreCase(type)) {
-            converted = new Integer(paramValue);
-        } else if ("java.lang.Long".equalsIgnoreCase(type)) {
-            converted = new Long(paramValue);
         } else {
-            converted = converterCachePool(type).convert(paramValue);
+            converted = type.convert(paramValue);
         }
         return converted;
     }
@@ -500,24 +475,18 @@ public abstract class TranslationConfiguration {
      * @param simpleMapping
      * @return is null when paramType is null
      */
-    private static String convertType2String(final Object paramType, final String type,
-            final Map<Object, Object> simpleMapping) {
+    private static String convertType2String(final Object paramType, final IConverter type) {
         if (paramType == null) {
             return null;
         }
         final String converted;
-        if ("java.lang.String".equalsIgnoreCase(type)) {
-            converted = (String) paramType;
-        } else if ("java.util.Map".equalsIgnoreCase(type)) {
-            if (simpleMapping.containsKey(paramType)) {
-                converted = (String) simpleMapping.get(paramType);
+        if (type instanceof StringMap) {
+            final StringMap strMap = (StringMap) type;
+            if (strMap.containsKey(paramType)) {
+                converted = strMap.get(paramType);
             } else {
                 converted = paramType.toString();
             }
-        } else if ("java.lang.Integer".equalsIgnoreCase(type)) {
-            converted = paramType.toString();
-        } else if ("java.lang.Long".equalsIgnoreCase(type)) {
-            converted = paramType.toString();
         } else {
             converted = paramType.toString();
         }
@@ -553,35 +522,5 @@ public abstract class TranslationConfiguration {
      */
     public static void setTranslationAdapter(final ITranslationConfigurationAdapter adapter) {
         TranslationConfiguration.adapter = adapter;
-    }
-
-    /**
-     * cache pool
-     */
-    private final static Map<String, IConverter> converterPool = new HashMap<String, IConverter>();
-
-    /**
-     * manages an cached pool of loaded converter instances
-     * 
-     * @param classPath
-     * @return value
-     * @throws InstantiationException
-     * @throws IllegalAccessException
-     * @throws ClassNotFoundException
-     */
-    public static IConverter converterCachePool(final String classPath) throws InstantiationException,
-            IllegalAccessException,
-            ClassNotFoundException {
-        if (converterPool.containsKey(classPath)) {
-            return converterPool.get(classPath);
-        } else {
-            final Object converter = Thread.currentThread().getContextClassLoader().loadClass(classPath).newInstance();
-            if (IConverter.class.isInstance(converter)) {
-                converterPool.put(classPath, (IConverter) converter);
-                return (IConverter) converter;
-            } else {
-                throw new IllegalArgumentException("Converter class don't implements IConverter.");
-            }
-        }
     }
 }

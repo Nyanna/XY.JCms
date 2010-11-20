@@ -46,7 +46,7 @@ public class ContentRepository extends Configuration<Map<String, Object>> {
      * @param key
      * @param type
      * @param config
-     * @return
+     * @return value
      */
     public Object getContent(final String key, final Class<?> type, final ComponentConfiguration config) {
         return getContentMatch(key, type, config).getValue();
@@ -68,9 +68,10 @@ public class ContentRepository extends Configuration<Map<String, Object>> {
      * @param key
      * @param type
      * @param config
-     * @return
+     * @return value
      */
-    public Match<String, Object> getContentMatch(final String key, final Class<?> type, final ComponentConfiguration config) {
+    public Match<String, Object> getContentMatch(final String key, final Class<?> type,
+            final ComponentConfiguration config) {
         final Match<String, Object> got = new Match<String, Object>(null, null);
         final String pathKey = ConfigurationIterationStrategy.fullPath(config, key);
         final Object found = getConfigurationValue().get(pathKey);

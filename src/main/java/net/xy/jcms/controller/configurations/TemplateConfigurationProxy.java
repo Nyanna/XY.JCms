@@ -30,6 +30,11 @@ import net.xy.jcms.shared.IFragment;
  */
 public class TemplateConfigurationProxy extends TemplateConfiguration {
     /**
+     * dummy param to return intercepted calls
+     */
+    private static final IFragment dummy = new Empty();
+
+    /**
      * stores missing requested templates
      */
     private final List<String> missingTmpls = new ArrayList<String>();
@@ -64,14 +69,14 @@ public class TemplateConfigurationProxy extends TemplateConfiguration {
             if (!missingTmpls.contains(full)) {
                 missingTmpls.add(full);
             }
-            return Empty.getInstance();
+            return dummy;
         }
     }
 
     /**
      * get the requested templates
      * 
-     * @return
+     * @return value
      */
     public Map<String, String> getTemplateNames() {
         final Map<String, String> merge = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
@@ -85,7 +90,7 @@ public class TemplateConfigurationProxy extends TemplateConfiguration {
     /**
      * get only missing template names
      * 
-     * @return
+     * @return value
      */
     public List<String> getMissingTemplateNames() {
         Collections.sort(missingTmpls, String.CASE_INSENSITIVE_ORDER);
@@ -95,7 +100,7 @@ public class TemplateConfigurationProxy extends TemplateConfiguration {
     /**
      * gets already configured template names
      * 
-     * @return
+     * @return value
      */
     public Map<String, String> getPresentTemplates() {
         return presentTmpls;
@@ -104,7 +109,7 @@ public class TemplateConfigurationProxy extends TemplateConfiguration {
     /**
      * returns true if a config is missing
      * 
-     * @return
+     * @return value
      */
     public boolean isMissing() {
         return missingTmpls.isEmpty() ? false : true;

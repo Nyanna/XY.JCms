@@ -69,15 +69,14 @@ public class RenderKitConfigurationProxy extends RenderKitConfiguration {
             if (!missingIfaces.contains(simple)) {
                 missingIfaces.add(simple);
             }
-            return new IRenderer() {
-            };
+            return new IRenderer() {};
         }
     }
 
     /**
      * get the collected interface names
      * 
-     * @return
+     * @return value
      */
     public Map<String, String> getInterfaceNames() {
         final Map<String, String> merge = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
@@ -91,7 +90,7 @@ public class RenderKitConfigurationProxy extends RenderKitConfiguration {
     /**
      * returns already configured renderers
      * 
-     * @return
+     * @return value
      */
     public Map<String, String> getPresentInterfaceNames() {
         return presentIfaces;
@@ -100,7 +99,7 @@ public class RenderKitConfigurationProxy extends RenderKitConfiguration {
     /**
      * returns only missing configurations
      * 
-     * @return
+     * @return value
      */
     public List<String> getMissingInterfaceNames() {
         Collections.sort(missingIfaces, String.CASE_INSENSITIVE_ORDER);
@@ -110,7 +109,7 @@ public class RenderKitConfigurationProxy extends RenderKitConfiguration {
     /**
      * returns true if a config is missing
      * 
-     * @return
+     * @return value
      */
     public boolean isMissing() {
         return missingIfaces.isEmpty() ? false : true;

@@ -99,7 +99,7 @@ public class ServletOutputStreamAdapter implements IOutWriter {
     /**
      * returns the buffer stored for putput caching
      * 
-     * @return
+     * @return value
      */
     public StringBuilder getBuffer() {
         return internalBuffer;

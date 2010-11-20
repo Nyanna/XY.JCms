@@ -29,9 +29,9 @@ public class ExampleMainLayout extends AbstractFragment {
 
             @Override
             protected ComponentConfiguration[] prepareChildren(final Map<String, Object> content) {
-                final ComponentConfiguration maincontent = addComponent("xyx-maincontent", BoxComponent.getInstance());
+                final ComponentConfiguration maincontent = addComponent("xyx-maincontent", BoxComponent.class);
                 final ComponentConfiguration simpletext = maincontent
-                        .addComponent("simpleText", TextComponent.getInstance());
+                        .addComponent("simpleText", TextComponent.class);
                 simpletext.setUIConfig("container", "div");
                 return null;
             }

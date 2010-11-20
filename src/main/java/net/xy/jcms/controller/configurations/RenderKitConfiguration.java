@@ -21,11 +21,13 @@ import java.util.Map.Entry;
 import org.apache.commons.lang.StringUtils;
 
 import net.xy.jcms.controller.configurations.ConfigurationIterationStrategy.ClimbUp;
+import net.xy.jcms.controller.configurations.pool.RendererPool;
 import net.xy.jcms.shared.DebugUtils;
 import net.xy.jcms.shared.IRenderer;
 
 /**
- * is like the baserenderfactory an configuration delivering renderer instances described by an interface
+ * is like the baserenderfactory an configuration delivering renderer instances
+ * described by an interface
  * 
  * @author Xyan
  * 
@@ -60,7 +62,7 @@ public class RenderKitConfiguration extends Configuration<Map<?, IRenderer>> {
      * 
      * @param rInterface
      * @param config
-     * @return
+     * @return value
      */
     public Match<String, IRenderer> getMatch(final Class<? extends IRenderer> rInterface,
             final ComponentConfiguration config) {
@@ -126,7 +128,7 @@ public class RenderKitConfiguration extends Configuration<Map<?, IRenderer>> {
      * @param configString
      * @return value
      */
-    public static RenderKitConfiguration initByString(final String configString) {
+    public static RenderKitConfiguration initByString(final String configString, final ClassLoader loader) {
         final Map<String, IRenderer> result = new HashMap<String, IRenderer>();
         final String[] lines = configString.split("\n");
         for (final String line : lines) {
@@ -137,52 +139,17 @@ public class RenderKitConfiguration extends Configuration<Map<?, IRenderer>> {
             try {
                 final String iface = parsed[0];
                 final String classPath = parsed[1];
-                result.put(iface.trim(), rendererCachePool(classPath.trim()));
+                result.put(iface.trim(), RendererPool.get(classPath.trim(), loader));
             } catch (final IndexOutOfBoundsException ex) {
                 throw new IllegalArgumentException(
                         "Error by parsing body configuration line for the template configuration. "
                                 + DebugUtils.printFields(line));
             } catch (final ClassNotFoundException e) {
-                throw new IllegalArgumentException("Fragment class couldn't be found. " + DebugUtils.printFields(line));
-            } catch (final InstantiationException e) {
-                throw new IllegalArgumentException("Fragment class couldn't be instantiated. "
-                        + DebugUtils.printFields(line));
-            } catch (final IllegalAccessException e) {
-                throw new IllegalArgumentException("Fragment class couldn't be instantiated. "
-                        + DebugUtils.printFields(line));
+                throw new IllegalArgumentException("Fragment class couldn't be found. " + DebugUtils.printFields(line),
+                        e);
             }
         }
         return new RenderKitConfiguration(result);
     }
 
-    /**
-     * cache pool
-     */
-    private final static Map<String, IRenderer> cachePool = new HashMap<String, IRenderer>();
-
-    /**
-     * manages an cached pool of loaded renderer instances
-     * 
-     * @param classPath
-     * @return value
-     * @throws InstantiationException
-     * @throws IllegalAccessException
-     * @throws ClassNotFoundException
-     */
-    public static IRenderer rendererCachePool(final String classPath) throws InstantiationException,
-            IllegalAccessException,
-            ClassNotFoundException {
-        if (cachePool.containsKey(classPath)) {
-            return cachePool.get(classPath);
-        } else {
-            // TODO [LOW] replace with callers classloader
-            final Object renderer = RenderKitConfiguration.class.getClassLoader().loadClass(classPath).newInstance();
-            if (IRenderer.class.isInstance(renderer)) {
-                cachePool.put(classPath, (IRenderer) renderer);
-                return (IRenderer) renderer;
-            } else {
-                throw new IllegalArgumentException("Renderer class don't implements IRenderer.");
-            }
-        }
-    }
 }

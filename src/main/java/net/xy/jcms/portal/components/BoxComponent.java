@@ -73,15 +73,4 @@ public class BoxComponent extends AbstractComponent {
         config.renderChilds(out);
         out.append(boxr.renderEnd());
     }
-
-    private BoxComponent() {
-        super(true);
-    }
-
-    private final static BoxComponent INSTANCE = new BoxComponent();
-
-    public static BoxComponent getInstance() {
-        return INSTANCE;
-    }
-
 }

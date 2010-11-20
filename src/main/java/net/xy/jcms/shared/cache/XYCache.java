@@ -33,6 +33,13 @@ public class XYCache {
      */
     private static final Logger LOG = Logger.getLogger(XYCache.class);
 
+    /**
+     * timebase multiplicator to align obmitted expiration values. the internal
+     * timebase are milliseconds so an input long of 1 has to aligned with 1000
+     * * 1000 to have the meaning of one second.
+     */
+    private static final int TIMEBASE_MULTIPLICATOR = 1000 * 1000;
+
     // Access part
 
     /**
@@ -52,7 +59,7 @@ public class XYCache {
      * get or creates an instance identified by an id
      * 
      * @param id
-     * @return
+     * @return value
      */
     public static XYCache getInstance(final String id) {
         if (!instanceMounts.containsKey(id)) {
@@ -72,7 +79,7 @@ public class XYCache {
         for (final Entry<String, XYCache> entry : instanceMounts.entrySet()) {
             entry.getValue().manager.stop = true;
         }
-        LOG.error("All caches are forced to shutdown");
+        LOG.info("All caches are forced to shutdown");
     }
 
     /**
@@ -80,13 +87,12 @@ public class XYCache {
      * 
      * @param id
      */
-    private static void createInstance(final String id) {
+    synchronized private static void createInstance(final String id) {
         LOG.info("[CREATED] Cache instance created: " + id);
         instanceMounts.put(id, new XYCache());
     }
 
     // Cache part
-    // TODO [HIGH] replace with an better timestamp than nanotime, doesnt fits, random hops
 
     /**
      * cache instance
@@ -103,7 +109,7 @@ public class XYCache {
      * 
      * @param region
      * @param key
-     * @return
+     * @return value
      */
     public Object get(final String region, final String key) {
         if (base.containsKey(region)) {
@@ -121,12 +127,12 @@ public class XYCache {
      * @param key
      * @param maxAge
      *            in seconds
-     * @return
+     * @return value
      */
     public Object get(final String region, final String key, final long maxAge) {
         if (base.containsKey(region)) {
             if (base.get(region).containsKey(key)) {
-                final long maxOld = System.nanoTime() - maxAge * 1000 * 1000 * 1000;
+                final long maxOld = System.currentTimeMillis() - maxAge * TIMEBASE_MULTIPLICATOR;
                 final CacheObj obj = base.get(region).get(key);
                 if (obj != null && obj.getTimeStamp() > maxOld) {
                     return obj.getObj();
@@ -138,7 +144,8 @@ public class XYCache {
     }
 
     /**
-     * put an object to the cash or more precisely put send an request to the manager
+     * put an object to the cash or more precisely put send an request to the
+     * manager
      * 
      * @param region
      * @param key
@@ -242,7 +249,7 @@ public class XYCache {
          *            in seconds
          */
         private void clean(final int maxAge) {
-            final long oldStamp = System.nanoTime() - maxAge;
+            final long oldStamp = System.currentTimeMillis() - maxAge * TIMEBASE_MULTIPLICATOR;
             for (final String regionName : base.keySet()) {
                 final Map<String, CacheObj> region = base.get(regionName);
                 for (final String key : region.keySet()) {
@@ -267,7 +274,7 @@ public class XYCache {
         /**
          * checks if an cleanup should be applied
          * 
-         * @return
+         * @return value
          */
         private boolean riseCleanup() {
             // clean auto/manual
@@ -279,7 +286,8 @@ public class XYCache {
         }
 
         /**
-         * implements an incremental cleanup until threshhold is reached or cache is empty
+         * implements an incremental cleanup until threshhold is reached or
+         * cache is empty
          */
         private void incrementalClean() {
             // TODO [LOW] implement incremental cache cleanup and trigger
@@ -325,7 +333,7 @@ public class XYCache {
         /**
          * timestamp on which this request was created
          */
-        final long timestamp = System.nanoTime();
+        final long timestamp = System.currentTimeMillis();
 
         /**
          * region for this request
@@ -358,7 +366,7 @@ public class XYCache {
         /**
          * get the timetsampt
          * 
-         * @return
+         * @return value
          */
         public long getTimestamp() {
             return timestamp;
@@ -367,7 +375,7 @@ public class XYCache {
         /**
          * get the region to which this request belongs
          * 
-         * @return
+         * @return value
          */
         public String getRegion() {
             return region;
@@ -376,7 +384,7 @@ public class XYCache {
         /**
          * get the key for this request
          * 
-         * @return
+         * @return value
          */
         public String getKey() {
             return key;
@@ -385,7 +393,7 @@ public class XYCache {
         /**
          * get this requests object
          * 
-         * @return
+         * @return value
          */
         public Object getObj() {
             return obj;
@@ -423,7 +431,7 @@ public class XYCache {
         /**
          * gets the timestamp
          * 
-         * @return
+         * @return value
          */
         public long getTimeStamp() {
             return timeStamp;
@@ -432,7 +440,7 @@ public class XYCache {
         /**
          * get the object
          * 
-         * @return
+         * @return value
          */
         public Object getObj() {
             return obj;

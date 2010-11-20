@@ -1,21 +1,22 @@
 /**
- *  This file is part of XY.JCms, Copyright 2010 (C) Xyan Kruse, Xyan@gmx.net, Xyan.kilu.de
- *
- *  XY.JCms is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  XY.JCms is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with XY.JCms.  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of XY.JCms, Copyright 2010 (C) Xyan Kruse, Xyan@gmx.net, Xyan.kilu.de
+ * 
+ * XY.JCms is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * XY.JCms is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with XY.JCms. If not, see <http://www.gnu.org/licenses/>.
  */
 package net.xy.jcms.controller.configurations.parser;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -33,6 +34,8 @@ import net.xy.jcms.controller.UsecaseConfiguration.Parameter;
 import net.xy.jcms.controller.UsecaseConfiguration.Usecase;
 import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
+import net.xy.jcms.controller.configurations.pool.ControllerPool;
+import net.xy.jcms.shared.JCmsHelper;
 
 /**
  * parses an usecase xml configuration file
@@ -42,7 +45,19 @@ import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
  */
 public class UsecaseParser {
 
-    public static Usecase[] parse(final InputStream in) throws XMLStreamException {
+    /**
+     * parses usecases out from an xml file
+     * 
+     * @param in
+     * @param loader
+     *            used for retrieving configuration included resources and also
+     *            for retrieving the controllers
+     * @return value
+     * @throws XMLStreamException
+     * @throws ClassNotFoundException
+     */
+    public static Usecase[] parse(final InputStream in, final ClassLoader loader) throws XMLStreamException,
+            ClassNotFoundException {
         final XMLInputFactory factory = XMLInputFactory.newInstance();
         factory.setProperty("javax.xml.stream.isCoalescing", true);
         // not supported be the reference implementation
@@ -51,17 +66,26 @@ public class UsecaseParser {
         while (parser.hasNext()) {
             final int event = parser.next();
             if (event == XMLStreamConstants.START_ELEMENT && parser.getName().getLocalPart().equals("usecases")) {
-                return parseUsecases(parser);
+                return parseUsecases(parser, loader);
             }
         }
         throw new IllegalArgumentException("No usecases section found. [" + parser.getLocation() + "]");
     }
 
-    private static Usecase[] parseUsecases(final XMLStreamReader parser) throws XMLStreamException {
+    /**
+     * parses usecase section
+     * 
+     * @param parser
+     * @return
+     * @throws XMLStreamException
+     * @throws ClassNotFoundException
+     */
+    private static Usecase[] parseUsecases(final XMLStreamReader parser, final ClassLoader loader)
+            throws XMLStreamException, ClassNotFoundException {
         final List<Usecase> cases = new ArrayList<Usecase>();
         while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
             if (parser.getLocalName().equals("usecase")) {
-                cases.add(parseUsecase(parser));
+                cases.add(parseUsecase(parser, loader));
             } else {
                 throw new IllegalArgumentException("Syntax error nothing allowed between Usecase sections. ["
                         + parser.getLocation() + "]");
@@ -70,7 +94,17 @@ public class UsecaseParser {
         return cases.toArray(new Usecase[cases.size()]);
     }
 
-    private static Usecase parseUsecase(final XMLStreamReader parser) throws XMLStreamException {
+    /**
+     * parse the usecase subsections
+     * 
+     * @param parser
+     * @return
+     * @throws XMLStreamException
+     * @throws ClassNotFoundException
+     */
+    private static Usecase parseUsecase(final XMLStreamReader parser, final ClassLoader loader)
+            throws XMLStreamException,
+            ClassNotFoundException {
         if (parser.getAttributeCount() != 1) {
             throw new IllegalArgumentException("There are to much or few attributes specified for usecase. ["
                     + parser.getLocation() + "]");
@@ -86,9 +120,9 @@ public class UsecaseParser {
             } else if (parser.getLocalName().equals("parameter")) {
                 parameterList = parseParameters(parser);
             } else if (parser.getLocalName().equals("controller")) {
-                controllerList = parseControllers(parser);
+                controllerList = parseControllers(parser, loader);
             } else if (parser.getLocalName().equals("configurations")) {
-                configurationList = parseConfigurations(parser);
+                configurationList = parseConfigurations(parser, loader);
             } else {
                 throw new IllegalArgumentException("Syntax error nothing allowed between Usecase sections. ["
                         + parser.getLocation() + "]");
@@ -101,6 +135,13 @@ public class UsecaseParser {
         return new Usecase(id, description, parameterList, controllerList, configurationList);
     }
 
+    /**
+     * parses the description field
+     * 
+     * @param parser
+     * @return
+     * @throws XMLStreamException
+     */
     private static String parseDescription(final XMLStreamReader parser) throws XMLStreamException {
         parser.next();
         final String text = parser.getText();
@@ -108,6 +149,13 @@ public class UsecaseParser {
         return text;
     }
 
+    /**
+     * parses parameter entries
+     * 
+     * @param parser
+     * @return
+     * @throws XMLStreamException
+     */
     private static Parameter[] parseParameters(final XMLStreamReader parser) throws XMLStreamException {
         final List<Parameter> params = new ArrayList<Parameter>();
         while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
@@ -121,6 +169,13 @@ public class UsecaseParser {
         return params.toArray(new Parameter[params.size()]);
     }
 
+    /**
+     * parses an parameter deffinition
+     * 
+     * @param parser
+     * @return
+     * @throws XMLStreamException
+     */
     private static Parameter parseParameter(final XMLStreamReader parser) throws XMLStreamException {
         if (parser.getAttributeCount() != 2) {
             throw new IllegalArgumentException("There are to much or few attributes specified for param. ["
@@ -143,11 +198,20 @@ public class UsecaseParser {
         return new Parameter(key, valueType);
     }
 
-    private static Controller[] parseControllers(final XMLStreamReader parser) throws XMLStreamException {
+    /**
+     * parses an controller section
+     * 
+     * @param parser
+     * @return
+     * @throws XMLStreamException
+     * @throws ClassNotFoundException
+     */
+    private static Controller[] parseControllers(final XMLStreamReader parser, final ClassLoader loader)
+            throws XMLStreamException, ClassNotFoundException {
         final List<Controller> controller = new ArrayList<Controller>();
         while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
             if (parser.getLocalName().equals("class")) {
-                controller.add(parseController(parser));
+                controller.add(parseController(parser, loader));
             } else {
                 throw new IllegalArgumentException("Syntax error nothing allowed between controller deffinitions. ["
                         + parser.getLocation() + "]");
@@ -156,7 +220,16 @@ public class UsecaseParser {
         return controller.toArray(new Controller[controller.size()]);
     }
 
-    private static Controller parseController(final XMLStreamReader parser) throws XMLStreamException {
+    /**
+     * parses the controller itself
+     * 
+     * @param parser
+     * @return
+     * @throws XMLStreamException
+     * @throws ClassNotFoundException
+     */
+    private static Controller parseController(final XMLStreamReader parser, final ClassLoader loader)
+            throws XMLStreamException, ClassNotFoundException {
         if (parser.getAttributeCount() != 2 && parser.getAttributeCount() != 1) {
             throw new IllegalArgumentException("There are to much or few attributes specified for class. ["
                     + parser.getLocation() + "]");
@@ -177,14 +250,22 @@ public class UsecaseParser {
             throw new IllegalArgumentException("Classpath must be set [" + parser.getLocation() + "]");
         }
         parser.nextTag();
-        return new Controller(path, obmitedConfigurations);
+        return new Controller(ControllerPool.get(path, loader), obmitedConfigurations);
     }
 
-    private static Configuration<?>[] parseConfigurations(final XMLStreamReader parser) throws XMLStreamException {
+    /**
+     * parses the configuration section
+     * 
+     * @param parser
+     * @return
+     * @throws XMLStreamException
+     */
+    private static Configuration<?>[] parseConfigurations(final XMLStreamReader parser, final ClassLoader loader)
+            throws XMLStreamException {
         final List<Configuration<?>> configs = new ArrayList<Configuration<?>>();
         while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
             if (parser.getLocalName().equals("configuration")) {
-                final Configuration<?> config = parseConfiguration(parser);
+                final Configuration<?> config = parseConfiguration(parser, loader);
                 if (config != null) {
                     configs.add(config);
                 }
@@ -196,7 +277,15 @@ public class UsecaseParser {
         return configs.toArray(new Configuration[configs.size()]);
     }
 
-    private static Configuration<?> parseConfiguration(final XMLStreamReader parser) throws XMLStreamException {
+    /**
+     * parses the configuration itself
+     * 
+     * @param parser
+     * @return
+     * @throws XMLStreamException
+     */
+    private static Configuration<?> parseConfiguration(final XMLStreamReader parser, final ClassLoader loader)
+            throws XMLStreamException {
         Configuration<?> config = null;
         if (parser.getAttributeCount() != 1 && parser.getAttributeCount() != 2) {
             throw new IllegalArgumentException("There are to much or few attributes specified for configuration. ["
@@ -215,9 +304,9 @@ public class UsecaseParser {
             throw new IllegalArgumentException("Configuration type must be set [" + parser.getLocation() + "]");
         }
         if (include != null) {
-            config = getConfigurationByInclude(type, include);
+            config = getConfigurationByInclude(type, include, loader);
         } else {
-            config = getConfigurationByBody(type, parser);
+            config = getConfigurationByBody(type, parser, loader);
         }
 
         if (config == null) {
@@ -227,17 +316,41 @@ public class UsecaseParser {
         return config;
     }
 
-    private static Configuration<?> getConfigurationByBody(final ConfigurationType type, final XMLStreamReader parser)
+    /**
+     * inits an config from the xml body
+     * 
+     * @param type
+     * @param parser
+     * @return
+     * @throws XMLStreamException
+     */
+    private static Configuration<?> getConfigurationByBody(final ConfigurationType type, final XMLStreamReader parser,
+            final ClassLoader loader)
             throws XMLStreamException {
         parser.next();
         final String text = parser.getText();
-        return Configuration.initByString(type, text);
+        return Configuration.initByString(type, text, loader);
     }
 
-    private static Configuration<?> getConfigurationByInclude(final ConfigurationType type, final String include) {
+    /**
+     * inits the config from an included resource
+     * 
+     * @param type
+     * @param include
+     * @return
+     */
+    private static Configuration<?> getConfigurationByInclude(final ConfigurationType type, final String include,
+            final ClassLoader loader) {
         if (include.startsWith("class://")) {
             final String classpath = include.replaceFirst("^class://", "");
-            return Configuration.initByStream(type, type.getClass().getResourceAsStream(classpath));
+            InputStream st;
+            try {
+                st = JCmsHelper.loadResource(classpath, loader);
+                if (st != null) {
+                    return Configuration.initByStream(type, st, loader);
+                }
+            } catch (final IOException e) {
+            }
         }
         throw new IllegalArgumentException("Include reffers to an invalid location!");
     }

@@ -47,7 +47,7 @@ class Match<PATH, VALUE> {
     /**
      * returns the parh
      * 
-     * @return
+     * @return value
      */
     public PATH getPath() {
         return path;
@@ -56,7 +56,7 @@ class Match<PATH, VALUE> {
     /**
      * returns the value
      * 
-     * @return
+     * @return value
      */
     public VALUE getValue() {
         return value;

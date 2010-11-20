@@ -32,6 +32,7 @@ public interface IUsecaseConfigurationAdapter {
      * 
      * @param dac
      * @return value
+     * @throws ClassNotFoundException
      */
     public Usecase[] getUsecaseList(final IDataAccessContext dac);
 }

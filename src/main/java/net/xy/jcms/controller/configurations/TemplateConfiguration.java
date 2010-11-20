@@ -12,18 +12,23 @@
  */
 package net.xy.jcms.controller.configurations;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
 
 import net.xy.jcms.controller.configurations.ConfigurationIterationStrategy.ClimbUp;
+import net.xy.jcms.controller.configurations.parser.FragmentXMLParser;
+import net.xy.jcms.controller.configurations.pool.TemplatePool;
 import net.xy.jcms.shared.DebugUtils;
 import net.xy.jcms.shared.IFragment;
+import net.xy.jcms.shared.JCmsHelper;
 
 /**
- * describes the connection of differend page components/fragements/templates. Template inclusion is performed to an
- * simple stacking of subsequent component tree's or component configuration trees.
+ * describes the connection of differend page components/fragements/templates.
+ * Template inclusion is performed to an simple stacking of subsequent component
+ * tree's or component configuration trees.
  * 
  * @author xyan
  * 
@@ -78,7 +83,8 @@ public class TemplateConfiguration extends Configuration<Map<String, IFragment>>
     }
 
     /**
-     * retrieves an global non component template configuration mainly used to retrieve the root fragment.
+     * retrieves an global non component template configuration mainly used to
+     * retrieve the root fragment.
      * 
      * @param tmplName
      * @return value
@@ -108,7 +114,7 @@ public class TemplateConfiguration extends Configuration<Map<String, IFragment>>
      * @param configString
      * @return value
      */
-    public static TemplateConfiguration initByString(final String configString) {
+    public static TemplateConfiguration initByString(final String configString, final ClassLoader loader) {
         final Map<String, IFragment> result = new HashMap<String, IFragment>();
         final String[] lines = configString.split("\n");
         for (final String line : lines) {
@@ -119,52 +125,24 @@ public class TemplateConfiguration extends Configuration<Map<String, IFragment>>
             try {
                 final String name = parsed[0];
                 final String classPath = parsed[1];
-                result.put(name.trim(), fragmentCachePool(classPath.trim()));
+                if (classPath.toLowerCase().endsWith(".xml")) {
+                    // init template by parsing an xml
+                    result.put(name.trim(), FragmentXMLParser.parse(JCmsHelper.loadResource(classPath, loader), loader));
+                } else {
+                    // init template by precompiled class
+                    result.put(name.trim(), TemplatePool.get(classPath.trim(), loader));
+                }
             } catch (final IndexOutOfBoundsException ex) {
                 throw new IllegalArgumentException(
                         "Error by parsing body configuration line for the template configuration. "
                                 + DebugUtils.printFields(line));
             } catch (final ClassNotFoundException e) {
-                throw new IllegalArgumentException("Fragment class couldn't be found. " + DebugUtils.printFields(line));
-            } catch (final InstantiationException e) {
-                throw new IllegalArgumentException("Fragment class couldn't be instantiated. "
-                        + DebugUtils.printFields(line));
-            } catch (final IllegalAccessException e) {
-                throw new IllegalArgumentException("Fragment class couldn't be instantiated. "
-                        + DebugUtils.printFields(line));
+                throw new IllegalArgumentException("Fragment class couldn't be found. " + DebugUtils.printFields(line), e);
+            } catch (final IOException e) {
+                throw new IllegalArgumentException("Fragment xml couldn't be found. " + DebugUtils.printFields(line), e);
             }
         }
         return new TemplateConfiguration(result);
     }
 
-    /**
-     * cache pool
-     */
-    private final static Map<String, IFragment> cachePool = new HashMap<String, IFragment>();
-
-    /**
-     * manages an cached pool of loaded fragment instances
-     * 
-     * @param classPath
-     * @return value
-     * @throws InstantiationException
-     * @throws IllegalAccessException
-     * @throws ClassNotFoundException
-     */
-    public static IFragment fragmentCachePool(final String classPath) throws InstantiationException,
-            IllegalAccessException,
-            ClassNotFoundException {
-        if (cachePool.containsKey(classPath)) {
-            return cachePool.get(classPath);
-        } else {
-            // TODO [LOW] replace with callers classloader
-            final Object fragment = TemplateConfiguration.class.getClassLoader().loadClass(classPath).newInstance();
-            if (IFragment.class.isInstance(fragment)) {
-                cachePool.put(classPath, (IFragment) fragment);
-                return (IFragment) fragment;
-            } else {
-                throw new IllegalArgumentException("Fragment class don't implements IFragment.");
-            }
-        }
-    }
 }

@@ -16,19 +16,19 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with XY.JCms.  If not, see <http://www.gnu.org/licenses/>.
- */ 
+ */
  -->
 <rules>
 	<!-- buildrule would be validated against the reacton rule -->
     <rule reactOn="^du willst wohl zu (Ringtones|Funsounds)" buildOff="du willst wohl zu Ringtones" usecase="contentgroup">
         <!-- NAL uses an converter which converts the "1" matching subgroup to the appropriated contentgroupid and adds this as an parameter to the Key  -->
-        <parameter name="contentgroup" group="1" convert="java.lang.String"/>
+        <parameter name="contentgroup" group="1" convert="net.xy.jcms.shared.types.StringWrapper"/>
     </rule>
 
     <rule reactOn="^du willst wohl zu (Ringtones|Funsounds) zur Unterkategorie ([0-9]+)" buildOff="du willst wohl zu Funsounds zur Unterkategorie 1270" usecase="subcategory">
         <!-- Converts the parameter to the appropriated type-->
-        <parameter name="contentgroup" group="1" convert="java.lang.String"/>
-        <parameter name="catalogid" group="2" convert="java.lang.String"/>
+        <parameter name="contentgroup" group="1" convert="net.xy.jcms.shared.types.StringWrapper"/>
+        <parameter name="catalogid" group="2" convert="net.xy.jcms.shared.types.StringWrapper"/>
     </rule>
     <rule reactOn="^Hm du willst dich also Einloggen$" buildOff="Hm du willst dich also Einloggen" usecase="userLogin"/>
 </rules>

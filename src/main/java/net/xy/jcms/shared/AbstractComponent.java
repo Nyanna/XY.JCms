@@ -15,28 +15,12 @@ package net.xy.jcms.shared;
 import net.xy.jcms.controller.configurations.UIConfiguration.UI;
 
 /**
- * abstract component functionality singleton pattern
+ * abstract component functionality singleton pattern trough an cachepool
  * 
  * @author Xyan
  * 
  */
 public abstract class AbstractComponent implements IComponent {
-    /**
-     * private constructor to prevent direct initilization
-     */
-    protected AbstractComponent() {
-        throw new IllegalArgumentException(
-                "Components should newer instantiated per constructor use getInstance instead! Check if an private Constructor overwrites the Abstract one.");
-    }
-
-    /**
-     * must be called to ensure that no default constructor will be used
-     * 
-     * @param skip
-     */
-    protected AbstractComponent(final boolean skip) {
-    }
-
     /**
      * place for static and widespread used ui configs
      */

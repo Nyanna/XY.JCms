@@ -13,6 +13,8 @@
 package net.xy.jcms.shared;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.net.URLConnection;
 import java.text.DecimalFormat;
 
@@ -46,7 +48,8 @@ public class JCmsHelper {
     private final static Logger LOG = Logger.getLogger(JCmsHelper.class);
 
     /**
-     * sets the configuration via two obmitted xml resource names, via thread classloader
+     * sets the configuration via two obmitted xml resource names, via its
+     * current classloader
      * 
      * @param translationConfigXml
      * @param usecaseConfigurationXml
@@ -55,7 +58,7 @@ public class JCmsHelper {
     public static void setConfiguration(final String translationConfigXml, final String usecaseConfigurationXml)
             throws XMLValidationException {
 
-        XMLValidator.validate(translationConfigXml);
+        XMLValidator.validate(translationConfigXml, JCmsHelper.class.getClassLoader());
         TranslationConfiguration.setTranslationAdapter(new ITranslationConfigurationAdapter() {
             TranslationRule[] cache = null;
 
@@ -66,18 +69,20 @@ public class JCmsHelper {
                 }
                 Exception ex = null;
                 try {
-                    final long start = System.nanoTime();
+                    final long start = System.currentTimeMillis();
                     final URLConnection con = this.getClass().getClassLoader()
                             .getResource(translationConfigXml).openConnection();
                     con.setUseCaches(false);
                     con.setDefaultUseCaches(false);
-                    con.addRequestProperty("seed", new Long(System.nanoTime()).toString());
-                    cache = TranslationParser.parse(con.getInputStream());
+                    con.addRequestProperty("seed", new Long(start).toString());
+                    cache = TranslationParser.parse(con.getInputStream(), this.getClass().getClassLoader());
                     LOG.info("Parsing and converting of Translationrule xml config tok:  "
-                            + new DecimalFormat("###,###,### \u039C").format((System.nanoTime() - start) / 1000));
+                            + new DecimalFormat("###,###,### \u039C").format((System.currentTimeMillis() - start)));
                 } catch (final XMLStreamException e) {
                     ex = e;
                 } catch (final IOException e) {
+                    ex = e;
+                } catch (final ClassNotFoundException e) {
                     ex = e;
                 } finally {
                     if (ex != null) {
@@ -88,7 +93,7 @@ public class JCmsHelper {
             }
         });
 
-        XMLValidator.validate(usecaseConfigurationXml);
+        XMLValidator.validate(usecaseConfigurationXml, JCmsHelper.class.getClassLoader());
         UsecaseConfiguration.setUsecaseAdapter(new IUsecaseConfigurationAdapter() {
             Usecase[] cache = null;
 
@@ -99,18 +104,20 @@ public class JCmsHelper {
                 }
                 Exception ex = null;
                 try {
-                    final long start = System.nanoTime();
+                    final long start = System.currentTimeMillis();
                     final URLConnection con = this.getClass().getClassLoader()
                             .getResource(usecaseConfigurationXml).openConnection();
                     con.setUseCaches(false);
                     con.setDefaultUseCaches(false);
-                    con.addRequestProperty("seed", new Long(System.nanoTime()).toString());
-                    cache = UsecaseParser.parse(con.getInputStream());
+                    con.addRequestProperty("seed", new Long(start).toString());
+                    cache = UsecaseParser.parse(con.getInputStream(), this.getClass().getClassLoader());
                     LOG.info("Parsing and converting of Usecase xml config tok:   "
-                            + new DecimalFormat("###,###,### \u039C").format((System.nanoTime() - start) / 1000));
+                            + new DecimalFormat("###,###,### \u039C").format((System.currentTimeMillis() - start)));
                 } catch (final XMLStreamException e) {
                     ex = e;
                 } catch (final IOException e) {
+                    ex = e;
+                } catch (final ClassNotFoundException e) {
                     ex = e;
                 } finally {
                     if (ex != null) {
@@ -136,5 +143,29 @@ public class JCmsHelper {
             }
         }
         return null;
+    }
+
+    /**
+     * loads an resource with the loader returns an inputstream and prevents the
+     * vm from caching
+     * 
+     * @param path
+     * @param loader
+     * @return
+     * @throws IOException
+     */
+    public static InputStream loadResource(final String path, final ClassLoader loader) throws IOException {
+        if (path == null || loader == null) {
+            throw new IllegalArgumentException("Fiedls can't be empty.");
+        }
+        final URL url = loader.getResource(path.trim());
+        if (url == null) {
+            throw new IllegalArgumentException("Resource to load doesn't exists. " + DebugUtils.printFields(path, loader));
+        }
+        final URLConnection con = url.openConnection();
+        con.setUseCaches(false);
+        con.setDefaultUseCaches(false);
+        con.addRequestProperty("seed", new Long(System.currentTimeMillis()).toString());
+        return con.getInputStream();
     }
 }

@@ -17,9 +17,11 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
-import net.xy.jcms.controller.usecase.IController;
+
+import net.xy.jcms.shared.IController;
 
 /**
  * configures the controller sectionwise and global
@@ -42,10 +44,37 @@ public class ControllerConfiguration extends Configuration<Map<String, Map<Strin
         super(TYPE, configurationValue);
     }
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public void mergeConfiguration(final Configuration<Map<String, Map<String, Object>>> otherConfig) {
-        getConfigurationValue().putAll(otherConfig.getConfigurationValue());
-        // no recursive merging new controller config overwrites old one
+        // controller section got separately merged
+        final Map<String, Map<String, Object>> own = getConfigurationValue();
+        for (final Entry<String, Map<String, Object>> ctrSec : otherConfig.getConfigurationValue().entrySet()) {
+            final String ctrlName = ctrSec.getKey();
+            if (!own.containsKey(ctrlName)) {
+                // ctrl config don't exist simply add
+                own.put(ctrSec.getKey(), ctrSec.getValue());
+                continue;
+            }
+            // else process ctrl config
+            for (final Entry<String, Object> ctrItem : ctrSec.getValue().entrySet()) {
+                // object can be an simple value or an list in case of instructions
+                if (!List.class.isInstance(ctrItem.getValue())) {
+                    // simple overwrite
+                    own.get(ctrlName).put(ctrItem.getKey(), ctrItem.getValue());
+                }
+                // when list append, warning two different listtypes cant be merged
+                final List otherList = (List) ctrItem.getValue();
+                final Object thisValue = own.get(ctrlName).get(ctrItem.getKey());
+                // two possibilities, own value is a list or not
+                if (List.class.isInstance(thisValue)) {
+                    ((List) thisValue).addAll(otherList);
+                } else {
+                    // overwrite
+                    own.get(ctrlName).put(ctrItem.getKey(), ctrItem.getValue());
+                }
+            }
+        }
     }
 
     /**

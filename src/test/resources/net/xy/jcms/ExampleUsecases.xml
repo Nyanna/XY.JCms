@@ -38,7 +38,7 @@
 
         <controller>
             <!-- Controller fill the ControllerConfiguration in case of login errors or directs to lvp-->
-            <class path="net.xyan.controller.UserController" obmitConfig="Parameters"/>
+            <!--class path="net.xyan.controller.UserController" obmitConfig="Parameters"/-->
         </controller>
 
         <configurations>
@@ -55,13 +55,13 @@
 
         <controller>
             <!-- checks if an login is needed and performs an usecase redirect with lvp parameter which is the actual NALKeyList-->
-            <class path="net.xyan.controller.UserController"/>
+            <!--class path="net.xyan.controller.UserController"/-->
             <!-- Controller maybe redirects to an content not supported usecase -->
-            <class path="net.xyan.controller.ClientSupportsContentController" obmitConfig="ControllerConfiguration,Parameters"/>
+            <!--class path="net.xyan.controller.ClientSupportsContentController" obmitConfig="ControllerConfiguration,Parameters"/-->
             <!-- Controller uses bindconfig to fill the ContentRepository -->
-            <class path="net.xyan.controller.ContentAggregationController" obmitConfig="ControllerConfiguration,Parameters"/>
+            <!--class path="net.xyan.controller.ContentAggregationController" obmitConfig="ControllerConfiguration,Parameters"/-->
             <!-- Controller reacts on missing content and alters the usecase -->
-            <class path="net.xyan.controller.ContentUnavailableController" obmitConfig="ControllerConfiguration"/>
+            <!--class path="net.xyan.controller.ContentUnavailableController" obmitConfig="ControllerConfiguration"/-->
         </controller>
         <configurations>
 	        <!--configuration type="ControllerConfiguration" include="class://de.jamba.config.GlobalBindConfig"/-->
@@ -91,7 +91,7 @@
 
 	        <configuration type="TemplateConfiguration">
 	        	<![CDATA[
-	        	root = net.xy.jcms.portal.templates.ExampleMainLayout
+	        	root = net/xy/jcms/portal/templates/TestLayout.xml
 				#root.header = de.jamba.frontend.fragments.CatalogHeader
 				#root.content = de.jamba.frontend.layouts.NavigationAndSidebar
 				#root.content.navigation = de.jamba.frontend.fragments.DefaultNavigation

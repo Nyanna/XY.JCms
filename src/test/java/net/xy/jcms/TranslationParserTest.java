@@ -27,11 +27,12 @@ import org.junit.Test;
 public class TranslationParserTest {
 
     @Test
-    public void parseXml() {
+    public void parseXml() throws InstantiationException, IllegalAccessException, ClassNotFoundException {
         TranslationRule[] rules = null;
         try {
             rules = TranslationParser.parse(Thread.currentThread().getContextClassLoader()
-                    .getResourceAsStream("net/xy/jcms/ExampleTranslationRules.xml"));
+                    .getResourceAsStream("net/xy/jcms/ExampleTranslationRules.xml"), Thread.currentThread()
+                    .getContextClassLoader());
         } catch (final XMLStreamException e) {
             e.printStackTrace();
         }

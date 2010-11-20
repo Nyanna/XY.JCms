@@ -14,10 +14,12 @@
  *  You should have received a copy of the GNU General Public License
  *  along with XY.JCms.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.xy.jcms.controller.usecase;
+package net.xy.jcms.controller.configurations.pool;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import net.xy.jcms.shared.IController;
 
 import org.apache.log4j.Logger;
 

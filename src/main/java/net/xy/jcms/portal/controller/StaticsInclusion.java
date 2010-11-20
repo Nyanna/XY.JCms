@@ -23,14 +23,16 @@ import net.xy.jcms.controller.NavigationAbstractionLayer.NALKey;
 import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.ContentRepository;
 import net.xy.jcms.controller.configurations.ControllerConfiguration;
-import net.xy.jcms.controller.usecase.IController;
 import net.xy.jcms.shared.IDataAccessContext;
 import net.xy.jcms.shared.JCmsHelper;
 import net.xy.jcms.shared.types.StringList;
 import net.xy.jcms.shared.types.StringMap;
 
-public class StaticsInclusionController implements IController {
+abstract public class StaticsInclusion extends Controller {
 
+    /**
+     * instruction section in config
+     */
     private static final String INSTRUCTION_SECTION = "include";
 
     @Override
@@ -48,7 +50,7 @@ public class StaticsInclusionController implements IController {
         if (configC == null || configK == null) {
             throw new IllegalArgumentException("Missing configurations");
         }
-        proccess(configK, configC);
+        proccess(configK, configC, dac);
         return null;
     }
 
@@ -59,8 +61,9 @@ public class StaticsInclusionController implements IController {
      * @param configC
      */
     @SuppressWarnings("unchecked")
-    private static void proccess(final ControllerConfiguration configK, final ContentRepository configC) {
-        final Map<String, Object> ownC = configK.getControllerConfig(StaticsInclusionController.class);
+    private void proccess(final ControllerConfiguration configK, final ContentRepository configC,
+            final IDataAccessContext dac) {
+        final Map<String, Object> ownC = getControllerConfig(configK);
         if (ownC.get(INSTRUCTION_SECTION) instanceof List) {
             for (final Map<Object, String> instruction : (List<Map<Object, String>>) ownC.get(INSTRUCTION_SECTION)) {
                 // get domain in case of one exists
@@ -96,6 +99,9 @@ public class StaticsInclusionController implements IController {
                         finalContent = new StringMap(strContent);
                     } else if ("String".equalsIgnoreCase(type)) {
                         finalContent = prefix + strContent;
+                    } else {
+                        // call abstract
+                        finalContent = processType(type, instruction, ownC, prefix, dac);
                     }
                 } else {
                     finalContent = firstContent;
@@ -112,20 +118,19 @@ public class StaticsInclusionController implements IController {
     }
 
     /**
-     * gets an config either from the section or instruction config or from the controller globals
+     * processes one to the StaticInclusion unknown portal dependent type
      * 
-     * @param key
+     * @param type
+     *            an string representing the type like StringMap, FlashTeaser
+     * @param sectionParams
      * @param globals
-     * @param section
-     * @return value can be null
+     * @param prefix
+     *            path prefix, can be null
+     * @param domain
+     *            an domain to set, can be null
+     * @return
      */
-    private static Object getPreciseOrGlobal(final Object key, final Map<String, Object> globals,
-            final Map<Object, String> section) {
-        final Object fromSection = section.get(key);
-        if (fromSection != null) {
-            return fromSection;
-        }
-        return globals.get(key);
-    }
+    protected abstract Object processType(final String type, final Map<Object, String> sectionParams,
+            final Map<String, Object> globals, final String prefix, final IDataAccessContext dac);
 
 }

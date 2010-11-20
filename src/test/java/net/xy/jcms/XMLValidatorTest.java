@@ -25,6 +25,6 @@ public class XMLValidatorTest {
 
     @Test
     public void testValidato() throws XMLValidationException {
-        XMLValidator.validate("net/xy/jcms/ExampleTranslationRules.xml");
+        XMLValidator.validate("net/xy/jcms/ExampleTranslationRules.xml", this.getClass().getClassLoader());
     }
 }

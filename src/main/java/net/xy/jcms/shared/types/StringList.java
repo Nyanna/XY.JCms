@@ -19,6 +19,8 @@ package net.xy.jcms.shared.types;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import net.xy.jcms.shared.IConverter;
+
 public class StringList extends ArrayList<String> implements IConverter {
 
     private static final long serialVersionUID = -8117979043461375581L;

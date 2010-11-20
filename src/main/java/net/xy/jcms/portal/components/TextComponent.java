@@ -23,8 +23,13 @@ import net.xy.jcms.shared.AbstractComponent;
 import net.xy.jcms.shared.IRenderer;
 import net.xy.jcms.shared.IOutWriter;
 
+/**
+ * an simple text displaying component
+ * 
+ * @author Xyan
+ * 
+ */
 public class TextComponent extends AbstractComponent {
-
     @Override
     public ComponentConfiguration getConfiguration() {
         return new ComponentConfiguration(this) {
@@ -82,15 +87,4 @@ public class TextComponent extends AbstractComponent {
             out.append(r.renderText(text));
         }
     }
-
-    private TextComponent() {
-        super(true);
-    }
-
-    private final static TextComponent INSTANCE = new TextComponent();
-
-    public static TextComponent getInstance() {
-        return INSTANCE;
-    }
-
 }

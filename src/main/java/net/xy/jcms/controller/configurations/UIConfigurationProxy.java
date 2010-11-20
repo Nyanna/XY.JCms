@@ -70,7 +70,7 @@ public class UIConfigurationProxy extends UIConfiguration {
     /**
      * returns all at collectec ui configs
      * 
-     * @return
+     * @return value
      */
     public Map<String, UI<?>> getPrepared() {
         final Map<String, UI<?>> merge = new TreeMap<String, UIConfiguration.UI<?>>(String.CASE_INSENSITIVE_ORDER);
@@ -82,7 +82,7 @@ public class UIConfigurationProxy extends UIConfiguration {
     /**
      * returns the already defined configs
      * 
-     * @return
+     * @return value
      */
     public Map<String, UI<?>> getPresent() {
         return prepared;
@@ -91,7 +91,7 @@ public class UIConfigurationProxy extends UIConfiguration {
     /**
      * returns only the missing configs
      * 
-     * @return
+     * @return value
      */
     public Map<String, UI<?>> getMissing() {
         return missing;
@@ -100,7 +100,7 @@ public class UIConfigurationProxy extends UIConfiguration {
     /**
      * returns true if a config is missing
      * 
-     * @return
+     * @return value
      */
     public boolean isMissing() {
         return missing.isEmpty() ? false : true;

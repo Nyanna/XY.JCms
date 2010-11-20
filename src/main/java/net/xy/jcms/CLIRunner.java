@@ -64,7 +64,8 @@ public class CLIRunner {
      * 
      * @throws IOException
      */
-    public CLIRunner() {}
+    public CLIRunner() {
+    }
 
     /**
      * constructor automaticly initiates the programm
@@ -73,15 +74,15 @@ public class CLIRunner {
      * @throws IOException
      */
     public CLIRunner(final String[] args) {
-        final long start = System.nanoTime();
+        final long start = System.currentTimeMillis();
         // LOG.info("Execution started: " + start);
         try {
             Main(args);
         } finally {
             XYCache.destroy();
         }
-        LOG.info("Execution succeeded in nanoseconds "
-                + new DecimalFormat("###,###,### \u039C").format((System.nanoTime() - start) / 1000));
+        LOG.info("Execution succeeded in milliseconds "
+                + new DecimalFormat("###,###,### \u039C").format((System.currentTimeMillis() - start)));
     }
 
     /**
@@ -127,7 +128,8 @@ public class CLIRunner {
             }
 
             /**
-             * run the controllers for the usecase, maybe redirect to another usecase.
+             * run the controllers for the usecase, maybe redirect to another
+             * usecase.
              */
             try {
                 forward = UsecaseAgent.executeController(usecase, dac, forward.getParameters());
@@ -140,8 +142,9 @@ public class CLIRunner {
         // no response adapter for the console is needed
 
         /**
-         * at this point caching takes effect by the safe asumption that the same configuration leads to the same
-         * result. realized through hashing and persistance.
+         * at this point caching takes effect by the safe asumption that the
+         * same configuration leads to the same result. realized through hashing
+         * and persistance.
          */
         final String output = UsecaseAgent.applyCaching(usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE),
                 firstForward, null, cacheTimeout);
@@ -150,13 +153,15 @@ public class CLIRunner {
             System.out.append(output);
         } else {
             /**
-             * get the configurationtree for the usecase from an empty run through the componenttree
+             * get the configurationtree for the usecase from an empty run
+             * through the componenttree
              */
             final Configuration<?>[] viewConfig = usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE);
             final ComponentConfiguration confTree = ViewRunner.runConfiguration(viewConfig);
 
             /**
-             * run and return the rendering tree through streamprocessing to the client
+             * run and return the rendering tree through streamprocessing to the
+             * client
              */
             final ConsoleOutWriter out = new ConsoleOutWriter();
             ViewRunner.runView(out, confTree);
@@ -249,7 +254,8 @@ public class CLIRunner {
 
         @Override
         public Object getProperty(final Object key) {
-            // TODO [LOW] parse and save setting from cmdline, param should not be saved in NAL or usecase
+            // TODO [LOW] parse and save setting from cmdline, param should not
+            // be saved in NAL or usecase
             return null;
         }
 
