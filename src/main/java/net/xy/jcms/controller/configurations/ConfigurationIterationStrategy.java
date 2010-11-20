@@ -179,4 +179,15 @@ public class ConfigurationIterationStrategy {
     public static String fullPath(final ComponentConfiguration actual, final String requestedKey) {
         return actual.getComponentPath() + ComponentConfiguration.COMPONENT_PATH_SEPARATOR + requestedKey;
     }
+
+    /**
+     * returns only the component and ists key comp.key
+     * 
+     * @param actual
+     * @param requestedKey
+     * @return
+     */
+    public static String componentId(final ComponentConfiguration actual, final String requestedKey) {
+        return actual.getId() + ComponentConfiguration.COMPONENT_PATH_SEPARATOR + requestedKey;
+    }
 }

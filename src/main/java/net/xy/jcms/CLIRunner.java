@@ -13,7 +13,7 @@
 package net.xy.jcms;
 
 import java.text.DecimalFormat;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -41,14 +41,18 @@ import net.xy.jcms.shared.cache.XYCache;
  * 
  */
 public class CLIRunner {
-
     /**
      * logger
      */
-    static final Logger LOG = Logger.getLogger(CLIRunner.class);
+    private static final Logger LOG = Logger.getLogger(CLIRunner.class);
     static {
         LOG.info("CLIRunner was loaded by " + CLIRunner.class.getClassLoader().getClass().getName());
     }
+
+    /**
+     * stores the prefix for environment vars used for the DAC creation
+     */
+    private static final String ENVIRONMENT_VARS_PREFIX = "DAC";
 
     /**
      * main entry point for the console
@@ -74,10 +78,20 @@ public class CLIRunner {
      * @throws IOException
      */
     public CLIRunner(final String[] args) {
+        this(args, null);
+    }
+
+    /**
+     * constructor uses obmitted dac
+     * 
+     * @param args
+     * @param dac
+     */
+    public CLIRunner(final String[] args, final IDataAccessContext dac) {
         final long start = System.currentTimeMillis();
         // LOG.info("Execution started: " + start);
         try {
-            Main(args);
+            Main(args, dac);
         } finally {
             XYCache.destroy();
         }
@@ -88,7 +102,7 @@ public class CLIRunner {
     /**
      * instance main method
      */
-    protected void Main(final String[] args) {
+    protected void Main(final String[] args, IDataAccessContext dac) {
         /**
          * first get portal configuration out from call information
          */
@@ -96,32 +110,32 @@ public class CLIRunner {
             System.out.append("You have to specify at least one request String.");
             return;
         }
-        final IDataAccessContext dac = new CLIDataAccessContext(args[0]);
+        if (dac == null) {
+            dac = new CLIDataAccessContext(args[0]);
+        }
 
         /**
          * first convert the call string to an navigation/usecasestruct
          */
         LOG.info("Run on Console: " + DebugUtils.printFields(args[0]));
-        final NALKey firstForward = NavigationAbstractionLayer.translatePathToKey(dac);
-        if (firstForward == null) {
+        NALKey forward = NavigationAbstractionLayer.translatePathToKey(dac);
+        if (forward == null) {
             new IllegalArgumentException("Request path could not be translated to an NALKey.");
         }
-        @SuppressWarnings("unchecked")
-        final long cacheTimeout = firstForward.getParameter("cache") != null ? new Long(
-                ((List<String>) firstForward.getParameter("cache")).get(0)) : -1;
 
         // run the protocol adapter which fills the struct with parameters from
         // console parameters & environment vars
         // NALKey forward = CLIConsoleArgumentAndEvironmentAdapter.apply();
-        NALKey forward = firstForward;
 
         Usecase usecase;
+        NALKey cacheKey;
         do {
             /**
              * find the corresponding usecase
              */
             try {
                 usecase = UsecaseAgent.findUsecaseForStruct(forward, dac);
+                cacheKey = UsecaseAgent.destinctCacheKey(usecase, forward);
             } catch (final NoUsecaseFound e) {
                 LOG.error(e);
                 throw new RuntimeException(e);
@@ -131,12 +145,7 @@ public class CLIRunner {
              * run the controllers for the usecase, maybe redirect to another
              * usecase.
              */
-            try {
-                forward = UsecaseAgent.executeController(usecase, dac, forward.getParameters());
-            } catch (final ClassNotFoundException ex) {
-                LOG.error(ex);
-                throw new RuntimeException("Couldn't load an Usecase controller");
-            }
+            forward = UsecaseAgent.executeController(usecase, dac, forward.getParameters());
         } while (forward != null);
 
         // no response adapter for the console is needed
@@ -147,7 +156,7 @@ public class CLIRunner {
          * and persistance.
          */
         final String output = UsecaseAgent.applyCaching(usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE),
-                firstForward, null, cacheTimeout);
+                cacheKey, null);
 
         if (output != null) {
             System.out.append(output);
@@ -169,8 +178,8 @@ public class CLIRunner {
             /**
              * caches the ouput for the future
              */
-            UsecaseAgent.applyCaching(usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE), firstForward, out
-                    .getBuffer().toString(), cacheTimeout);
+            UsecaseAgent.applyCaching(usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE), cacheKey, out
+                    .getBuffer().toString());
         }
 
     }
@@ -227,12 +236,24 @@ public class CLIRunner {
         private final String request;
 
         /**
+         * stores environment properties
+         */
+        private final Map<Object, Object> properties;
+
+        /**
          * default constructor
          * 
          * @param request
          */
         public CLIDataAccessContext(final String request) {
             this.request = request;
+            properties = new HashMap<Object, Object>();
+            for (final Entry<String, String> var : System.getenv().entrySet()) {
+                if (var.getKey().startsWith(ENVIRONMENT_VARS_PREFIX)) {
+                    final String key = var.getKey().substring(ENVIRONMENT_VARS_PREFIX.length());
+                    properties.put(key, var.getValue());
+                }
+            }
         }
 
         @Override
@@ -254,9 +275,17 @@ public class CLIRunner {
 
         @Override
         public Object getProperty(final Object key) {
-            // TODO [LOW] parse and save setting from cmdline, param should not
-            // be saved in NAL or usecase
-            return null;
+            return properties.get(key);
+        }
+
+        /**
+         * sets an property from child implementations
+         * 
+         * @param key
+         * @param value
+         */
+        protected void setProperty(final Object key, final Object value) {
+            properties.put(key, value);
         }
 
     };

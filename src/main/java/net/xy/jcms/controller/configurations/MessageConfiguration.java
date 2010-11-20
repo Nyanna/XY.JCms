@@ -42,6 +42,8 @@ public class MessageConfiguration extends AbstractPropertyBasedConfiguration {
 
     /**
      * get an message text
+     * -full component path comp1.comp2.comp3.key
+     * -root key
      * 
      * @param key
      * @return value
@@ -51,7 +53,9 @@ public class MessageConfiguration extends AbstractPropertyBasedConfiguration {
     }
 
     /**
-     * get an message text and where ist was found, closure
+     * get an message text and where ist was found, closure:
+     * -full component path comp1.comp2.comp3.key
+     * -root key
      * 
      * @param key
      * @param config

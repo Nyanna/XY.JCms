@@ -49,7 +49,8 @@ public class TemplateConfiguration extends Configuration<Map<String, IFragment>>
     }
 
     /**
-     * returns an key associated template deffinition
+     * returns an key associated template deffinition from full component path
+     * comp1.comp2.key ans climbup strategy
      * 
      * @param tmplName
      * @return value
@@ -59,7 +60,9 @@ public class TemplateConfiguration extends Configuration<Map<String, IFragment>>
     }
 
     /**
-     * returns an key associated template deffinition and where it was found
+     * returns an key associated template deffinition and where it was found.
+     * -full component path comp1.comp2.comp3.key
+     * -parents comp1.comp2.key, comp1.key
      * 
      * @param tmplName
      * @param config

@@ -14,6 +14,10 @@ package net.xy.jcms.controller.configurations;
 
 import java.util.Map;
 
+import net.xy.jcms.shared.DebugUtils;
+
+import org.apache.log4j.Logger;
+
 /**
  * an content repository for bindvariables and objects mainly from type IContent
  * 
@@ -21,6 +25,11 @@ import java.util.Map;
  * 
  */
 public class ContentRepository extends Configuration<Map<String, Object>> {
+    /**
+     * logger
+     */
+    private static final Logger LOG = Logger.getLogger(ContentRepository.class);
+
     /**
      * gloabl type constant for this type
      */
@@ -41,7 +50,9 @@ public class ContentRepository extends Configuration<Map<String, Object>> {
     }
 
     /**
-     * get an key based content object
+     * get an key based content object:
+     * -full component path comp1.comp2.comp3.key
+     * -global component deffinition, comp3.key
      * 
      * @param key
      * @param type
@@ -64,6 +75,8 @@ public class ContentRepository extends Configuration<Map<String, Object>> {
 
     /**
      * gets an key based content object and where it was found, closure
+     * -full component path comp1.comp2.comp3.key
+     * -global component deffinition, comp3.key
      * 
      * @param key
      * @param type
@@ -73,10 +86,21 @@ public class ContentRepository extends Configuration<Map<String, Object>> {
     public Match<String, Object> getContentMatch(final String key, final Class<?> type,
             final ComponentConfiguration config) {
         final Match<String, Object> got = new Match<String, Object>(null, null);
-        final String pathKey = ConfigurationIterationStrategy.fullPath(config, key);
-        final Object found = getConfigurationValue().get(pathKey);
-        if (!type.isInstance(found)) {
+        // 1. try full path
+        String pathKey = ConfigurationIterationStrategy.fullPath(config, key);
+        Object found = getConfigurationValue().get(pathKey);
+        if (found != null && !type.isInstance(found)) {
+            LOG.error("Content was found but has not the right type. " + DebugUtils.printFields(key, type));
             return got;
+        }
+
+        if (found == null) {
+            // 2. global component deffinition comp3.key
+            pathKey = ConfigurationIterationStrategy.componentId(config, key);
+            found = getConfigurationValue().get(pathKey);
+            if (!type.isInstance(found)) {
+                return got;
+            }
         }
         return new Match<String, Object>(pathKey, found);
     }

@@ -145,4 +145,14 @@ public class HttpRequestDataAccessContext implements IDataAccessContext {
     public Object getProperty(final Object key) {
         return properties.get(key);
     }
+
+    /**
+     * sets an property from child implementations
+     * 
+     * @param key
+     * @param value
+     */
+    protected void setProperty(final Object key, final Object value) {
+        properties.put(key, value);
+    }
 }

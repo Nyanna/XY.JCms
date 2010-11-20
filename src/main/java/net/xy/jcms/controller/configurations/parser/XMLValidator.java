@@ -51,7 +51,6 @@ public class XMLValidator {
      * @throws XMLValidationException
      */
     public static void validate(final String xml, final ClassLoader loader) throws XMLValidationException {
-        // TODO [LOW] replace with callers classloader
         validate(loader.getResourceAsStream(xml));
     }
 

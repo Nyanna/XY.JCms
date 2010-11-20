@@ -51,6 +51,19 @@ public class UIConfiguration extends AbstractPropertyBasedConfiguration {
         return getConfigMatch(ui, config).getValue();
     }
 
+    /**
+     * retrieves an key:
+     * iterable true:
+     * -check full qualified path key, comp1.comp2.comp3.key
+     * -move up to its parents and check these configs, comp1.comp2.key,
+     * comp1.key
+     * iterable false:
+     * -check full qualified path key only, comp1.comp2.comp3.key
+     * 
+     * @param ui
+     * @param config
+     * @return
+     */
     public Match<String, Object> getConfigMatch(final UI<?> ui, final ComponentConfiguration config) {
         Match<String, Object> value = new Match<String, Object>(null, null);
         final List<String> retrievalStack = new ArrayList<String>();

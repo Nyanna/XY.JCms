@@ -49,6 +49,8 @@ public class RenderKitConfiguration extends Configuration<Map<?, IRenderer>> {
 
     /**
      * return the singleton renderer instance
+     * -full component path comp1.comp2.comp3.key
+     * -parents comp1.comp2.key, comp1.key
      * 
      * @param rInterface
      * @return value
@@ -58,7 +60,9 @@ public class RenderKitConfiguration extends Configuration<Map<?, IRenderer>> {
     }
 
     /**
-     * return the singleton renderer instance and where it was found, closure
+     * return the singleton renderer instance and where it was found, closure.
+     * -full component path comp1.comp2.comp3.key
+     * -parents comp1.comp2.key, comp1.key
      * 
      * @param rInterface
      * @param config

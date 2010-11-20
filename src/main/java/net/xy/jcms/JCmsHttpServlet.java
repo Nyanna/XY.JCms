@@ -15,7 +15,6 @@ package net.xy.jcms;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.DecimalFormat;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -35,6 +34,7 @@ import net.xy.jcms.controller.ViewRunner;
 import net.xy.jcms.controller.configurations.ComponentConfiguration;
 import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
+import net.xy.jcms.shared.IDataAccessContext;
 import net.xy.jcms.shared.adapter.HttpProtocolRequestAdapter;
 import net.xy.jcms.shared.adapter.HttpProtocolResponseAdapter;
 import net.xy.jcms.shared.adapter.HttpRequestDataAccessContext;
@@ -67,24 +67,33 @@ public class JCmsHttpServlet extends HttpServlet {
         }
     }
 
-    @Override
-    protected void service(final HttpServletRequest request, final HttpServletResponse response)
-            throws ServletException,
-            IOException {
+    /**
+     * usual http request cycle
+     * 
+     * @param request
+     * @param response
+     * @param dac
+     *            if null an new one will be initialized
+     * @throws ServletException
+     * @throws IOException
+     */
+    protected void service(final HttpServletRequest request, final HttpServletResponse response,
+            IDataAccessContext dac) throws ServletException, IOException {
         /**
          * first get portal configuration out from request information
          */
-        final HttpRequestDataAccessContext dac;
-        try {
-            dac = new HttpRequestDataAccessContext(request);
-        } catch (final URISyntaxException ex) {
-            throw new ServletException("Data access context couldn't be initialized.", ex);
+        if (dac == null) {
+            try {
+                dac = new HttpRequestDataAccessContext(request);
+            } catch (final URISyntaxException ex) {
+                throw new ServletException("Data access context couldn't be initialized.", ex);
+            }
         }
 
         /**
          * first convert the request to an navigation/usecasestruct
          */
-        NALKey firstForward = NavigationAbstractionLayer.translatePathToKey(dac);
+        final NALKey firstForward = NavigationAbstractionLayer.translatePathToKey(dac);
         if (firstForward == null) {
             new ServletException("Request path could not be translated to an NALKey.");
         }
@@ -92,12 +101,8 @@ public class JCmsHttpServlet extends HttpServlet {
         // run the protocol adapter which fills the struct with parameters from
         // the request: cookie data, header data,
         // post data
-        firstForward = HttpProtocolRequestAdapter.apply(request, firstForward);
-        @SuppressWarnings("unchecked")
-        final long cacheTimeout = firstForward.getParameter("cache") != null ? new Long(
-                ((List<String>) firstForward.getParameter("cache")).get(0)) : -1;
-
-        NALKey forward = firstForward;
+        NALKey forward = HttpProtocolRequestAdapter.apply(request, firstForward);
+        NALKey cacheKey;
         Usecase usecase;
         do {
             /**
@@ -105,6 +110,7 @@ public class JCmsHttpServlet extends HttpServlet {
              */
             try {
                 usecase = UsecaseAgent.findUsecaseForStruct(forward, dac);
+                cacheKey = UsecaseAgent.destinctCacheKey(usecase, forward);
             } catch (final NoUsecaseFound e) {
                 LOG.error(e);
                 throw new ServletException(e);
@@ -115,29 +121,22 @@ public class JCmsHttpServlet extends HttpServlet {
              * usecase. there should also be an expiration contoller for http tu
              * use client caching feature.
              */
-            try {
-                // clientstore is one of the parameters
-                forward = UsecaseAgent.executeController(usecase, dac, forward.getParameters());
-            } catch (final ClassNotFoundException ex) {
-                throw new ServletException("Couldn't load an Usecase controller", ex);
-            }
+            forward = UsecaseAgent.executeController(usecase, dac, forward.getParameters());
         } while (forward != null);
 
         // run the protocol response adapter, which fills for http as an example
         // the headers
         HttpProtocolResponseAdapter.apply(response,
                 usecase.getConfigurationList(ConfigurationType.CONTROLLERAPPLICABLE));
-        // TODO: [LOW] implement caching also of response headers corelated to
-        // the request first testwise via binary outstream with headers
-        // TODO [LAST] check and profile performance, check timestams in nano
+        // TODO [HIGH] check and profile performance
 
         /**
-         * at this point caching takes effect by the safe asumption that the
-         * same configuration leads to the same result. realized through hashing
-         * and persistance.
+         * at this point late caching takes effect by the safe asumption that
+         * the same configuration leads to the same result. realized through
+         * hashing and persistance.
          */
         final String output = UsecaseAgent.applyCaching(usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE),
-                firstForward, null, cacheTimeout);
+                cacheKey, null);
 
         if (output != null) {
             response.getWriter().append(output);
@@ -159,8 +158,8 @@ public class JCmsHttpServlet extends HttpServlet {
             /**
              * caches the ouput for the future
              */
-            UsecaseAgent.applyCaching(usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE), firstForward, out
-                    .getBuffer().toString(), cacheTimeout);
+            UsecaseAgent.applyCaching(usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE), cacheKey, out
+                    .getBuffer().toString());
         }
 
     }

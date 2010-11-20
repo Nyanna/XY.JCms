@@ -323,7 +323,7 @@ public class UsecaseConfiguration {
          * @throws ClassNotFoundException
          */
         public NALKey invoke(final IDataAccessContext dac, final Configuration<?>[] configuration,
-                final Map<Object, Object> parameters) throws ClassNotFoundException {
+                final Map<Object, Object> parameters) {
             if (parameters != null) {
                 return controllerId.invoke(dac, configuration, parameters);
             } else {

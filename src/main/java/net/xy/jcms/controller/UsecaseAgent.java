@@ -17,12 +17,14 @@
 package net.xy.jcms.controller;
 
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 
 import net.xy.jcms.controller.NavigationAbstractionLayer.NALKey;
 import net.xy.jcms.controller.UsecaseConfiguration.Controller;
+import net.xy.jcms.controller.UsecaseConfiguration.Parameter;
 import net.xy.jcms.controller.UsecaseConfiguration.Usecase;
 import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
@@ -94,6 +96,26 @@ public class UsecaseAgent {
     }
 
     /**
+     * creates an destinct NALKey for caching. It checks by which NAL params the
+     * usecase was found and will delete params not relevant for the usecase.
+     * 
+     * @param usecase
+     *            which was found for the
+     * @param foundFor
+     *            nalkey
+     * @return
+     */
+    public static NALKey destinctCacheKey(final Usecase usecase, final NALKey foundFor) {
+        final Map<Object, Object> relevant = new HashMap<Object, Object>();
+        for (final Parameter param : usecase.getParameterList()) {
+            relevant.put(param.getParameterKey(), foundFor.getParameter(param.getParameterKey()));
+        }
+        final NALKey destinct = new NALKey(foundFor.getId());
+        destinct.setParameters(relevant);
+        return destinct;
+    }
+
+    /**
      * executes all data aggregation processing and controller logic
      * 
      * @param usecase
@@ -102,7 +124,7 @@ public class UsecaseAgent {
      * @throws ClassNotFoundException
      */
     public static NALKey executeController(final Usecase usecase, final IDataAccessContext dac,
-            final Map<Object, Object> parameters) throws ClassNotFoundException {
+            final Map<Object, Object> parameters) {
         final Controller[] list = usecase.getControllerList();
         NALKey next = null;
         for (final Controller controller : list) {
@@ -132,13 +154,13 @@ public class UsecaseAgent {
      * @param cacheTimeout
      * @return value
      */
-    public static String applyCaching(final Configuration<?>[] configs, final NALKey key, final String content,
-            final long cacheTimeout) {
+    public static String applyCaching(final Configuration<?>[] configs, final NALKey key, final String content) {
         /**
          * caching should support two modes after an specified timeout e.g. 60
          * seconds ofter after config changes e.g. onChange
          */
-        final long timeout;
+        final long cacheTimeout = key != null && key.getParameter("cache") != null ? (Long) key.getParameter("cache") : -1;
+
         final StringBuilder hashKey = new StringBuilder();
         if (cacheTimeout <= -1) {
             // -1 disabled
@@ -149,7 +171,6 @@ public class UsecaseAgent {
             if (configs == null) {
                 return null;
             }
-            timeout = 0;
             for (final Configuration<?> config : configs) {
                 hashKey.append(config.hashCode());
             }
@@ -158,14 +179,13 @@ public class UsecaseAgent {
             if (key == null) {
                 return null;
             }
-            timeout = cacheTimeout;
             hashKey.append(key.hashCode());
         }
         if (content == null) { // get
             final String result;
-            if (timeout > 0) {
+            if (cacheTimeout > 0) {
                 result = (String) XYCache.getInstance(USECASE_OUPUT_CACHE_ID).get(CACHE_REGION, hashKey.toString(),
-                        timeout);
+                        cacheTimeout);
             } else {
                 result = (String) XYCache.getInstance(USECASE_OUPUT_CACHE_ID).get(CACHE_REGION, hashKey.toString());
             }

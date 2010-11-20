@@ -264,6 +264,17 @@ public abstract class ComponentConfiguration {
     }
 
     /**
+     * add an anonymous child (hashCode).
+     * 
+     * @param child
+     */
+    final protected void addChildren(final ComponentConfiguration child) {
+        changeValid();
+        child.setParent(this);
+        children.put(new Integer(child.hashCode()).toString(), child);
+    }
+
+    /**
      * adds an component as child and returns it configuration object
      * 
      * @param id
@@ -290,9 +301,7 @@ public abstract class ComponentConfiguration {
         final ComponentConfiguration[] childs = prepareChildren(Collections.unmodifiableMap(content));
         if (childs != null) {
             for (final ComponentConfiguration child : childs) {
-                child.getId();
-                // TODO [LOW] remove or change to mapp
-                // addChildren(id, child);
+                addChildren(child);
             }
         }
     }
@@ -307,7 +316,8 @@ public abstract class ComponentConfiguration {
     }
 
     /**
-     * prepare and collect the child configuration
+     * prepare and collect the child configuration. Add named children with
+     * addComponent returned list will add anonymous childrens.
      * 
      * @return value
      */
@@ -416,7 +426,6 @@ public abstract class ComponentConfiguration {
                                 + DebugUtils.printFields(ui));
                     }
                     uiconfig.put(ui.getKey(), config.getConfig(ui, this));
-                    // TODO [LOW] add type safty through separate get boolean
                 }
             }
         }
@@ -424,6 +433,12 @@ public abstract class ComponentConfiguration {
 
     protected abstract UI<?>[] prepareUIConfig();
 
+    /**
+     * gets an ui config object via key
+     * 
+     * @param key
+     * @return value
+     */
     public Object getUIConfig(final String key) {
         final Object config = uiconfig.get(key);
         if (config == null) {
@@ -431,6 +446,46 @@ public abstract class ComponentConfiguration {
                     + DebugUtils.printFields(key));
         }
         return config;
+    }
+
+    /**
+     * simple castign wrapper for an ui config object
+     * 
+     * @param key
+     * @return value
+     */
+    public String getUIConfigString(final String key) {
+        return (String) getUIConfig(key);
+    }
+
+    /**
+     * simple castign wrapper for an ui config object
+     * 
+     * @param key
+     * @return value
+     */
+    public Integer getUIConfigInteger(final String key) {
+        return (Integer) getUIConfig(key);
+    }
+
+    /**
+     * simple castign wrapper for an ui config object
+     * 
+     * @param key
+     * @return value
+     */
+    public Long getUIConfigLong(final String key) {
+        return (Long) getUIConfig(key);
+    }
+
+    /**
+     * simple castign wrapper for an ui config object
+     * 
+     * @param key
+     * @return value
+     */
+    public Boolean getUIConfigBoolean(final String key) {
+        return (Boolean) getUIConfig(key);
     }
 
     /**

@@ -12,7 +12,7 @@
  */
 package net.xy.jcms;
 
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -50,7 +50,7 @@ public class JavaRunner {
      * @throws ExecutionException
      */
     public static String execute(final String request) throws ExecutionException {
-        return execute(request, null, new JavaDataAccessContext(request));
+        return execute(request, null, new JavaDataAccessContext(request, null));
     }
 
     /**
@@ -62,7 +62,7 @@ public class JavaRunner {
      * @throws ExecutionException
      */
     public static String execute(final String request, final Map<String, Object> params) throws ExecutionException {
-        return execute(request, params, new JavaDataAccessContext(request));
+        return execute(request, params, new JavaDataAccessContext(request, null));
     }
 
     /**
@@ -80,75 +80,72 @@ public class JavaRunner {
          * DAC would be obmitted
          */
         if (dac == null) {
-            dac = new JavaDataAccessContext(request);
+            dac = new JavaDataAccessContext(request, null);
         }
 
         /**
          * first convert the call string to an navigation/usecasestruct
          */
-        final NALKey firstForward = NavigationAbstractionLayer.translatePathToKey(dac);
-        if (firstForward == null) {
+        NALKey forward = NavigationAbstractionLayer.translatePathToKey(dac);
+        if (forward == null) {
             new IllegalArgumentException("Request path could not be translated to an NALKey.");
         }
 
         // run the protocol adapter which fills the struct with parameters from
         // console parameters & environment vars
         // NALKey forward = fillWithParams(firstForward,parrams);
-        @SuppressWarnings("unchecked")
-        final long cacheTimeout = firstForward.getParameter("cache") != null ? new Long(
-                ((List<String>) firstForward.getParameter("cache")).get(0)) : -1;
 
-        NALKey forward = firstForward;
         Usecase usecase;
+        NALKey cacheKey;
         do {
             /**
              * find the corresponding usecase
              */
             try {
                 usecase = UsecaseAgent.findUsecaseForStruct(forward, dac);
+                cacheKey = UsecaseAgent.destinctCacheKey(usecase, forward);
             } catch (final NoUsecaseFound e) {
                 LOG.error(e);
                 throw new ExecutionException(e);
             }
 
             /**
-             * run the controllers for the usecase, maybe redirect to another usecase.
+             * run the controllers for the usecase, maybe redirect to another
+             * usecase.
              */
-            try {
-                forward = UsecaseAgent.executeController(usecase, dac, forward.getParameters());
-            } catch (final ClassNotFoundException ex) {
-                LOG.error(ex);
-                throw new ExecutionException("Couldn't load an Usecase controller");
-            }
+            forward = UsecaseAgent.executeController(usecase, dac, forward.getParameters());
         } while (forward != null);
 
         // no response adapter for the console is needed
 
         /**
-         * at this point caching takes effect by the safe asumption that the same configuration leads to the same
-         * result. realized through hashing and persistance.
+         * at this point late caching takes effect by the safe asumption that
+         * the same configuration leads to the same result. realized through
+         * hashing and persistance.
          */
         final String output = UsecaseAgent.applyCaching(usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE),
-                firstForward, null, cacheTimeout);
+                cacheKey, null);
 
         if (output != null) {
             return output;
         } else {
             /**
-             * get the configurationtree for the usecase from an empty run through the componenttree
+             * get the configurationtree for the usecase from an empty run
+             * through the componenttree
              */
             final Configuration<?>[] viewConfig = usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE);
             final ComponentConfiguration confTree = ViewRunner.runConfiguration(viewConfig);
 
             /**
-             * run and return the rendering tree through streamprocessing to the client
+             * run and return the rendering tree through streamprocessing to the
+             * client
              */
             final BufferAppender buffer = new BufferAppender();
             ViewRunner.runView(buffer, confTree);
 
             final String strBuffer = buffer.toString();
-            UsecaseAgent.applyCaching(usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE), firstForward,
-                    strBuffer, cacheTimeout);
+            UsecaseAgent.applyCaching(usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE), cacheKey,
+                    strBuffer);
             return strBuffer;
         }
     }
@@ -215,12 +212,22 @@ public class JavaRunner {
         private final String request;
 
         /**
+         * stores properties for java
+         */
+        private final Map<Object, Object> properties;
+
+        /**
          * default constructor
          * 
          * @param request
          */
-        JavaDataAccessContext(final String request) {
+        JavaDataAccessContext(final String request, final Map<Object, Object> properties) {
             this.request = request;
+            if (properties != null && !properties.isEmpty()) {
+                this.properties = properties;
+            } else {
+                this.properties = new HashMap<Object, Object>();
+            }
         }
 
         @Override
@@ -241,8 +248,7 @@ public class JavaRunner {
 
         @Override
         public Object getProperty(final Object key) {
-            // TODO [LOW] store java obmitted params, param should not be saved in NAL or usecase
-            return null;
+            return properties.get(key);
         }
 
     }
