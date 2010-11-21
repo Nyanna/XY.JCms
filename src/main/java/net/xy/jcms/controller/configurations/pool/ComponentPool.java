@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import net.xy.jcms.shared.DebugUtils;
 import net.xy.jcms.shared.IComponent;
 
 /**
@@ -33,7 +34,7 @@ public class ComponentPool {
     /**
      * logger
      */
-    private final static Logger LOG = Logger.getLogger(TemplatePool.class);
+    private final static Logger LOG = Logger.getLogger(ComponentPool.class);
 
     /**
      * cache pool
@@ -69,6 +70,9 @@ public class ComponentPool {
      */
     public static IComponent get(final Class<? extends IComponent> component) throws ClassNotFoundException {
         if (cachePool.containsKey(component.getName())) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Component retrieved from cache. " + DebugUtils.printFields(component.getName()));
+            }
             return cachePool.get(component.getName());
         } else {
             if (!IComponent.class.isAssignableFrom(component)) {
@@ -87,6 +91,10 @@ public class ComponentPool {
                         + component.getName());
             }
 
+            if (LOG.isDebugEnabled()) {
+                // only log infor when debug
+                LOG.info("Component new instantiated. " + DebugUtils.printFields(component.getName()));
+            }
             cachePool.put(component.getName(), comp);
             return comp;
         }

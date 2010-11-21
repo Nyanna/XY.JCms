@@ -1,1 +1,21 @@
 -think about an modular controller set with configuration management
+-cleanup and review of all jdoc comments
+
+
+
+
+#Performace conclusion
+
+1. Class initialization - no problem after startup phase - all components got cached
+2. Component config path iteration!
+
+
+#component path retrieval problem
+1.Split config run
+component initialization could be devided into two runs, child component aggregation and config aggregation
++config tree is first ready and can matched against an cached diff of the config,
+	maybe component wise. So components in the tree can individually initialized and rendered.
+	We can call this subtree updates.
+-config is not so flexible, component tree can't be generated dynamicly
+
+2. pre aggregate the config also into an component tree each config node containing only its note passing it one to one to the config

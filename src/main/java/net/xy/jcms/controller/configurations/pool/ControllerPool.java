@@ -19,6 +19,7 @@ package net.xy.jcms.controller.configurations.pool;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.xy.jcms.shared.DebugUtils;
 import net.xy.jcms.shared.IController;
 
 import org.apache.log4j.Logger;
@@ -51,6 +52,9 @@ public class ControllerPool {
      */
     public static IController get(final String id, final ClassLoader loader) throws ClassNotFoundException {
         if (controllers.containsKey(id)) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Controller retrieved from cache. " + DebugUtils.printFields(id));
+            }
             return controllers.get(id);
         } else {
             final Object instance;
@@ -65,6 +69,10 @@ public class ControllerPool {
                 throw new ClassNotFoundException("Failure on accessing and instantiating Controller class " + id);
             }
             if (IController.class.isInstance(instance)) {
+                if (LOG.isDebugEnabled()) {
+                    // only log infor when debug
+                    LOG.info("Controller new instantiated. " + DebugUtils.printFields(id));
+                }
                 controllers.put(id, (IController) instance);
                 return controllers.get(id);
             } else {

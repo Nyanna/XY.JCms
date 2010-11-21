@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import net.xy.jcms.shared.DebugUtils;
 import net.xy.jcms.shared.IRenderer;
 
 /**
@@ -52,6 +53,9 @@ public class RendererPool {
     public static IRenderer get(final String classPath, final ClassLoader loader)
             throws ClassNotFoundException {
         if (cachePool.containsKey(classPath)) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Renderer retrieved from cache. " + DebugUtils.printFields(classPath));
+            }
             return cachePool.get(classPath);
         } else {
             final Object renderer;
@@ -65,6 +69,10 @@ public class RendererPool {
                 throw new ClassNotFoundException("Failure on accessing and instantiating Renderer class " + classPath);
             }
             if (IRenderer.class.isInstance(renderer)) {
+                if (LOG.isDebugEnabled()) {
+                    // only log infor when debug
+                    LOG.info("Renderer new instantiated. " + DebugUtils.printFields(classPath));
+                }
                 cachePool.put(classPath, (IRenderer) renderer);
                 return (IRenderer) renderer;
             } else {

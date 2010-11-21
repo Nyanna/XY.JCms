@@ -143,8 +143,8 @@ public class DynamicFragment extends AbstractFragment {
 
     @Override
     public void render(final IOutWriter out, final FragmentConfiguration config) {
-        while (!struct.isEmpty()) {
-            final Element elem = struct.removeFirst();
+        // beware of mutable operation in an pseudo static fragment instance
+        for (final Element elem : struct) {
             switch (elem.getType()) {
             case Child:
                 config.renderChild(elem.getValue(), out);

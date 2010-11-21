@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import net.xy.jcms.shared.DebugUtils;
 import net.xy.jcms.shared.IFragment;
 
 /**
@@ -52,6 +53,9 @@ public class TemplatePool {
     public static IFragment get(final String classPath, final ClassLoader loader)
             throws ClassNotFoundException {
         if (cachePool.containsKey(classPath)) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Template retrieved from cache. " + DebugUtils.printFields(classPath));
+            }
             return cachePool.get(classPath);
         } else {
             final Object fragment;
@@ -65,6 +69,10 @@ public class TemplatePool {
                 throw new ClassNotFoundException("Failure on accessing and instantiating Template class " + classPath);
             }
             if (IFragment.class.isInstance(fragment)) {
+                if (LOG.isDebugEnabled()) {
+                    // only log infor when debug
+                    LOG.info("Template new instantiated. " + DebugUtils.printFields(classPath));
+                }
                 cachePool.put(classPath, (IFragment) fragment);
                 return (IFragment) fragment;
             } else {

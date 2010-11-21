@@ -62,7 +62,11 @@ public class XMLValidator {
      */
     public static void validate(final InputStream xml) throws XMLValidationException {
         try {
-            final XMLReader parser = XMLReaderFactory.createXMLReader();
+            final XMLReader parser = XMLReaderFactory
+                    .createXMLReader();
+            // org.apache.xerces.parsers.SAXParser -- with JCL
+            // com.sun.org.apache.xerces.internal.parsers.SAXParser -- without
+            // -Dorg.xml.sax.driver=
             LOG.info("XMLReader loaded: " + parser.getClass().getName());
             final SAXReactor handler = new SAXReactor();
             parser.setFeature("http://xml.org/sax/features/validation", Boolean.TRUE);

@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
+import net.xy.jcms.shared.DebugUtils;
 import net.xy.jcms.shared.IConverter;
 
 /**
@@ -52,6 +53,9 @@ public class ConverterPool {
     public static IConverter get(final String classPath, final ClassLoader loader)
             throws ClassNotFoundException {
         if (converterPool.containsKey(classPath)) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Converter retrieved from cache. " + DebugUtils.printFields(classPath));
+            }
             return converterPool.get(classPath);
         } else {
             final Object converter;
@@ -65,6 +69,10 @@ public class ConverterPool {
                 throw new ClassNotFoundException("Failure on accessing and instantiating Converter class " + classPath);
             }
             if (IConverter.class.isInstance(converter)) {
+                if (LOG.isDebugEnabled()) {
+                    // only log infor when debug
+                    LOG.info("Converter new instantiated. " + DebugUtils.printFields(classPath));
+                }
                 converterPool.put(classPath, (IConverter) converter);
                 return (IConverter) converter;
             } else {

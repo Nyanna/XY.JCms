@@ -16,8 +16,10 @@
  */
 package net.xy.jcms.controller;
 
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -96,6 +98,11 @@ public class UsecaseAgent {
     }
 
     /**
+     * specifies global parameters for all usecases to be copied
+     */
+    private static final List<String> globals = Arrays.asList(new String[] { "cache" });
+
+    /**
      * creates an destinct NALKey for caching. It checks by which NAL params the
      * usecase was found and will delete params not relevant for the usecase.
      * 
@@ -109,6 +116,9 @@ public class UsecaseAgent {
         final Map<Object, Object> relevant = new HashMap<Object, Object>();
         for (final Parameter param : usecase.getParameterList()) {
             relevant.put(param.getParameterKey(), foundFor.getParameter(param.getParameterKey()));
+        }
+        for (final String param : globals) {
+            relevant.put(param, foundFor.getParameter(param));
         }
         final NALKey destinct = new NALKey(foundFor.getId());
         destinct.setParameters(relevant);
@@ -154,12 +164,23 @@ public class UsecaseAgent {
      * @param cacheTimeout
      * @return value
      */
+    @SuppressWarnings("unchecked")
     public static String applyCaching(final Configuration<?>[] configs, final NALKey key, final String content) {
         /**
          * caching should support two modes after an specified timeout e.g. 60
          * seconds ofter after config changes e.g. onChange
          */
-        final long cacheTimeout = key != null && key.getParameter("cache") != null ? (Long) key.getParameter("cache") : -1;
+        long cacheTimeout = -1;
+        if (key != null && key.getParameter("cache") != null) {
+            final Object keyValue = key.getParameter("cache");
+            if (keyValue instanceof List) {
+                cacheTimeout = new Long(((List<String>) keyValue).get(0));
+            } else if (keyValue instanceof Long) {
+                cacheTimeout = (Long) keyValue;
+            } else if (keyValue instanceof Integer) {
+                cacheTimeout = (Integer) keyValue;
+            }
+        }
 
         final StringBuilder hashKey = new StringBuilder();
         if (cacheTimeout <= -1) {
@@ -167,7 +188,8 @@ public class UsecaseAgent {
             return null;
         } else if (cacheTimeout == 0) {
             // 0 means hash the whole configs
-            // TODO [HIGH] implement proper equals for the configurations
+            // TODO [LOW] implement proper equals for the configurations, maybe
+            // also some other objects from jcms
             if (configs == null) {
                 return null;
             }
@@ -190,7 +212,9 @@ public class UsecaseAgent {
                 result = (String) XYCache.getInstance(USECASE_OUPUT_CACHE_ID).get(CACHE_REGION, hashKey.toString());
             }
             if (result != null) {
-                LOG.info("Cache object was found! Yeah. " + hashKey);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Cache object was found! Yeah. " + hashKey);
+                }
             }
             return result;
         } else { // put

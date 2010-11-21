@@ -128,7 +128,6 @@ public class JCmsHttpServlet extends HttpServlet {
         // the headers
         HttpProtocolResponseAdapter.apply(response,
                 usecase.getConfigurationList(ConfigurationType.CONTROLLERAPPLICABLE));
-        // TODO [HIGH] check and profile performance
 
         /**
          * at this point late caching takes effect by the safe asumption that
