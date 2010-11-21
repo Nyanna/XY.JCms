@@ -33,7 +33,7 @@ import org.xeustechnologies.jcl.JarClassLoader;
  * @author xyan
  * 
  */
-public abstract class CLIClassLoader {
+public class CLIClassLoader {
     /**
      * logger
      */
@@ -45,14 +45,9 @@ public abstract class CLIClassLoader {
     }
 
     /**
-     * default constructor starts program
-     * 
-     * @param args
-     * @throws Throwable
+     * defines the entry class should be set from childs
      */
-    public CLIClassLoader(final String[] args) throws Throwable {
-        main(args);
-    }
+    protected static String ENTRY_CLASS = "net.xy.jcms.CLIRunner";
 
     /**
      * initializes jcl and the entry class
@@ -61,7 +56,7 @@ public abstract class CLIClassLoader {
      * @throws Throwable
      */
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    private void main(final String[] args) throws Throwable {
+    public static void main(final String[] args) throws Throwable {
         final File libDir = new File("../lib/");
         final File[] libFiles = libDir.listFiles();
         final List<URL> files = new LinkedList<URL>();
@@ -82,7 +77,7 @@ public abstract class CLIClassLoader {
 
         try {
             LOG.info("Invoking main method.");
-            final Class mainCl = jcl.loadClass(getEntryClass());
+            final Class mainCl = jcl.loadClass(ENTRY_CLASS);
             LOG.info("JarLoader got " + mainCl.getName() + " with " + mainCl.getClassLoader().getClass().getName());
 
             final Method main = mainCl.getMethod("main", String[].class);
@@ -91,11 +86,4 @@ public abstract class CLIClassLoader {
             throw ex.getCause();
         }
     }
-
-    /**
-     * get the name of the programms entry class
-     * 
-     * @return
-     */
-    protected abstract String getEntryClass();
 }
