@@ -94,6 +94,7 @@ public class UsecaseAgent {
             }
             return foundErrorCase;
         }
+        LOG.info("Found usecase: " + DebugUtils.printFields(struct));
         return foundCase;
     }
 
@@ -110,7 +111,7 @@ public class UsecaseAgent {
      *            which was found for the
      * @param foundFor
      *            nalkey
-     * @return
+     * @return value
      */
     public static NALKey destinctCacheKey(final Usecase usecase, final NALKey foundFor) {
         final Map<Object, Object> relevant = new HashMap<Object, Object>();
@@ -139,9 +140,13 @@ public class UsecaseAgent {
         NALKey next = null;
         for (final Controller controller : list) {
             final EnumSet<ConfigurationType> types = controller.getObmitedConfigurations().clone();
-            types.addAll(ConfigurationType.CONTROLLERAPPLICABLE);
-            final Configuration<?>[] configs = usecase.getConfigurationList(types);
+            boolean initWParams = false;
             if (types.contains(ConfigurationType.Parameters)) {
+                types.remove(ConfigurationType.Parameters);
+                initWParams = true;
+            }
+            final Configuration<?>[] configs = usecase.getConfigurationList(types);
+            if (initWParams) {
                 // obmit parameters if configured
                 next = controller.invoke(dac, configs, parameters);
             } else {

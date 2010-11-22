@@ -19,3 +19,4 @@ component initialization could be devided into two runs, child component aggrega
 -config is not so flexible, component tree can't be generated dynamicly
 
 2. pre aggregate the config also into an component tree each config node containing only its note passing it one to one to the config
+3. optimize the data structure of the configs, reversed tree

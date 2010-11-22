@@ -31,7 +31,8 @@ import net.xy.jcms.shared.IOutWriter;
 import org.apache.log4j.Logger;
 
 /**
- * adaption from JCms to get called via java
+ * adaption from JCms to get called via java. This represents the cycle typical
+ * for an java client.
  * 
  * @author xyan
  * 
@@ -66,11 +67,12 @@ public class JavaRunner {
     }
 
     /**
-     * entrypoint returns the rendered output
+     * entrypoint returns the rendered output and executes the cycle.
      * 
      * @param request
      * @param params
      * @param dac
+     *            if null an new one will be created
      * @return value
      * @throws ExecutionException
      */
@@ -92,7 +94,7 @@ public class JavaRunner {
         }
 
         // run the protocol adapter which fills the struct with parameters from
-        // console parameters & environment vars
+        // parameters or java properties
         // NALKey forward = fillWithParams(firstForward,parrams);
 
         Usecase usecase;
@@ -138,11 +140,14 @@ public class JavaRunner {
 
             /**
              * run and return the rendering tree through streamprocessing to the
-             * client
+             * client. fo java clients by default an stringbuilder is used.
              */
             final BufferAppender buffer = new BufferAppender();
             ViewRunner.runView(buffer, confTree);
 
+            /**
+             * use caching for later usage
+             */
             final String strBuffer = buffer.toString();
             UsecaseAgent.applyCaching(usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE), cacheKey,
                     strBuffer);

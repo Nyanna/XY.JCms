@@ -35,7 +35,7 @@ import net.xy.jcms.shared.IOutWriter;
 import net.xy.jcms.shared.cache.XYCache;
 
 /**
- * adaption of JCms to run on an console
+ * adaption of JCms to run in an console
  * 
  * @author xyan
  * 
@@ -82,7 +82,7 @@ public class CLIRunner {
     }
 
     /**
-     * constructor uses obmitted dac
+     * constructor uses obmitted dac and destroy cache instances after run.
      * 
      * @param args
      * @param dac
@@ -101,10 +101,14 @@ public class CLIRunner {
 
     /**
      * instance main method
+     * 
+     * @param args
+     * @param dac
      */
     protected void Main(final String[] args, IDataAccessContext dac) {
         /**
-         * first get portal configuration out from call information
+         * first get portal configuration out from call information or use
+         * obmitted dac
          */
         if (args.length < 1 || StringUtils.isBlank(args[0])) {
             System.out.append("You have to specify at least one request String.");
@@ -115,7 +119,7 @@ public class CLIRunner {
         }
 
         /**
-         * first convert the call string to an navigation/usecasestruct
+         * than convert the call string to an navigation/usecasestruct
          */
         LOG.info("Run on Console: " + DebugUtils.printFields(args[0]));
         NALKey forward = NavigationAbstractionLayer.translatePathToKey(dac);
@@ -125,7 +129,7 @@ public class CLIRunner {
 
         // run the protocol adapter which fills the struct with parameters from
         // console parameters & environment vars
-        // NALKey forward = CLIConsoleArgumentAndEvironmentAdapter.apply();
+        // NALKey forward = CLIConsoleEnvironmentAdapter.apply();
 
         Usecase usecase;
         NALKey cacheKey;

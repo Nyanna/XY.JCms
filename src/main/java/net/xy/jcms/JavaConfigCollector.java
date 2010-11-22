@@ -44,6 +44,12 @@ import net.xy.jcms.JavaRunner.JavaDataAccessContext;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+/**
+ * processing for java clients managing the configurations.
+ * 
+ * @author Xyan
+ * 
+ */
 public class JavaConfigCollector {
 
     /**
@@ -53,18 +59,19 @@ public class JavaConfigCollector {
 
     /**
      * does an configuration aggregation only run and returns an dummy config
-     * list containing all requested configs
+     * list containing all requested configs missing and present
      * 
      * @param request
      * @param params
      * @param dac
+     *            if null an new one will be created
      * @return value
      * @throws ExecutionException
      */
     public static Configuration<?>[] getConfig(final String request, final Map<String, Object> params,
             IDataAccessContext dac) throws ExecutionException {
         /**
-         * DAC would be obmitted
+         * DAC would be obmitted, or fresh created
          */
         if (dac == null) {
             dac = new JavaDataAccessContext(request, null);
@@ -79,7 +86,7 @@ public class JavaConfigCollector {
         }
 
         // run the protocol adapter which fills the struct with parameters from
-        // console parameters & environment vars
+        // params java properties
         // NALKey forward = fillWithParams(firstForward,parrams);
 
         Usecase usecase;
@@ -118,19 +125,21 @@ public class JavaConfigCollector {
     }
 
     /**
-     * converts the dummy config to an copyable string with linebreaks
+     * converts the dummy config to an copyable string with linebreaks. calls
+     * implicit getConfig.
      * 
      * @param request
      * @param params
      * @param dac
+     * @return an string ready to get posted on the console
      */
     public static String getConsoleConfigString(final String request, final Map<String, Object> params,
-            IDataAccessContext dac) {
-        if (dac == null) {
-            dac = new JavaDataAccessContext(request, null);
-        }
+            final IDataAccessContext dac) {
+        // get all requested configs or only the missing ones ?
         final boolean getAll = params != null && params.containsKey("getAll") ? true : false;
         final StringBuilder ret = new StringBuilder();
+
+        // is there missing config ?
         boolean isMissingConfig = false;
         try {
             final long start = System.currentTimeMillis();
@@ -138,6 +147,7 @@ public class JavaConfigCollector {
             final Configuration<?>[] configs = getConfig(request, params, dac);
             LOG.info("Execution succeeded in milliseconds "
                     + new DecimalFormat("###,###,### \u039C").format((System.currentTimeMillis() - start)));
+
             for (final Configuration<?> config : configs) {
                 switch (config.getConfigurationType()) {
                 case UIConfiguration:

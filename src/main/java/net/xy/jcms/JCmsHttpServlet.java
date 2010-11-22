@@ -80,7 +80,8 @@ public class JCmsHttpServlet extends HttpServlet {
     protected void service(final HttpServletRequest request, final HttpServletResponse response,
             IDataAccessContext dac) throws ServletException, IOException {
         /**
-         * first get portal configuration out from request information
+         * first get portal configuration out from request information, or use
+         * obmitted one
          */
         if (dac == null) {
             try {
@@ -91,7 +92,7 @@ public class JCmsHttpServlet extends HttpServlet {
         }
 
         /**
-         * first convert the request to an navigation/usecasestruct
+         * second convert the request to an navigation/usecasestruct
          */
         final NALKey firstForward = NavigationAbstractionLayer.translatePathToKey(dac);
         if (firstForward == null) {
@@ -99,8 +100,7 @@ public class JCmsHttpServlet extends HttpServlet {
         }
 
         // run the protocol adapter which fills the struct with parameters from
-        // the request: cookie data, header data,
-        // post data
+        // the request: cookie data, header data, post data
         NALKey forward = HttpProtocolRequestAdapter.apply(request, firstForward);
         NALKey cacheKey;
         Usecase usecase;
@@ -118,14 +118,14 @@ public class JCmsHttpServlet extends HttpServlet {
 
             /**
              * run the controllers for the usecase, maybe redirect to another
-             * usecase. there should also be an expiration contoller for http tu
+             * usecase. there should also be an expiration contoller for http to
              * use client caching feature.
              */
             forward = UsecaseAgent.executeController(usecase, dac, forward.getParameters());
         } while (forward != null);
 
         // run the protocol response adapter, which fills for http as an example
-        // the headers
+        // the headers, sets cookies
         HttpProtocolResponseAdapter.apply(response,
                 usecase.getConfigurationList(ConfigurationType.CONTROLLERAPPLICABLE));
 
@@ -142,7 +142,8 @@ public class JCmsHttpServlet extends HttpServlet {
         } else {
             /**
              * get the configurationtree for the usecase from an empty run
-             * through the componenttree
+             * through the componenttree. give the run all view dependent
+             * configs.
              */
             final Configuration<?>[] viewConfig = usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE);
             final ComponentConfiguration confTree = ViewRunner.runConfiguration(viewConfig);
@@ -155,7 +156,7 @@ public class JCmsHttpServlet extends HttpServlet {
             ViewRunner.runView(out, confTree);
 
             /**
-             * caches the ouput for the future
+             * caches the ouput for future use
              */
             UsecaseAgent.applyCaching(usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE), cacheKey, out
                     .getBuffer().toString());

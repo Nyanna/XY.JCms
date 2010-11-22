@@ -112,7 +112,7 @@ public class FragmentXMLParser {
             ret.addStatic(stream.substring(pointer, beginPos));
             pointer = endPos + END.length();
 
-            final String comment = stream.substring(beginPos + BEGIN.length(), endPos - 1).trim();
+            final String comment = stream.substring(beginPos + BEGIN.length(), endPos).trim();
             Matcher match = COMPONENT.matcher(comment);
             if (match.matches()) {
                 // found component
