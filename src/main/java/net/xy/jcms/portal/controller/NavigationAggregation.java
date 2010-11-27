@@ -23,12 +23,12 @@ import net.xy.jcms.controller.TranslationConfiguration.InvalidBuildRule;
 import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.ContentRepository;
 import net.xy.jcms.controller.configurations.ControllerConfiguration;
+import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
 import net.xy.jcms.shared.IDataAccessContext;
-import net.xy.jcms.shared.JCmsHelper;
 import net.xy.jcms.shared.types.StringList;
 
 /**
- * implements aggregation of navigation content
+ * implements aggregation of navigation content in an abstract way.
  * 
  * @author Xyan
  * 
@@ -41,12 +41,12 @@ public abstract class NavigationAggregation<LINKOBJECT> extends Controller {
     private static final String INSTRUCTION_SECTION = "navigation";
 
     @Override
-    public NALKey invoke(final IDataAccessContext dac, final Configuration<?>[] configuration) {
+    public NALKey invoke(final IDataAccessContext dac, final Map<ConfigurationType, Configuration<?>> configuration) {
         return invoke(dac, configuration, null);
     }
 
     @Override
-    public NALKey invoke(final IDataAccessContext dac, final Configuration<?>[] configuration,
+    public NALKey invoke(final IDataAccessContext dac, final Map<ConfigurationType, Configuration<?>> configuration,
             final Map<Object, Object> parameters) {
         try {
             proccess(dac, configuration, parameters);
@@ -69,14 +69,12 @@ public abstract class NavigationAggregation<LINKOBJECT> extends Controller {
      * @throws GroupCouldNotBeFilled
      */
     @SuppressWarnings("unchecked")
-    private void proccess(final IDataAccessContext dac, final Configuration<?>[] configuration,
+    private void proccess(final IDataAccessContext dac, final Map<ConfigurationType, Configuration<?>> configuration,
             final Map<Object, Object> parameters)
             throws GroupCouldNotBeFilled, InvalidBuildRule {
 
-        final ControllerConfiguration configK = (ControllerConfiguration) JCmsHelper.getConfigurationByType(
-                ControllerConfiguration.TYPE, configuration);
-        final ContentRepository configC = (ContentRepository) JCmsHelper.getConfigurationByType(
-                ContentRepository.TYPE, configuration);
+        final ControllerConfiguration configK = (ControllerConfiguration) configuration.get(ControllerConfiguration.TYPE);
+        final ContentRepository configC = (ContentRepository) configuration.get(ContentRepository.TYPE);
 
         if (configC == null || configK == null) {
             throw new IllegalArgumentException("Missing configurations");
@@ -104,7 +102,7 @@ public abstract class NavigationAggregation<LINKOBJECT> extends Controller {
                     }
                 }
                 final StringList targets = new StringList(instruction.get("target"));
-                saveLinkDTOs(configC, targets, contents, configuration, parameters);
+                saveLinkDTOs(targets, contents, configuration, parameters);
             }
         }
     }
@@ -117,7 +115,7 @@ public abstract class NavigationAggregation<LINKOBJECT> extends Controller {
      * @return
      */
     protected abstract LINKOBJECT getLinkDTO(final String href, final String usecaseId,
-            final Configuration<?>[] configuration,
+            final Map<ConfigurationType, Configuration<?>> configuration,
             final Map<Object, Object> parameters);
 
     /**
@@ -127,9 +125,7 @@ public abstract class NavigationAggregation<LINKOBJECT> extends Controller {
      * @param targets
      * @param dtos
      */
-    protected abstract void saveLinkDTOs(final ContentRepository configC, final StringList targets,
-            final List<LINKOBJECT> dtos,
-            final Configuration<?>[] configuration,
-            final Map<Object, Object> parameters);
+    protected abstract void saveLinkDTOs(final StringList targets, final List<LINKOBJECT> dtos,
+            final Map<ConfigurationType, Configuration<?>> configuration, final Map<Object, Object> parameters);
 
 }

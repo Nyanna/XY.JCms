@@ -15,7 +15,7 @@ package net.xy.jcms.shared;
 import net.xy.jcms.controller.configurations.UIConfiguration.UI;
 
 /**
- * abstract component functionality singleton pattern trough an cachepool
+ * abstract component functionality. singleton pattern trough an cachepool.
  * 
  * @author Xyan
  * 

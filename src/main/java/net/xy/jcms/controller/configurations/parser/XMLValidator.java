@@ -32,7 +32,8 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
- * validated xml accordingly to their dtd loaded from classpath dtd directory
+ * validated xml accordingly to their dtd loaded from classpath dtd directory. Needed because some stax implementations
+ * don't support validation.
  * 
  * @author Xyan
  * 
@@ -44,8 +45,7 @@ public class XMLValidator {
     private final static Logger LOG = Logger.getLogger(XMLValidator.class);
 
     /**
-     * delegate which loads the inputstream from string in current thread
-     * context
+     * delegate which loads the inputstream from string via given loader
      * 
      * @param xml
      * @throws XMLValidationException
@@ -132,7 +132,7 @@ public class XMLValidator {
     }
 
     /**
-     * handler for the sax parser
+     * handler for the sax parser, implements handler and resolver.
      * 
      * @author Xyan
      * 
@@ -188,13 +188,11 @@ public class XMLValidator {
         }
 
         @Override
-        public void notationDecl(final String name, final String publicId, final String systemId) throws SAXException {
-        }
+        public void notationDecl(final String name, final String publicId, final String systemId) throws SAXException {}
 
         @Override
         public void unparsedEntityDecl(final String name, final String publicId, final String systemId,
                 final String notationName)
-                throws SAXException {
-        }
+                throws SAXException {}
     }
 }

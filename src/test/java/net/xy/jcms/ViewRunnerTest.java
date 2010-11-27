@@ -26,6 +26,7 @@ import net.xy.jcms.controller.configurations.MessageConfiguration;
 import net.xy.jcms.controller.configurations.RenderKitConfiguration;
 import net.xy.jcms.controller.configurations.TemplateConfiguration;
 import net.xy.jcms.controller.configurations.UIConfiguration;
+import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
 import net.xy.jcms.portal.components.TextComponent;
 import net.xy.jcms.portal.renderer.ITextRenderer;
 import net.xy.jcms.portal.renderer.TextRenderer;
@@ -85,32 +86,35 @@ public class ViewRunnerTest {
 
     @Test
     public void testViewRunner() {
-        final Configuration<?>[] test = new Configuration<?>[] {
-                new TemplateConfiguration(new HashMap<String, IFragment>() {
-                    private static final long serialVersionUID = -4045340286970438413L;
+        final Map<ConfigurationType, Configuration<?>> test = new HashMap<Configuration.ConfigurationType, Configuration<?>>();
+        test.put(ConfigurationType.TemplateConfiguration, new TemplateConfiguration(new HashMap<String, IFragment>() {
+            private static final long serialVersionUID = -4045340286970438413L;
 
-                    {
-                        put("root", new TestFragement());
-                    }
-                }), new UIConfiguration(new Properties() {
-                    private static final long serialVersionUID = -1203791194278285716L;
+            {
+                put("root", new TestFragement());
+            }
+        }));
+        test.put(ConfigurationType.UIConfiguration, new UIConfiguration(new Properties() {
+            private static final long serialVersionUID = -1203791194278285716L;
 
-                    {
-                        put("testus", "steronus");
-                    }
-                }), new MessageConfiguration(new Properties() {
-                    private static final long serialVersionUID = -9001849818985539140L;
+            {
+                put("testus", "steronus");
+            }
+        }));
+        test.put(ConfigurationType.MessageConfiguration, new MessageConfiguration(new Properties() {
+            private static final long serialVersionUID = -9001849818985539140L;
 
-                    {
-                        put("text", "steronus1");
-                    }
-                }), new RenderKitConfiguration(new HashMap<String, IRenderer>() {
-                    private static final long serialVersionUID = 8311301144389878165L;
+            {
+                put("text", "steronus1");
+            }
+        }));
+        test.put(ConfigurationType.RenderKitConfiguration, new RenderKitConfiguration(new HashMap<String, IRenderer>() {
+            private static final long serialVersionUID = 8311301144389878165L;
 
-                    {
-                        put(ITextRenderer.class.getSimpleName(), new TextRenderer());
-                    }
-                }) };
+            {
+                put(ITextRenderer.class.getSimpleName(), new TextRenderer());
+            }
+        }));
 
         final ComponentConfiguration result = ViewRunner.runConfiguration(test);
         System.out.append(result.toString() + "\n");

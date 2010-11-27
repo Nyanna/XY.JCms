@@ -19,6 +19,12 @@ import javax.servlet.ServletOutputStream;
 import org.apache.log4j.Logger;
 import net.xy.jcms.shared.IOutWriter;
 
+/**
+ * adapts stream processing to an servlet context
+ * 
+ * @author xyan
+ * 
+ */
 public class ServletOutputStreamAdapter implements IOutWriter {
     /**
      * logger
@@ -26,12 +32,12 @@ public class ServletOutputStreamAdapter implements IOutWriter {
     static final Logger LOG = Logger.getLogger(ServletOutputStreamAdapter.class);
 
     /**
-     * outstream
+     * outstream reference
      */
     private final ServletOutputStream outStream;
 
     /**
-     * outwriter
+     * outwriter reference
      */
     private final PrintWriter writer;
 
@@ -51,7 +57,7 @@ public class ServletOutputStreamAdapter implements IOutWriter {
     }
 
     /**
-     * constructor for writter
+     * constructor for writter/charachter output
      * 
      * @param writer
      */
@@ -97,7 +103,7 @@ public class ServletOutputStreamAdapter implements IOutWriter {
     }
 
     /**
-     * returns the buffer stored for putput caching
+     * returns the buffer stored for output caching
      * 
      * @return value
      */

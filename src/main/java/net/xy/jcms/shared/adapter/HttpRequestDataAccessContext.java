@@ -29,7 +29,7 @@ import net.xy.jcms.shared.DebugUtils;
 import net.xy.jcms.shared.IDataAccessContext;
 
 /**
- * http protocol adapter for DataAccessContext
+ * http protocol adapter for DataAccessContext, ectracts all needed informations out from an http request
  * 
  * @author Xyan
  * 
@@ -37,7 +37,7 @@ import net.xy.jcms.shared.IDataAccessContext;
 public class HttpRequestDataAccessContext implements IDataAccessContext {
 
     /**
-     * represents the root url of this app
+     * represents the root url of this app, used to generate links
      */
     private final URI rootUrl;
 
@@ -52,10 +52,17 @@ public class HttpRequestDataAccessContext implements IDataAccessContext {
     private final String requestPath;
 
     /**
-     * stores DAC properties only
+     * stores DAC properties only, should only be used to access data not to conrtroll usecases
      */
     private final Map<Object, Object> properties = new HashMap<Object, Object>();
 
+    /**
+     * default constructor
+     * 
+     * @param request
+     * @throws MalformedURLException
+     * @throws URISyntaxException
+     */
     public HttpRequestDataAccessContext(final HttpServletRequest request) throws MalformedURLException,
             URISyntaxException {
         // gets cappsubrand default locale and various other jj related

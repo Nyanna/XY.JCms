@@ -58,13 +58,13 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
          */
         UIConfiguration,
         /**
-         * this configuration gots refilled into cinfiguration objects for the
-         * include fragments components building the componenttree.
+         * this configuration gots refilled into configuration objects for the
+         * including fragments components building the componenttree.
          */
         TemplateConfiguration,
         /**
          * the message configuration gots refilled into the component
-         * configuration objects
+         * configuration objects and also will be used by controllers
          */
         MessageConfiguration,
         /**
@@ -74,7 +74,7 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
         ControllerConfiguration,
         /**
          * usually an renderfactory which provides the renderer for the
-         * component configuration
+         * component configuration. will be refilled to each component.
          */
         RenderKitConfiguration,
         /**
@@ -93,10 +93,13 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
          * all configuration will be additionally obmitted to the controllers
          */
         public static final EnumSet<ConfigurationType> CONTROLLERAPPLICABLE = EnumSet.of(ControllerConfiguration);
+        static {
+            CONTROLLERAPPLICABLE.addAll(VIEWAPPLICABLE);
+        }
     }
 
     /**
-     * what kind of configuration should only n abstract view no jj models
+     * what kind of configuration should only abstract view no jj models
      */
     private final ConfigurationType configurationType;
 
@@ -111,6 +114,9 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
      * configuration.
      */
     private final String configurationSource;
+
+    // TODO write source from extern configuration in config i forgot, hm think
+    // about merging strategy
 
     /**
      * constructor with obmited config object
@@ -175,9 +181,31 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
     /**
      * implements joining of configurations
      * 
-     * @param otherConfig
+     * @param otherConfig2
      */
-    public abstract void mergeConfiguration(final Configuration<CONFIGURATION_OBJECT> otherConfig);
+    public abstract Configuration<CONFIGURATION_OBJECT> mergeConfiguration(
+            final Configuration<CONFIGURATION_OBJECT> otherConfig2);
+
+    /**
+     * implements joining of an config and an other config object
+     * 
+     * @param configObject
+     * @return
+     */
+    public abstract Configuration<CONFIGURATION_OBJECT> mergeConfiguration(final CONFIGURATION_OBJECT configObject);
+
+    /**
+     * public method for merging two configs of the same type
+     * 
+     * @param otherConfig1
+     * @param otherConfig2
+     * @return an new config of 1 and 2
+     */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public static Configuration mergeConfiguration(final Configuration otherConfig1,
+            final Configuration otherConfig2) {
+        return otherConfig1.mergeConfiguration(otherConfig2);
+    }
 
     /**
      * for hashing each view configuration has to implement there own hashing
@@ -251,5 +279,18 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
         } catch (final IOException e) {
         }
         return initByString(type, writer.toString(), loader);
+    }
+
+    /**
+     * by default caching is enabled but it can for optimization purpose
+     * deactivated
+     */
+    protected boolean enableCache = true;
+
+    /**
+     * @return if this config is mutable
+     */
+    public boolean disableCache() {
+        return true;
     }
 }

@@ -45,6 +45,11 @@ public class RenderKitConfigurationProxy extends RenderKitConfiguration {
         super(new HashMap<Object, IRenderer>());
     }
 
+    /**
+     * proxy passing the specified config
+     * 
+     * @param config
+     */
     public RenderKitConfigurationProxy(final RenderKitConfiguration config) {
         super(config.getConfigurationValue());
     }

@@ -1,18 +1,18 @@
 /**
- *  This file is part of XY.JCms, Copyright 2010 (C) Xyan Kruse, Xyan@gmx.net, Xyan.kilu.de
- *
- *  XY.JCms is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  XY.JCms is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with XY.JCms.  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of XY.JCms, Copyright 2010 (C) Xyan Kruse, Xyan@gmx.net, Xyan.kilu.de
+ * 
+ * XY.JCms is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * XY.JCms is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with XY.JCms. If not, see <http://www.gnu.org/licenses/>.
  */
 package net.xy.jcms.controller.configurations;
 
@@ -21,7 +21,7 @@ import java.util.Iterator;
 import org.apache.commons.lang.StringUtils;
 
 /**
- * provides helper methods for iterating ofer component configuration tree's
+ * provides helper methods for iterating over component configuration tree's
  * 
  * @author xyan
  * 
@@ -181,11 +181,11 @@ public class ConfigurationIterationStrategy {
     }
 
     /**
-     * returns only the component and ists key comp.key
+     * returns only the component and its key comp.key
      * 
      * @param actual
      * @param requestedKey
-     * @return
+     * @return value
      */
     public static String componentId(final ComponentConfiguration actual, final String requestedKey) {
         return actual.getId() + ComponentConfiguration.COMPONENT_PATH_SEPARATOR + requestedKey;

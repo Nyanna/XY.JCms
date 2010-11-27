@@ -13,7 +13,6 @@
 package net.xy.jcms.controller.configurations;
 
 import java.util.Properties;
-import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -33,15 +32,22 @@ public abstract class AbstractPropertyBasedConfiguration extends Configuration<P
      * @param configurationType
      * @param configurationValue
      */
-    public AbstractPropertyBasedConfiguration(final ConfigurationType configurationType, final Properties configurationValue) {
+    public AbstractPropertyBasedConfiguration(final ConfigurationType configurationType,
+            final Properties configurationValue) {
         super(configurationType, configurationValue);
     }
 
-    @Override
-    public void mergeConfiguration(final Configuration<Properties> otherConfig) {
-        for (final Entry<Object, Object> entry : otherConfig.getConfigurationValue().entrySet()) {
-            getConfigurationValue().put(entry.getKey(), entry.getValue());
-        }
+    /**
+     * merges two pproperties
+     * 
+     * @param config1
+     * @param config2
+     * @return
+     */
+    protected Properties mergeConfiguration(final Properties config1, final Properties config2) {
+        final Properties result = new Properties(config1);
+        result.putAll(config2);
+        return result;
     }
 
     @Override
@@ -55,7 +61,7 @@ public abstract class AbstractPropertyBasedConfiguration extends Configuration<P
     }
 
     /**
-     * parses an string to an property
+     * parses an string to an property object
      * 
      * @param configString
      * @return value

@@ -60,6 +60,12 @@ public class RenderKitConfiguration extends Configuration<Map<?, IRenderer>> {
     }
 
     /**
+     * stores found config requests to save iteration strategies
+     */
+    private final Map<String, Match<String, IRenderer>> cache = enableCache ? new HashMap<String, Match<String, IRenderer>>()
+            : null;
+
+    /**
      * return the singleton renderer instance and where it was found, closure.
      * -full component path comp1.comp2.comp3.key
      * -parents comp1.comp2.key, comp1.key
@@ -70,8 +76,16 @@ public class RenderKitConfiguration extends Configuration<Map<?, IRenderer>> {
      */
     public Match<String, IRenderer> getMatch(final Class<? extends IRenderer> rInterface,
             final ComponentConfiguration config) {
+        final String key = rInterface.getSimpleName();
+        final String fullPathKey = ConfigurationIterationStrategy.fullPath(config, key);
+        if (enableCache) {
+            final Match<String, IRenderer> cached = cache.get(fullPathKey);
+            if (cached != null) {
+                return cached;
+            }
+        }
         Match<String, IRenderer> value = new Match<String, IRenderer>(null, null);
-        final ClimbUp strategy = new ClimbUp(config, rInterface.getSimpleName());
+        final ClimbUp strategy = new ClimbUp(config, key);
         final List<String> retrievalStack = new ArrayList<String>();
         for (final String pathKey : strategy) {
             retrievalStack.add(pathKey);
@@ -82,17 +96,26 @@ public class RenderKitConfiguration extends Configuration<Map<?, IRenderer>> {
             }
         }
         if (value.getValue() != null) {
+            if (enableCache) {
+                cache.put(fullPathKey, value);
+            }
             return value;
         } else {
             throw new IllegalArgumentException("An mendatory renderer was missing! "
-                    + DebugUtils.printFields(rInterface, retrievalStack));
+                    + DebugUtils.printFields(key, retrievalStack));
         }
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
-    public void mergeConfiguration(final Configuration<Map<?, IRenderer>> otherConfig) {
-        getConfigurationValue().putAll((Map) otherConfig.getConfigurationValue());
+    public RenderKitConfiguration mergeConfiguration(final Configuration<Map<?, IRenderer>> otherConfig) {
+        return mergeConfiguration(otherConfig.getConfigurationValue());
+    }
+
+    @Override
+    public RenderKitConfiguration mergeConfiguration(final Map<?, IRenderer> otherConfig) {
+        final Map<Object, IRenderer> result = new HashMap<Object, IRenderer>(getConfigurationValue());
+        result.putAll(otherConfig);
+        return new RenderKitConfiguration(result);
     }
 
     @Override

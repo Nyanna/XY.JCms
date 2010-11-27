@@ -13,7 +13,9 @@
 package net.xy.jcms.controller.configurations;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import net.xy.jcms.controller.configurations.ConfigurationIterationStrategy.ClimbUp;
 import net.xy.jcms.shared.DebugUtils;
@@ -28,7 +30,7 @@ import org.apache.commons.lang.StringUtils;
  */
 public class UIConfiguration extends AbstractPropertyBasedConfiguration {
     /**
-     * gloabl type constant for this type
+     * global type constant for this type
      */
     public static final ConfigurationType TYPE = ConfigurationType.UIConfiguration;
 
@@ -52,6 +54,12 @@ public class UIConfiguration extends AbstractPropertyBasedConfiguration {
     }
 
     /**
+     * stores found config requests to save iteration strategies
+     */
+    private final Map<String, Match<String, Object>> cache = enableCache ? new HashMap<String, Match<String, Object>>()
+            : null;
+
+    /**
      * retrieves an key:
      * iterable true:
      * -check full qualified path key, comp1.comp2.comp3.key
@@ -62,9 +70,18 @@ public class UIConfiguration extends AbstractPropertyBasedConfiguration {
      * 
      * @param ui
      * @param config
-     * @return
+     * @return value
      */
     public Match<String, Object> getConfigMatch(final UI<?> ui, final ComponentConfiguration config) {
+        final String fullPathKey = ConfigurationIterationStrategy.fullPath(config, ui.getKey());
+        if (enableCache) {
+            final Match<String, Object> cached = cache.get(fullPathKey);
+            if (cached != null) {
+                return cached;
+            }
+        }
+
+        // retrieval
         Match<String, Object> value = new Match<String, Object>(null, null);
         final List<String> retrievalStack = new ArrayList<String>();
         if (ui.isIterate()) {
@@ -82,20 +99,26 @@ public class UIConfiguration extends AbstractPropertyBasedConfiguration {
                 }
             }
         } else {
-            final String pathKey = ConfigurationIterationStrategy.fullPath(config, ui.getKey());
-            final Object found = getConfigurationValue().get(pathKey);
-            retrievalStack.add(pathKey);
+            final Object found = getConfigurationValue().get(fullPathKey);
+            retrievalStack.add(fullPathKey);
             // type check based on class parameter
             if (found != null && !rightType(ui, found)) {
                 throw new IllegalArgumentException("An vital ui configuration is not the right object type!");
             }
-            value = new Match<String, Object>(pathKey, found);
+            value = new Match<String, Object>(fullPathKey, found);
         }
         if (value.getValue() != null) {
+            if (enableCache) {
+                cache.put(fullPathKey, value);
+            }
             return value;
-        } else if (value.getValue() == null && ui.getDefaultValue() != null && !(ui.getDefaultValue() instanceof Class<?>)) {
-            return new Match<String, Object>("#" + ConfigurationIterationStrategy.fullPath(config, ui.getKey()),
-                    ui.getDefaultValue());
+        } else if (value.getValue() == null && ui.getDefaultValue() != null
+                && !(ui.getDefaultValue() instanceof Class<?>)) {
+            final Match<String, Object> mFound = new Match<String, Object>("#" + fullPathKey, ui.getDefaultValue());
+            if (enableCache) {
+                cache.put(fullPathKey, mFound);
+            }
+            return mFound;
         } else {
             throw new IllegalArgumentException("An vital ui configuration is missing, check the configuration! "
                     + DebugUtils.printFields(retrievalStack));
@@ -255,6 +278,16 @@ public class UIConfiguration extends AbstractPropertyBasedConfiguration {
         public String toString() {
             return DebugUtils.printFields(key, defaultValue);
         }
+    }
+
+    @Override
+    public UIConfiguration mergeConfiguration(final Configuration<Properties> otherConfig2) {
+        return mergeConfiguration(otherConfig2.getConfigurationValue());
+    }
+
+    @Override
+    public UIConfiguration mergeConfiguration(final Properties otherConfig2) {
+        return new UIConfiguration(mergeConfiguration(getConfigurationValue(), otherConfig2));
     }
 
 }

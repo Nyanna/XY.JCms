@@ -85,7 +85,7 @@ public class DynamicFragment extends AbstractFragment {
         /**
          * gets the type
          * 
-         * @return
+         * @return value
          */
         public ElementType getType() {
             return type;
@@ -94,7 +94,7 @@ public class DynamicFragment extends AbstractFragment {
         /**
          * gets the value
          * 
-         * @return
+         * @return value
          */
         public String getValue() {
             return value;

@@ -16,9 +16,8 @@ import java.util.Map;
 
 /**
  * a context in which all information are provided who are vital to access external resources. Formaly known as portal
- * context, request context, portal configuration, cappsubrand and vice versa. It will be filled by an factory injected
- * and configured with spring or/and with request information. Access to the containing data is only made in the
- * aggregator layer who knows which underlying service need what for information to provide data.
+ * context, request context, portal configuration, cappsubrand and vice versa. It will be protocol dependent filled.
+ * Access will only be granted in the aggregation layer.
  * 
  * @author xyan
  * 

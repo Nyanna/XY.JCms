@@ -39,6 +39,7 @@ import net.xy.jcms.controller.configurations.UIConfiguration;
 import net.xy.jcms.controller.configurations.UIConfiguration.UI;
 import net.xy.jcms.controller.configurations.UIConfigurationProxy;
 import net.xy.jcms.shared.IDataAccessContext;
+import net.xy.jcms.shared.JCmsHelper;
 import net.xy.jcms.JavaRunner.JavaDataAccessContext;
 
 import org.apache.commons.lang.StringUtils;
@@ -68,7 +69,7 @@ public class JavaConfigCollector {
      * @return value
      * @throws ExecutionException
      */
-    public static Configuration<?>[] getConfig(final String request, final Map<String, Object> params,
+    public static Map<ConfigurationType, Configuration<?>> getConfig(final String request, final Map<String, Object> params,
             IDataAccessContext dac) throws ExecutionException {
         /**
          * DAC would be obmitted, or fresh created
@@ -90,6 +91,7 @@ public class JavaConfigCollector {
         // NALKey forward = fillWithParams(firstForward,parrams);
 
         Usecase usecase;
+        Map<ConfigurationType, Configuration<?>> configs;
         do {
             /**
              * find the corresponding usecase
@@ -111,17 +113,19 @@ public class JavaConfigCollector {
              * run the controllers for the usecase, maybe redirect to another
              * usecase.
              */
-            forward = UsecaseAgent.executeController(usecase, dac, forward.getParameters());
+            configs = usecase.getConfigurations(ConfigurationType.CONTROLLERAPPLICABLE);
+            forward = UsecaseAgent.executeController(usecase.getControllerList(), configs, dac, forward.getParameters());
         } while (forward != null);
 
         /**
          * get the configurationtree for the usecase from an empty run through
          * the componenttree
          */
-        final Configuration<?>[] viewConfig = usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE);
+        final Map<ConfigurationType, Configuration<?>> viewConfigs = JCmsHelper.getConfigurations(
+                ConfigurationType.VIEWAPPLICABLE, configs);
         @SuppressWarnings("unused")
-        final ComponentConfiguration confTree = ViewRunner.runConfiguration(viewConfig);
-        return viewConfig;
+        final ComponentConfiguration confTree = ViewRunner.runConfiguration(viewConfigs);
+        return viewConfigs;
     }
 
     /**
@@ -144,11 +148,12 @@ public class JavaConfigCollector {
         try {
             final long start = System.currentTimeMillis();
             // LOG.info("Configuration aggregation started: " + start);
-            final Configuration<?>[] configs = getConfig(request, params, dac);
+            final Map<ConfigurationType, Configuration<?>> configs = getConfig(request, params, dac);
             LOG.info("Execution succeeded in milliseconds "
                     + new DecimalFormat("###,###,### \u039C").format((System.currentTimeMillis() - start)));
 
-            for (final Configuration<?> config : configs) {
+            for (final Entry<ConfigurationType, Configuration<?>> mEntry : configs.entrySet()) {
+                final Configuration<?> config = mEntry.getValue();
                 switch (config.getConfigurationType()) {
                 case UIConfiguration:
                     final Map<String, UI<?>> uis;

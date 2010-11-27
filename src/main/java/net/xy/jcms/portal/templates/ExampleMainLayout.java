@@ -21,6 +21,12 @@ import net.xy.jcms.portal.components.TextComponent;
 import net.xy.jcms.shared.AbstractFragment;
 import net.xy.jcms.shared.IOutWriter;
 
+/**
+ * test fragment
+ * 
+ * @author xyan
+ * 
+ */
 public class ExampleMainLayout extends AbstractFragment {
 
     @Override

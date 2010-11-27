@@ -23,11 +23,17 @@ import net.xy.jcms.controller.NavigationAbstractionLayer.NALKey;
 import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.ContentRepository;
 import net.xy.jcms.controller.configurations.ControllerConfiguration;
+import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
 import net.xy.jcms.shared.IDataAccessContext;
-import net.xy.jcms.shared.JCmsHelper;
 import net.xy.jcms.shared.types.StringList;
 import net.xy.jcms.shared.types.StringMap;
 
+/**
+ * abstract handler for including images,css,js mainly static resources
+ * 
+ * @author xyan
+ * 
+ */
 abstract public class StaticsInclusion extends Controller {
 
     /**
@@ -36,21 +42,19 @@ abstract public class StaticsInclusion extends Controller {
     private static final String INSTRUCTION_SECTION = "include";
 
     @Override
-    public NALKey invoke(final IDataAccessContext dac, final Configuration<?>[] configuration) {
+    public NALKey invoke(final IDataAccessContext dac, final Map<ConfigurationType, Configuration<?>> configuration) {
         return invoke(dac, configuration, new HashMap<Object, Object>());
     }
 
     @Override
-    public NALKey invoke(final IDataAccessContext dac, final Configuration<?>[] configuration,
+    public NALKey invoke(final IDataAccessContext dac, final Map<ConfigurationType, Configuration<?>> configuration,
             final Map<Object, Object> parameters) {
-        final ControllerConfiguration configK = (ControllerConfiguration) JCmsHelper.getConfigurationByType(
-                ControllerConfiguration.TYPE, configuration);
-        final ContentRepository configC = (ContentRepository) JCmsHelper.getConfigurationByType(
-                ContentRepository.TYPE, configuration);
+        final ControllerConfiguration configK = (ControllerConfiguration) configuration.get(ControllerConfiguration.TYPE);
+        final ContentRepository configC = (ContentRepository) configuration.get(ContentRepository.TYPE);
         if (configC == null || configK == null) {
             throw new IllegalArgumentException("Missing configurations");
         }
-        proccess(configK, configC, dac);
+        proccess(configK, configC, configuration, dac);
         return null;
     }
 
@@ -62,7 +66,8 @@ abstract public class StaticsInclusion extends Controller {
      */
     @SuppressWarnings("unchecked")
     private void proccess(final ControllerConfiguration configK, final ContentRepository configC,
-            final IDataAccessContext dac) {
+            final Map<ConfigurationType, Configuration<?>> configuration, final IDataAccessContext dac) {
+        final Map<String, Object> aggregatedContent = new HashMap<String, Object>();
         final Map<String, Object> ownC = getControllerConfig(configK);
         if (ownC.get(INSTRUCTION_SECTION) instanceof List) {
             for (final Map<Object, String> instruction : (List<Map<Object, String>>) ownC.get(INSTRUCTION_SECTION)) {
@@ -110,11 +115,12 @@ abstract public class StaticsInclusion extends Controller {
                 // put in targets
                 if (finalContent != null) {
                     for (final String target : new StringList(instruction.get("target"))) {
-                        configC.putContent(target, finalContent);
+                        aggregatedContent.put(target, finalContent);
                     }
                 }
             }
         }
+        configuration.put(ContentRepository.TYPE, configC.mergeConfiguration(aggregatedContent));
     }
 
     /**

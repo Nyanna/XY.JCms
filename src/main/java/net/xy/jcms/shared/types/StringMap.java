@@ -22,7 +22,7 @@ import java.util.Map;
 import net.xy.jcms.shared.IConverter;
 
 /**
- * simpele typesation
+ * simple typesation of an stringmap
  * 
  * @author xyan
  * 

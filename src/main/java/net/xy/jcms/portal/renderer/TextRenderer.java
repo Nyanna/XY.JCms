@@ -13,7 +13,7 @@
 package net.xy.jcms.portal.renderer;
 
 /**
- * an simple text renderer
+ * an simple text renderer, with the abbility to render html containers.
  * 
  * @author Xyan
  * 

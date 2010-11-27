@@ -17,7 +17,8 @@
 package net.xy.jcms.shared;
 
 /**
- * an interface for loose coupled type conversion from property strings
+ * an interface for loose coupled type conversion from/to property strings. can be used for human readable configuration
+ * mainly via xml.
  * 
  * @author Xyan
  * 

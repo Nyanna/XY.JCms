@@ -27,12 +27,12 @@ public class ContentRepositoryProxy extends ContentRepository {
     /**
      * collects the desired but missing content
      */
-    private final Map<String, Class<?>> missingContent = new TreeMap<String, Class<?>>(String.CASE_INSENSITIVE_ORDER);
+    private Map<String, Class<?>> missingContent = new TreeMap<String, Class<?>>(String.CASE_INSENSITIVE_ORDER);
 
     /**
      * collects the desired and present content
      */
-    private final Map<String, Class<?>> presentContent = new TreeMap<String, Class<?>>(String.CASE_INSENSITIVE_ORDER);
+    private Map<String, Class<?>> presentContent = new TreeMap<String, Class<?>>(String.CASE_INSENSITIVE_ORDER);
 
     /**
      * default empty content
@@ -48,6 +48,15 @@ public class ContentRepositoryProxy extends ContentRepository {
      */
     public ContentRepositoryProxy(final ContentRepository config) {
         super(config.getConfigurationValue());
+    }
+
+    /**
+     * initializes proxy by its configuration value
+     * 
+     * @param configValue
+     */
+    public ContentRepositoryProxy(final Map<String, Object> configValue) {
+        super(configValue);
     }
 
     @Override
@@ -108,4 +117,18 @@ public class ContentRepositoryProxy extends ContentRepository {
         return missingContent.isEmpty() ? false : true;
     }
 
+    @Override
+    public ContentRepositoryProxy mergeConfiguration(final Configuration<Map<String, Object>> otherConfig) {
+        return mergeConfiguration(otherConfig.getConfigurationValue());
+    }
+
+    @Override
+    public ContentRepositoryProxy mergeConfiguration(final Map<String, Object> otherConfig) {
+        final Map<String, Object> result = new HashMap<String, Object>(getConfigurationValue());
+        result.putAll(otherConfig);
+        final ContentRepositoryProxy newOne = new ContentRepositoryProxy(result);
+        newOne.missingContent = missingContent;
+        newOne.presentContent = presentContent;
+        return newOne;
+    }
 }

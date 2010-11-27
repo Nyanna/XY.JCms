@@ -24,7 +24,9 @@ import org.apache.commons.lang.StringUtils;
 import net.xy.jcms.shared.IController;
 
 /**
- * configures the controller sectionwise and global
+ * configures the controller sectionwise and global. has an internal structure
+ * of global space, controller specific
+ * spaces and within controller instructions.
  * 
  * @author Xyan
  * 
@@ -46,10 +48,10 @@ public class ControllerConfiguration extends Configuration<Map<String, Map<Strin
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
-    public void mergeConfiguration(final Configuration<Map<String, Map<String, Object>>> otherConfig) {
+    public ControllerConfiguration mergeConfiguration(final Map<String, Map<String, Object>> otherConfig) {
         // controller section got separately merged
-        final Map<String, Map<String, Object>> own = getConfigurationValue();
-        for (final Entry<String, Map<String, Object>> ctrSec : otherConfig.getConfigurationValue().entrySet()) {
+        final Map<String, Map<String, Object>> own = new HashMap<String, Map<String, Object>>(getConfigurationValue());
+        for (final Entry<String, Map<String, Object>> ctrSec : otherConfig.entrySet()) {
             final String ctrlName = ctrSec.getKey();
             if (!own.containsKey(ctrlName)) {
                 // ctrl config don't exist simply add
@@ -58,12 +60,14 @@ public class ControllerConfiguration extends Configuration<Map<String, Map<Strin
             }
             // else process ctrl config
             for (final Entry<String, Object> ctrItem : ctrSec.getValue().entrySet()) {
-                // object can be an simple value or an list in case of instructions
+                // object can be an simple value or an list in case of
+                // instructions
                 if (!List.class.isInstance(ctrItem.getValue())) {
                     // simple overwrite
                     own.get(ctrlName).put(ctrItem.getKey(), ctrItem.getValue());
                 }
-                // when list append, warning two different listtypes cant be merged
+                // when list append, warning two different listtypes cant be
+                // merged
                 final List otherList = (List) ctrItem.getValue();
                 final Object thisValue = own.get(ctrlName).get(ctrItem.getKey());
                 // two possibilities, own value is a list or not
@@ -75,6 +79,12 @@ public class ControllerConfiguration extends Configuration<Map<String, Map<Strin
                 }
             }
         }
+        return new ControllerConfiguration(own);
+    }
+
+    @Override
+    public ControllerConfiguration mergeConfiguration(final Configuration<Map<String, Map<String, Object>>> otherConfig) {
+        return mergeConfiguration(otherConfig.getConfigurationValue());
     }
 
     /**

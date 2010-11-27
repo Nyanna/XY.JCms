@@ -17,8 +17,8 @@ import net.xy.jcms.shared.IFragment;
 import net.xy.jcms.shared.IRenderer;
 
 /**
- * fragment configuratio scheme. an fragment is almost an component except of the following restriktions: -an fragment
- * can't own message or ui configuration and can't request renderers
+ * fragment configuratio scheme. an fragment is almost an component except of the following restriktions:
+ * -an fragment can't own message or ui configuration and can't request renderers
  * 
  * @author Xyan
  * 
@@ -62,5 +62,40 @@ public abstract class FragmentConfiguration extends ComponentConfiguration {
     @Override
     public void setUIConfig(final String key, final Object value) {
         throw new IllegalArgumentException("Setting an UI config on an Template/Fragment is not supported!");
+    }
+
+    @Override
+    public String getMessage(final String key) {
+        throw new UnsupportedOperationException("Method is not supported for an fragment configuration.");
+    }
+
+    @Override
+    public Object getRenderer(final Class<? extends IRenderer> rIface) {
+        throw new UnsupportedOperationException("Method is not supported for an fragment configuration.");
+    }
+
+    @Override
+    public Object getUIConfig(final String key) {
+        throw new UnsupportedOperationException("Method is not supported for an fragment configuration.");
+    }
+
+    @Override
+    public Boolean getUIConfigBoolean(final String key) {
+        throw new UnsupportedOperationException("Method is not supported for an fragment configuration.");
+    }
+
+    @Override
+    public Integer getUIConfigInteger(final String key) {
+        throw new UnsupportedOperationException("Method is not supported for an fragment configuration.");
+    }
+
+    @Override
+    public Long getUIConfigLong(final String key) {
+        throw new UnsupportedOperationException("Method is not supported for an fragment configuration.");
+    }
+
+    @Override
+    public String getUIConfigString(final String key) {
+        throw new UnsupportedOperationException("Method is not supported for an fragment configuration.");
     }
 }

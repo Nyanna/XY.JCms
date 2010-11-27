@@ -17,6 +17,12 @@ import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
 
+/**
+ * common base renderer for xhtml
+ * 
+ * @author xyan
+ * 
+ */
 public class BaseRenderer implements IBaseRenderer {
 
     @Override

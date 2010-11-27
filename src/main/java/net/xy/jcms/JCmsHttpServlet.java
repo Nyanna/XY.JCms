@@ -15,6 +15,7 @@ package net.xy.jcms;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.DecimalFormat;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -35,6 +36,7 @@ import net.xy.jcms.controller.configurations.ComponentConfiguration;
 import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
 import net.xy.jcms.shared.IDataAccessContext;
+import net.xy.jcms.shared.JCmsHelper;
 import net.xy.jcms.shared.adapter.HttpProtocolRequestAdapter;
 import net.xy.jcms.shared.adapter.HttpProtocolResponseAdapter;
 import net.xy.jcms.shared.adapter.HttpRequestDataAccessContext;
@@ -104,6 +106,7 @@ public class JCmsHttpServlet extends HttpServlet {
         NALKey forward = HttpProtocolRequestAdapter.apply(request, firstForward);
         NALKey cacheKey;
         Usecase usecase;
+        Map<ConfigurationType, Configuration<?>> configs;
         do {
             /**
              * find the corresponding usecase
@@ -121,21 +124,22 @@ public class JCmsHttpServlet extends HttpServlet {
              * usecase. there should also be an expiration contoller for http to
              * use client caching feature.
              */
-            forward = UsecaseAgent.executeController(usecase, dac, forward.getParameters());
+            configs = usecase.getConfigurations(ConfigurationType.CONTROLLERAPPLICABLE);
+            forward = UsecaseAgent.executeController(usecase.getControllerList(), configs, dac, forward.getParameters());
         } while (forward != null);
 
         // run the protocol response adapter, which fills for http as an example
         // the headers, sets cookies
-        HttpProtocolResponseAdapter.apply(response,
-                usecase.getConfigurationList(ConfigurationType.CONTROLLERAPPLICABLE));
+        HttpProtocolResponseAdapter.apply(response, configs.get(ConfigurationType.ControllerConfiguration));
 
         /**
          * at this point late caching takes effect by the safe asumption that
          * the same configuration leads to the same result. realized through
          * hashing and persistance.
          */
-        final String output = UsecaseAgent.applyCaching(usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE),
-                cacheKey, null);
+        final Map<ConfigurationType, Configuration<?>> viewConfigs = JCmsHelper.getConfigurations(
+                ConfigurationType.VIEWAPPLICABLE, configs);
+        final String output = UsecaseAgent.applyCaching(viewConfigs, cacheKey, null);
 
         if (output != null) {
             response.getWriter().append(output);
@@ -145,8 +149,7 @@ public class JCmsHttpServlet extends HttpServlet {
              * through the componenttree. give the run all view dependent
              * configs.
              */
-            final Configuration<?>[] viewConfig = usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE);
-            final ComponentConfiguration confTree = ViewRunner.runConfiguration(viewConfig);
+            final ComponentConfiguration confTree = ViewRunner.runConfiguration(viewConfigs);
 
             /**
              * run and return the rendering tree through streamprocessing to the
@@ -158,8 +161,7 @@ public class JCmsHttpServlet extends HttpServlet {
             /**
              * caches the ouput for future use
              */
-            UsecaseAgent.applyCaching(usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE), cacheKey, out
-                    .getBuffer().toString());
+            UsecaseAgent.applyCaching(viewConfigs, cacheKey, out.getBuffer().toString());
         }
 
     }

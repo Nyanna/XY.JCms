@@ -21,7 +21,9 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 /**
- * Main cache implementation
+ * Main cache implementation. Smart and simple without any type of synchronization.
+ * Read access is always possible write access gots asynchronously proccessed by an management thread. At the moment in
+ * memory cache only.
  * 
  * @author Xyan
  * 
@@ -43,12 +45,12 @@ public class XYCache {
     // Access part
 
     /**
-     * instance moutn map
+     * instance mount map, to hold cache instances each cache has its own manager.
      */
     final static Map<String, XYCache> instanceMounts = new HashMap<String, XYCache>();
 
     /**
-     * constructor which also starts the cache monitor
+     * constructor which also starts the cache manager
      */
     private XYCache() {
         manager.setDaemon(true); // before thread starts
@@ -144,7 +146,7 @@ public class XYCache {
     }
 
     /**
-     * put an object to the cash or more precisely put send an request to the
+     * put an object to the cash or more precisely send an put request to the
      * manager
      * 
      * @param region
@@ -192,7 +194,7 @@ public class XYCache {
         private final Map<String, Map<String, CacheObj>> base;
 
         /**
-         * constructor with cachw reference
+         * constructor with cache reference
          * 
          * @param base
          */
@@ -263,7 +265,7 @@ public class XYCache {
         }
 
         /**
-         * flushes all region
+         * flushes all regions
          */
         private void flushAllRegions() {
             for (final Object key : base.entrySet()) {
@@ -306,6 +308,7 @@ public class XYCache {
             boolean isUpdate = true; // default update
             if (base.get(req.getRegion()).containsKey(req.getKey())) {
                 // update only if request is newer
+                // to old requests get droped
                 isUpdate = req.getTimestamp() > base.get(req.getRegion()).get(req.getKey()).getTimeStamp();
             }
             if (isUpdate) {
@@ -315,7 +318,7 @@ public class XYCache {
         }
 
         /**
-         * pushes an request to the managers qeue
+         * pushes an request to the managers queue
          * 
          * @param req
          */

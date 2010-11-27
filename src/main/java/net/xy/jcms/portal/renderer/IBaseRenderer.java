@@ -17,7 +17,7 @@ import java.util.Map;
 import net.xy.jcms.shared.IRenderer;
 
 /**
- * baserenderer interface
+ * baserenderer interface for xhtml
  * 
  * @author Xyan
  * 

@@ -22,7 +22,7 @@ import net.xy.jcms.shared.IRenderer;
 import net.xy.jcms.shared.IOutWriter;
 
 /**
- * standard box component
+ * standard box component, renders his childs in an box.
  * 
  * @author Xyan
  * 

@@ -12,6 +12,8 @@
  */
 package net.xy.jcms.controller;
 
+import java.util.Map;
+
 import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
 import net.xy.jcms.controller.configurations.ComponentConfiguration;
@@ -22,7 +24,6 @@ import net.xy.jcms.controller.configurations.TemplateConfiguration;
 import net.xy.jcms.controller.configurations.UIConfiguration;
 import net.xy.jcms.shared.IFragment;
 import net.xy.jcms.shared.IOutWriter;
-import net.xy.jcms.shared.JCmsHelper;
 
 /**
  * these runner gets the configuration tree and performs the output rendering
@@ -32,7 +33,7 @@ import net.xy.jcms.shared.JCmsHelper;
  */
 public class ViewRunner {
     /**
-     * the main entry class for all usecases
+     * the main entry template for all usecases
      */
     private static final String ENTRY_TEMPLATE = "root";
 
@@ -40,17 +41,18 @@ public class ViewRunner {
      * aggregates the component configuration tree
      * 
      * @param configuration
+     *            view applicable configurations
      * @return value
      */
-    public static ComponentConfiguration runConfiguration(final Configuration<?>[] configuration) {
-        final TemplateConfiguration tmplConfig = (TemplateConfiguration) JCmsHelper.getConfigurationByType(
-                ConfigurationType.TemplateConfiguration, configuration);
+    public static ComponentConfiguration runConfiguration(final Map<ConfigurationType, Configuration<?>> configurations) {
+        final TemplateConfiguration tmplConfig = (TemplateConfiguration) configurations
+                .get(ConfigurationType.TemplateConfiguration);
         if (tmplConfig != null) {
             final IFragment root = tmplConfig.get(ENTRY_TEMPLATE);
             if (root != null) {
                 final ComponentConfiguration rootConfig = root.getConfiguration();
                 if (rootConfig != null) {
-                    return initializeConfigurations(rootConfig, configuration);
+                    return initializeConfigurations(rootConfig, configurations);
                 }
                 throw new IllegalArgumentException("Root template doesn't returns an configuration object");
             }
@@ -59,20 +61,21 @@ public class ViewRunner {
     }
 
     /**
-     * fills and prepares an empty or default component configuration problem
+     * builds the component tree and initializes its config
      * 
      * @param draftTree
      * @param model
      * @return value
      */
     private static ComponentConfiguration initializeConfigurations(final ComponentConfiguration rootConfig,
-            final Configuration<?>[] model) {
-        ComponentConfiguration.initialize(rootConfig,
-                (ContentRepository) JCmsHelper.getConfigurationByType(ConfigurationType.ContentRepository, model),
-                (TemplateConfiguration) JCmsHelper.getConfigurationByType(ConfigurationType.TemplateConfiguration, model),
-                (UIConfiguration) JCmsHelper.getConfigurationByType(ConfigurationType.UIConfiguration, model),
-                (MessageConfiguration) JCmsHelper.getConfigurationByType(ConfigurationType.MessageConfiguration, model),
-                (RenderKitConfiguration) JCmsHelper.getConfigurationByType(ConfigurationType.RenderKitConfiguration, model));
+            final Map<ConfigurationType, Configuration<?>> model) {
+        ComponentConfiguration
+                .initialize(rootConfig,
+                        (ContentRepository) model.get(ConfigurationType.ContentRepository),
+                        (TemplateConfiguration) model.get(ConfigurationType.TemplateConfiguration),
+                        (UIConfiguration) model.get(ConfigurationType.UIConfiguration),
+                        (MessageConfiguration) model.get(ConfigurationType.MessageConfiguration),
+                        (RenderKitConfiguration) model.get(ConfigurationType.RenderKitConfiguration));
         return rootConfig;
     }
 
@@ -84,7 +87,8 @@ public class ViewRunner {
      */
     public static void runView(final IOutWriter out, final ComponentConfiguration configuration) {
         if (configuration == null || out == null) {
-            throw new IllegalArgumentException("Runview has to be executed with an outwriter and an configuration tree.");
+            throw new IllegalArgumentException(
+                    "Runview has to be executed with an outwriter and an configuration tree.");
         }
         ComponentConfiguration.render(out, configuration);
     }

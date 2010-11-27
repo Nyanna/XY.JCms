@@ -60,6 +60,12 @@ public class TemplateConfiguration extends Configuration<Map<String, IFragment>>
     }
 
     /**
+     * stores found config requests to save iteration strategies
+     */
+    private final Map<String, Match<String, IFragment>> cache = enableCache ? new HashMap<String, Match<String, IFragment>>()
+            : null;
+
+    /**
      * returns an key associated template deffinition and where it was found.
      * -full component path comp1.comp2.comp3.key
      * -parents comp1.comp2.key, comp1.key
@@ -69,6 +75,13 @@ public class TemplateConfiguration extends Configuration<Map<String, IFragment>>
      * @return never null
      */
     public Match<String, IFragment> getMatch(final String tmplName, final ComponentConfiguration config) {
+        final String fullPathKey = ConfigurationIterationStrategy.fullPath(config, tmplName);
+        if (enableCache) {
+            final Match<String, IFragment> cached = cache.get(fullPathKey);
+            if (cached != null) {
+                return cached;
+            }
+        }
         Match<String, IFragment> value = new Match<String, IFragment>(null, null);
         final ClimbUp strategy = new ClimbUp(config, tmplName);
         for (final String pathKey : strategy) {
@@ -79,6 +92,9 @@ public class TemplateConfiguration extends Configuration<Map<String, IFragment>>
             }
         }
         if (value.getValue() != null) {
+            if (enableCache) {
+                cache.put(fullPathKey, value);
+            }
             return value;
         } else {
             throw new IllegalArgumentException("An mendatory fragment/template definition was not found!");
@@ -107,8 +123,15 @@ public class TemplateConfiguration extends Configuration<Map<String, IFragment>>
     }
 
     @Override
-    public void mergeConfiguration(final Configuration<Map<String, IFragment>> otherConfig) {
-        getConfigurationValue().putAll(otherConfig.getConfigurationValue());
+    public TemplateConfiguration mergeConfiguration(final Configuration<Map<String, IFragment>> otherConfig) {
+        return mergeConfiguration(otherConfig.getConfigurationValue());
+    }
+
+    @Override
+    public TemplateConfiguration mergeConfiguration(final Map<String, IFragment> otherConfig) {
+        final Map<String, IFragment> result = new HashMap<String, IFragment>(getConfigurationValue());
+        result.putAll(otherConfig);
+        return new TemplateConfiguration(result);
     }
 
     /**

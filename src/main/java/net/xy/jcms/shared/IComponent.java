@@ -15,7 +15,8 @@ package net.xy.jcms.shared;
 import net.xy.jcms.controller.configurations.ComponentConfiguration;
 
 /**
- * general component interface
+ * general component interface. an component is the main element in the tree. also fragments are components with
+ * degraded features.
  * 
  * @author xyan
  * 
@@ -25,7 +26,7 @@ public interface IComponent {
     /**
      * returns the components configuration preparing alghorhythms
      * 
-     * @return an configuration object with proper set parent and childs
+     * @return an configuration which describes all requested configs
      */
     public ComponentConfiguration getConfiguration();
 
@@ -33,6 +34,7 @@ public interface IComponent {
      * starts the rendering run
      * 
      * @param out
+     *            the outwritter adaption
      * @param config
      */
     public void render(final IOutWriter out, final ComponentConfiguration config);

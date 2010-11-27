@@ -1,18 +1,18 @@
 /**
- *  This file is part of XY.JCms, Copyright 2010 (C) Xyan Kruse, Xyan@gmx.net, Xyan.kilu.de
- *
- *  XY.JCms is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  XY.JCms is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with XY.JCms.  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of XY.JCms, Copyright 2010 (C) Xyan Kruse, Xyan@gmx.net, Xyan.kilu.de
+ * 
+ * XY.JCms is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * XY.JCms is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with XY.JCms. If not, see <http://www.gnu.org/licenses/>.
  */
 package net.xy.jcms.controller;
 
@@ -27,10 +27,10 @@ import net.xy.jcms.controller.TranslationConfiguration.TranslationRule;
 import net.xy.jcms.shared.IDataAccessContext;
 
 /**
- * Abstraction Layer for Navigation<->Usecase<->Requests<->URL's $Path - is an
- * human language uri like /search_for_artist_shakira $Key/Keychain - is an
- * semantic description of the path via independent id's and must not be human
- * readable. Usually an Chain or list of Keys. Example /Contentgroup/Subcategory
+ * Abstraction Layer for Navigation<->Usecase<->Requests<->URL's
+ * $Path - is an human language uri like /search_for_artist_shakira
+ * $Key - is an semantic description of the path via independent id's and must not be human
+ * readable. Example /Contentgroup.
  * 
  * @author xyan
  */
@@ -41,7 +41,7 @@ public class NavigationAbstractionLayer {
     static final Logger LOG = Logger.getLogger(NavigationAbstractionLayer.class);
 
     /**
-     * Each Key korresponds to one usecase
+     * Each Key korresponds to one usecase. Not immutable
      * 
      * @author xyan
      * 
@@ -159,7 +159,7 @@ public class NavigationAbstractionLayer {
      * translates
      * 
      * @param key
-     *            [Contentgroup,Subcategory]
+     *            [Subcategory]
      * @return path "you_wanna_got_to_ringtones?"
      */
     public static String translateKeyToPath(final NALKey key, final IDataAccessContext dac) {
@@ -171,24 +171,10 @@ public class NavigationAbstractionLayer {
      * 
      * @param path
      *            "you_wanna_got_to_ringtones?"
-     * @return Key[Contentgroup,Subcategory]
+     * @return Key[Subcategory]
      */
     public static NALKey translatePathToKey(final IDataAccessContext dac) {
-        Exception ex = null;
-        try {
-            return TranslationConfiguration.find(dac.getRequestPath(), dac);
-        } catch (final InstantiationException e) {
-            ex = e;
-        } catch (final IllegalAccessException e) {
-            ex = e;
-        } catch (final ClassNotFoundException e) {
-            ex = e;
-        } finally {
-            if (ex != null) {
-                LOG.error("An key was found but an error occured on converting it param values", ex);
-            }
-        }
-        return null;
+        return TranslationConfiguration.find(dac.getRequestPath(), dac);
     }
 
     /**
@@ -204,7 +190,8 @@ public class NavigationAbstractionLayer {
      * @throws InvalidBuildRule
      *             in case the buildrule can't be applied
      */
-    public static String translateKeyWithRule(final NALKey key, final TranslationRule rule) throws GroupCouldNotBeFilled,
+    public static String translateKeyWithRule(final NALKey key, final TranslationRule rule)
+            throws GroupCouldNotBeFilled,
             InvalidBuildRule {
         return TranslationConfiguration.translateKeyWithRule(key, rule);
     }

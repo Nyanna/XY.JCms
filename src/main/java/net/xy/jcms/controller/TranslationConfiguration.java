@@ -18,6 +18,7 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import net.xy.jcms.controller.NavigationAbstractionLayer.NALKey;
@@ -28,7 +29,7 @@ import net.xy.jcms.shared.IDataAccessContext;
 import net.xy.jcms.shared.types.StringMap;
 
 /**
- * describes the configuration used to translate pathes in KeyChains
+ * describes the configuration used to translate path's in Keys
  * 
  * @author xyan
  * 
@@ -40,8 +41,8 @@ public abstract class TranslationConfiguration {
     static final Logger LOG = Logger.getLogger(TranslationConfiguration.class);
 
     /**
-     * describes an path translation rule to convert human readable pathes in an
-     * semantic navigation hierarchy
+     * describes an path translation rule to convert human readable path's in an
+     * semantic navigation key. Rule is immutable.
      * 
      * @author xyan
      * 
@@ -126,7 +127,7 @@ public abstract class TranslationConfiguration {
     }
 
     /**
-     * specifies an parameter
+     * specifies an parameter to which regexp group it belongs and the typeconverter used.
      * 
      * @author Xyan
      * 
@@ -157,9 +158,13 @@ public abstract class TranslationConfiguration {
          * @param converter
          */
         public RuleParameter(final String parameterName, final int aplicatesToGroup, final IConverter converter) {
+            if (StringUtils.isBlank(parameterName)) {
+                throw new IllegalArgumentException("Parameter name can't be blank.");
+            }
             this.parameterName = parameterName;
             this.aplicatesToGroup = aplicatesToGroup;
             this.converter = converter;
+            // TODO [LOW] implement usecase params without regexp
         }
 
         /**
@@ -172,7 +177,7 @@ public abstract class TranslationConfiguration {
         }
 
         /**
-         * returns the substitution group
+         * returns the substitution group or null
          * 
          * @return value
          */
@@ -181,7 +186,7 @@ public abstract class TranslationConfiguration {
         }
 
         /**
-         * returns the type converter
+         * returns the type converter or null
          * 
          * @return value
          */
@@ -284,7 +289,7 @@ public abstract class TranslationConfiguration {
     }
 
     /**
-     * error handling
+     * error handling, simple exception marker
      * 
      * @author xyan
      * 
@@ -298,7 +303,7 @@ public abstract class TranslationConfiguration {
     }
 
     /**
-     * error handling
+     * error handling, simple exception marker
      * 
      * @author xyan
      * 
@@ -392,13 +397,8 @@ public abstract class TranslationConfiguration {
      *            navigation level
      * @param path
      * @return value
-     * @throws ClassNotFoundException
-     * @throws IllegalAccessException
-     * @throws InstantiationException
      */
-    public static NALKey find(final String path, final IDataAccessContext dac)
-            throws InstantiationException,
-            IllegalAccessException, ClassNotFoundException {
+    public static NALKey find(final String path, final IDataAccessContext dac) {
         final NALKey key = null;
         for (final TranslationRule rule : getRuleList(dac)) {
             final Matcher match = rule.getReacton().matcher(path);
@@ -415,13 +415,8 @@ public abstract class TranslationConfiguration {
      * @param rule
      * @param matcher
      * @return value
-     * @throws ClassNotFoundException
-     * @throws IllegalAccessException
-     * @throws InstantiationException
      */
-    private static NALKey createKey(final TranslationRule rule, final Matcher matcher)
-            throws InstantiationException,
-            IllegalAccessException, ClassNotFoundException {
+    private static NALKey createKey(final TranslationRule rule, final Matcher matcher) {
         final NALKey key = new NALKey(rule.getUsecase());
         for (final RuleParameter parameterRule : rule.getParameters()) {
             final String paramValue = matcher.group(parameterRule.getAplicatesToGroup());
@@ -440,14 +435,8 @@ public abstract class TranslationConfiguration {
      * @param type
      * @param simpleMapping
      * @return never null
-     * @throws InstantiationException
-     * @throws IllegalAccessException
-     * @throws ClassNotFoundException
      */
-    private static Object convertParam2Type(final String paramValue, final IConverter type)
-            throws InstantiationException,
-            IllegalAccessException,
-            ClassNotFoundException {
+    private static Object convertParam2Type(final String paramValue, final IConverter type) {
         Object converted = null; // aka final
         if (type instanceof StringMap) {
             final StringMap strMap = (StringMap) type;

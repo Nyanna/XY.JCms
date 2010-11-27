@@ -21,6 +21,7 @@ import java.util.Map;
 import net.xy.jcms.controller.NavigationAbstractionLayer.NALKey;
 import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.MessageConfiguration;
+import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
 import net.xy.jcms.shared.IController;
 import net.xy.jcms.shared.IDataAccessContext;
 
@@ -29,9 +30,9 @@ import org.junit.Assert;
 public class MockController implements IController {
 
     @Override
-    public NALKey invoke(final IDataAccessContext dac, final Configuration<?>[] configuration) {
-        Assert.assertTrue(configuration[0] instanceof MessageConfiguration);
-        final MessageConfiguration mess = (MessageConfiguration) configuration[0];
+    public NALKey invoke(final IDataAccessContext dac, final Map<ConfigurationType, Configuration<?>> configuration) {
+        Assert.assertTrue(configuration.get(MessageConfiguration.TYPE) instanceof MessageConfiguration);
+        final MessageConfiguration mess = (MessageConfiguration) configuration.get(MessageConfiguration.TYPE);
         if (mess != null) {
 
         }
@@ -39,10 +40,10 @@ public class MockController implements IController {
     }
 
     @Override
-    public NALKey invoke(final IDataAccessContext dac, final Configuration<?>[] configuration,
+    public NALKey invoke(final IDataAccessContext dac, final Map<ConfigurationType, Configuration<?>> configuration,
             final Map<Object, Object> parameters) {
-        Assert.assertTrue(configuration[0] instanceof MessageConfiguration);
-        final MessageConfiguration mess = (MessageConfiguration) configuration[0];
+        Assert.assertTrue(configuration.get(MessageConfiguration.TYPE) instanceof MessageConfiguration);
+        final MessageConfiguration mess = (MessageConfiguration) configuration.get(MessageConfiguration.TYPE);
         if (mess != null) {
 
         }

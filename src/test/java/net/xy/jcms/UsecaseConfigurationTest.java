@@ -99,7 +99,8 @@ public class UsecaseConfigurationTest {
         key.addParameter("contentgroup", "Cars");
         final Usecase uCase = UsecaseConfiguration.findUsecaseForStruct(key, new CLIDataAccessContext("test"));
         Assert.assertNotNull(uCase);
-        final NALKey forward = UsecaseAgent.executeController(uCase, new CLIDataAccessContext("test"), null);
+        final NALKey forward = UsecaseAgent.executeController(uCase.getControllerList(), uCase.getConfigurations(),
+                new CLIDataAccessContext("test"), null);
         Assert.assertNotNull(forward);
         System.out.append(forward.toString());
     }

@@ -12,6 +12,12 @@
  */
 package net.xy.jcms.portal.renderer;
 
+/**
+ * text renderer interface
+ * 
+ * @author xyan
+ * 
+ */
 public interface ITextRenderer extends IBaseRenderer {
 
     /**

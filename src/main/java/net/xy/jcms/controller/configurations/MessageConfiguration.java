@@ -13,7 +13,9 @@
 package net.xy.jcms.controller.configurations;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import net.xy.jcms.controller.configurations.ConfigurationIterationStrategy.FullPathOrRoot;
@@ -53,6 +55,12 @@ public class MessageConfiguration extends AbstractPropertyBasedConfiguration {
     }
 
     /**
+     * stores found config requests to save iteration strategies
+     */
+    private final Map<String, Match<String, String>> cache = enableCache ? new HashMap<String, Match<String, String>>()
+            : null;
+
+    /**
      * get an message text and where ist was found, closure:
      * -full component path comp1.comp2.comp3.key
      * -root key
@@ -62,6 +70,13 @@ public class MessageConfiguration extends AbstractPropertyBasedConfiguration {
      * @return value
      */
     public Match<String, String> getMessageMatch(final String key, final ComponentConfiguration config) {
+        final String fullPathKey = ConfigurationIterationStrategy.fullPath(config, key);
+        if (enableCache) {
+            final Match<String, String> cached = cache.get(fullPathKey);
+            if (cached != null) {
+                return cached;
+            }
+        }
         Match<String, String> value = new Match<String, String>(null, null);
         final FullPathOrRoot strategy = new FullPathOrRoot(config, key);
         final List<String> retrievalStack = new ArrayList<String>();
@@ -74,6 +89,9 @@ public class MessageConfiguration extends AbstractPropertyBasedConfiguration {
             }
         }
         if (value.getValue() != null) {
+            if (enableCache) {
+                cache.put(fullPathKey, value);
+            }
             return value;
         }
         throw new IllegalArgumentException("An mendatory message configuration was missing! "
@@ -104,6 +122,16 @@ public class MessageConfiguration extends AbstractPropertyBasedConfiguration {
      */
     public static MessageConfiguration initByString(final String configString) {
         return new MessageConfiguration(AbstractPropertyBasedConfiguration.initPropertiesByString(configString));
+    }
+
+    @Override
+    public MessageConfiguration mergeConfiguration(final Configuration<Properties> otherConfig2) {
+        return mergeConfiguration(otherConfig2.getConfigurationValue());
+    }
+
+    @Override
+    public MessageConfiguration mergeConfiguration(final Properties otherConfig2) {
+        return new MessageConfiguration(mergeConfiguration(getConfigurationValue(), otherConfig2));
     }
 
 }

@@ -37,7 +37,7 @@ import net.xy.jcms.shared.compiler.DynamicFragment;
  */
 public class FragmentXMLParser {
     /**
-     * mask instructions ass sgml/xml comments to not influence diverse dialekts
+     * mask instructions ass sgml/xml comments to not influence diverse dialects
      */
     private final static String BEGIN = "<!--";
     private final static String END = "-->";
@@ -80,7 +80,7 @@ public class FragmentXMLParser {
      * @param st
      * @param loader
      *            for loading component instances
-     * @return
+     * @return value
      * @throws ClassNotFoundException
      */
     public static IFragment parse(final InputStream st, final ClassLoader loader) throws ClassNotFoundException {

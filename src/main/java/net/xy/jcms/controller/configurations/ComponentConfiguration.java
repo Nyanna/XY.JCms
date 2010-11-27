@@ -37,19 +37,17 @@ import net.xy.jcms.shared.IRenderer;
  */
 public abstract class ComponentConfiguration {
     /**
-     * separates individual component path elements
+     * separates individual component path elements, actually its not needed cuz of the iteration handling
      */
     public final static String COMPONENT_PATH_SEPARATOR = ".";
 
     /**
-     * holds the mendatory component id. On every added component id got set on
-     * every fragment not.
+     * holds the mendatory component id. On every added component id got set on.
      */
     private String id = "";
 
     /**
-     * holds an id stacked component path. On every added component path got set
-     * on every fragment not.
+     * holds an id stacked component path. On every added component path got set.
      */
     private String componentPath = "";
 
@@ -66,12 +64,12 @@ public abstract class ComponentConfiguration {
 
     /**
      * flag stores if the config were already initialized and if further configs
-     * are possible
+     * are not possible
      */
     private boolean ready = false;
 
     /**
-     * constructor
+     * only constructor
      * 
      * @param id
      *            of this component
@@ -88,7 +86,7 @@ public abstract class ComponentConfiguration {
 
     /**
      * initializes the complete component configuration in case of an
-     * missconfiguration it throws an exception
+     * missconfiguration it throws an exception. recursively initializes children.
      * 
      * @param cmpConfig
      *            ComponentConfiguration to be initialized
@@ -194,11 +192,11 @@ public abstract class ComponentConfiguration {
     }
 
     /**
-     * set the parent, an an new component path
+     * set the parent, and an new component path
      * 
      * @param parent
      */
-    final private void setParent(final ComponentConfiguration parent) {
+    private void setParent(final ComponentConfiguration parent) {
         changeValid();
         this.parent = parent;
         updateComponentPath();
@@ -392,8 +390,19 @@ public abstract class ComponentConfiguration {
         }
     }
 
+    /**
+     * gets an list of requested message keys. No message available which got not prepared.
+     * 
+     * @return
+     */
     protected abstract String[] prepareMessages();
 
+    /**
+     * returns message or throws an exception
+     * 
+     * @param key
+     * @return message string
+     */
     public String getMessage(final String key) {
         final String message = messages.get(key);
         if (message == null) {
@@ -431,6 +440,11 @@ public abstract class ComponentConfiguration {
         }
     }
 
+    /**
+     * returns an list of prepared ui objects with its description and defaults..
+     * 
+     * @return
+     */
     protected abstract UI<?>[] prepareUIConfig();
 
     /**
@@ -524,8 +538,19 @@ public abstract class ComponentConfiguration {
         }
     }
 
+    /**
+     * gets an list of renderer by its interface class.
+     * 
+     * @return
+     */
     protected abstract Class<? extends IRenderer>[] prepareRenderers();
 
+    /**
+     * returns an prepared renderer ot the requested type.
+     * 
+     * @param rIface
+     * @return value
+     */
     public Object getRenderer(final Class<? extends IRenderer> rIface) {
         final Object renderer = renderers.get(rIface);
         if (renderer == null) {
@@ -560,8 +585,20 @@ public abstract class ComponentConfiguration {
         }
     }
 
+    /**
+     * prepares template deffinitions by its name.
+     * 
+     * @param content
+     * @return value
+     */
     protected abstract String[] prepareTemplates(final Map<String, Object> content);
 
+    /**
+     * gets an prepared template
+     * 
+     * @param name
+     * @return vlaue
+     */
     private FragmentConfiguration getTemplate(final String name) {
         final FragmentConfiguration tmpl = templates.get(name);
         if (tmpl == null) {
@@ -628,6 +665,11 @@ public abstract class ComponentConfiguration {
         content.put(key, obj);
     }
 
+    /**
+     * returns an list of requested content by its binding and the class it should be an instance of.
+     * 
+     * @return
+     */
     protected abstract Map<String, Class<?>> prepareContent();
 
     /**
@@ -644,5 +686,4 @@ public abstract class ComponentConfiguration {
         }
         return contentObj;
     }
-
 }

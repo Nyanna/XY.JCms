@@ -17,9 +17,11 @@ import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.DecimalFormat;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
-
 import org.apache.log4j.Logger;
 
 import net.xy.jcms.controller.TranslationConfiguration;
@@ -146,12 +148,28 @@ public class JCmsHelper {
     }
 
     /**
+     * filters out specific types of configurations
+     * 
+     * @param types
+     * @param configurations
+     * @return an filtered selection of the given configs
+     */
+    public static Map<ConfigurationType, Configuration<?>> getConfigurations(final EnumSet<ConfigurationType> types,
+            final Map<ConfigurationType, Configuration<?>> configurations) {
+        final Map<ConfigurationType, Configuration<?>> returnedConfig = new HashMap<Configuration.ConfigurationType, Configuration<?>>();
+        for (final ConfigurationType type : types) {
+            returnedConfig.put(type, configurations.get(type));
+        }
+        return returnedConfig;
+    }
+
+    /**
      * loads an resource with the loader returns an inputstream and prevents the
      * vm from caching
      * 
      * @param path
      * @param loader
-     * @return
+     * @return value
      * @throws IOException
      */
     public static InputStream loadResource(final String path, final ClassLoader loader) throws IOException {
@@ -160,7 +178,8 @@ public class JCmsHelper {
         }
         final URL url = loader.getResource(path.trim());
         if (url == null) {
-            throw new IllegalArgumentException("Resource to load doesn't exists. " + DebugUtils.printFields(path, loader));
+            throw new IllegalArgumentException("Resource to load doesn't exists. "
+                    + DebugUtils.printFields(path, loader));
         }
         final URLConnection con = url.openConnection();
         con.setUseCaches(false);

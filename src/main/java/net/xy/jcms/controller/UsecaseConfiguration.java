@@ -27,7 +27,7 @@ import net.xy.jcms.shared.IController;
 import net.xy.jcms.shared.IDataAccessContext;
 
 /**
- * Configuration object describing the usecases
+ * Configuration object describing the usecases and its behavior
  * 
  * @author xyan
  * 
@@ -35,7 +35,7 @@ import net.xy.jcms.shared.IDataAccessContext;
 public class UsecaseConfiguration {
     /**
      * main usecase object describing all and anything. After these usecase
-     * comes only singleton and static code concern this.
+     * comes only singleton and static code, concern this.
      * 
      * @author Xyan
      * 
@@ -47,7 +47,7 @@ public class UsecaseConfiguration {
         private final String id;
 
         /**
-         * an description
+         * an description, mendatory
          */
         private final String description;
 
@@ -68,9 +68,6 @@ public class UsecaseConfiguration {
          * all involved code.
          */
         private final Map<ConfigurationType, Configuration<?>> configurationList;
-
-        // TODO [LOW] optimize all occurences of configuration list and replace
-        // them with not iteration strategy access
 
         /**
          * default constructor
@@ -97,13 +94,14 @@ public class UsecaseConfiguration {
          * @param mergeList
          * @return value
          */
-        @SuppressWarnings({ "unchecked", "rawtypes" })
+        @SuppressWarnings({ "rawtypes" })
         private static Map<ConfigurationType, Configuration<?>> mergeConfigurations(final Configuration<?>[] mergeList) {
             final Map<ConfigurationType, Configuration<?>> returnedConfig = new HashMap<ConfigurationType, Configuration<?>>();
             for (final Configuration config : mergeList) {
                 if (returnedConfig.containsKey(config.getConfigurationType())) {
                     // merge
-                    returnedConfig.get(config.getConfigurationType()).mergeConfiguration(config);
+                    returnedConfig.put(config.getConfigurationType(),
+                            Configuration.mergeConfiguration(returnedConfig.get(config.getConfigurationType()), config));
                 } else {
                     // insert
                     returnedConfig.put(config.getConfigurationType(), config);
@@ -142,28 +140,28 @@ public class UsecaseConfiguration {
         /**
          * return all available configuration
          * 
-         * @return value
+         * @return an copy of the inertanl config map
          */
-        public Configuration<?>[] getConfigurationList() {
-            return configurationList.values().toArray(new Configuration[configurationList.size()]);
+        public Map<ConfigurationType, Configuration<?>> getConfigurations() {
+            return new HashMap<Configuration.ConfigurationType, Configuration<?>>(configurationList);
         }
 
         /**
          * gets only specific types of configuration
          * 
          * @param types
-         * @return value
+         * @return n copy of the inertanl config map
          */
-        public Configuration<?>[] getConfigurationList(final EnumSet<ConfigurationType> types) {
-            final List<Configuration<?>> returnedConfig = new ArrayList<Configuration<?>>();
+        public Map<ConfigurationType, Configuration<?>> getConfigurations(final EnumSet<ConfigurationType> types) {
+            final Map<ConfigurationType, Configuration<?>> returnedConfig = new HashMap<Configuration.ConfigurationType, Configuration<?>>();
             for (final ConfigurationType type : types) {
                 if (!configurationList.containsKey(type)) {
                     final Configuration<?> emptyConf = Configuration.initByString(type, StringUtils.EMPTY, null);
                     configurationList.put(type, emptyConf);
                 }
-                returnedConfig.add(configurationList.get(type));
+                returnedConfig.put(type, configurationList.get(type));
             }
-            return returnedConfig.toArray(new Configuration[returnedConfig.size()]);
+            return returnedConfig;
         }
 
         /**
@@ -174,14 +172,7 @@ public class UsecaseConfiguration {
          *         requested type.
          */
         public Configuration<?> getConfiguration(final ConfigurationType type) {
-            final Configuration<?>[] config = getConfigurationList(EnumSet.of(type));
-            if (config == null || config.length <= 0) {
-                final Configuration<?> emptyConf = Configuration.initByString(type, StringUtils.EMPTY, null);
-                configurationList.put(type, emptyConf);
-                return emptyConf;
-            } else {
-                return config[0];
-            }
+            return getConfigurations(EnumSet.of(type)).get(type);
         }
 
         /**
@@ -196,7 +187,7 @@ public class UsecaseConfiguration {
         @Override
         public String toString() {
             return "id=" + getId() + " description=\"" + getDescription() + "\" parameter=" + getParameterList()
-                    + " controller=" + getControllerList() + " configuration=" + getConfigurationList();
+                    + " controller=" + getControllerList() + " configuration=" + getConfigurations();
         }
     }
 
@@ -214,7 +205,7 @@ public class UsecaseConfiguration {
 
         /**
          * the type of this parameters value, can be an primitive or an complex
-         * type like contentType
+         * type like contentType as an classpath.
          */
         private final String parameterType;
 
@@ -240,7 +231,7 @@ public class UsecaseConfiguration {
         }
 
         /**
-         * returns the type of the parameters value
+         * returns the type of the parameters value as classpath
          * 
          * @return value
          */
@@ -262,9 +253,9 @@ public class UsecaseConfiguration {
      */
     final public static class Controller {
         /**
-         * an controler id
+         * an controler instance
          */
-        private final IController controllerId;
+        private final IController controllerInstance;
 
         /**
          * configuration types wich should be obmitted to the controller
@@ -274,21 +265,15 @@ public class UsecaseConfiguration {
         /**
          * default constructor
          * 
-         * @param controllerId
+         * @param controllerInstance
          * @param obmitedConfigurations
          */
-        public Controller(final IController controllerId, final EnumSet<ConfigurationType> obmitedConfigurations) {
-            this.controllerId = controllerId;
+        public Controller(final IController controllerInstance, final EnumSet<ConfigurationType> obmitedConfigurations) {
+            if (controllerInstance == null || obmitedConfigurations == null) {
+                throw new IllegalArgumentException("Parameters can't be null.");
+            }
+            this.controllerInstance = controllerInstance;
             this.obmitedConfigurations = obmitedConfigurations;
-        }
-
-        /**
-         * returns the id
-         * 
-         * @return value
-         */
-        final public IController getControllerId() {
-            return controllerId;
         }
 
         /**
@@ -301,19 +286,6 @@ public class UsecaseConfiguration {
         }
 
         /**
-         * delegates an invoke operation to the controllers static instance
-         * 
-         * @param dac
-         * @param configuration
-         * @return value
-         * @throws ClassNotFoundException
-         */
-        public NALKey invoke(final IDataAccessContext dac, final Configuration<?>[] configuration)
-                throws ClassNotFoundException {
-            return invoke(dac, configuration, null);
-        }
-
-        /**
          * calls an controller with given parameterset
          * 
          * @param dac
@@ -322,18 +294,18 @@ public class UsecaseConfiguration {
          * @return value
          * @throws ClassNotFoundException
          */
-        public NALKey invoke(final IDataAccessContext dac, final Configuration<?>[] configuration,
+        public NALKey invoke(final IDataAccessContext dac, final Map<ConfigurationType, Configuration<?>> configuration,
                 final Map<Object, Object> parameters) {
             if (parameters != null) {
-                return controllerId.invoke(dac, configuration, parameters);
+                return controllerInstance.invoke(dac, configuration, parameters);
             } else {
-                return controllerId.invoke(dac, configuration);
+                return controllerInstance.invoke(dac, configuration);
             }
         }
 
         @Override
         public String toString() {
-            return "id=" + getControllerId() + " configurations=" + getObmitedConfigurations();
+            return "id=" + controllerInstance.getClass().getName() + " configurations=" + getObmitedConfigurations();
         }
     }
 

@@ -1,5 +1,6 @@
 -think about an modular controller set with configuration management
--cleanup and review of all jdoc comments
+-think about like cocoon merge translation and usecase configuration, usecase hold its translations, if so implement nalkey resolution that for and back transforms the key to check if ist ordering is high enough, or check if two keys matches on the same
+-think about rendering only subcomponents pathes, or init without an use case an litle component tree an render an asingle content list
 
 
 
@@ -7,7 +8,7 @@
 #Performace conclusion
 
 1. Class initialization - no problem after startup phase - all components got cached
-2. Component config path iteration!
+2. Component config path iteration! - now will be cached
 
 
 #component path retrieval problem
@@ -19,4 +20,4 @@ component initialization could be devided into two runs, child component aggrega
 -config is not so flexible, component tree can't be generated dynamicly
 
 2. pre aggregate the config also into an component tree each config node containing only its note passing it one to one to the config
-3. optimize the data structure of the configs, reversed tree
+3. optimize the data structure of the configs, reversed treew

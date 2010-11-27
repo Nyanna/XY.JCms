@@ -21,7 +21,8 @@ import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.stores.ClientStore;
 
 /**
- * protocol specific response adapter which alters http response headers
+ * protocol specific response adapter which alters http response headers, sets
+ * cookies
  * 
  * @author xyan
  * 
@@ -29,20 +30,20 @@ import net.xy.jcms.controller.configurations.stores.ClientStore;
 public class HttpProtocolResponseAdapter {
 
     /**
-     * alters the response headers based on the obmitted configuration maybe an
-     * dedicated response configuration should be introduced
+     * alters the response headers based on the obmitted controller
+     * configuration
      * 
      * @param response
      * @param model
      */
-    public static void apply(final HttpServletResponse response, final Configuration<?>[] model) {
+    public static void apply(final HttpServletResponse response, final Configuration<?> model) {
         response.setCharacterEncoding("UTF-8");
         response.setContentType("text/html;charset=utf-8");
     }
 
     /**
      * appends the clientstore back to the http response. for http it should
-     * only send changed dataas cookies.
+     * only send changed data cookies.
      * 
      * @param store
      */

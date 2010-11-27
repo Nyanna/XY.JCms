@@ -21,6 +21,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 
@@ -32,10 +33,11 @@ import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
 import net.xy.jcms.shared.DebugUtils;
 import net.xy.jcms.shared.IDataAccessContext;
+import net.xy.jcms.shared.JCmsHelper;
 import net.xy.jcms.shared.cache.XYCache;
 
 /**
- * Agent determing the usecase from an KeyChain.
+ * Agent determing the usecase from an NALKey.
  * 
  * @author xyan
  * 
@@ -52,12 +54,12 @@ public class UsecaseAgent {
     private static final String ERROR_USECASE_ID = "ERROR";
 
     /**
-     * cache instance used for cahcing the usecase output
+     * cache instance used for caching the usecase output
      */
     private static final String USECASE_OUPUT_CACHE_ID = "USECASE_OUPUT_CACHE_ID";
 
     /**
-     * cache region
+     * cache region used for caching the usecase output
      */
     private static final String CACHE_REGION = "USECASE_CACHE";
 
@@ -134,24 +136,28 @@ public class UsecaseAgent {
      *         redirect
      * @throws ClassNotFoundException
      */
-    public static NALKey executeController(final Usecase usecase, final IDataAccessContext dac,
-            final Map<Object, Object> parameters) {
-        final Controller[] list = usecase.getControllerList();
+    public static NALKey executeController(final Controller[] ctrlList,
+            final Map<ConfigurationType, Configuration<?>> configurations,
+            final IDataAccessContext dac, final Map<Object, Object> parameters) {
         NALKey next = null;
-        for (final Controller controller : list) {
+        for (final Controller controller : ctrlList) {
             final EnumSet<ConfigurationType> types = controller.getObmitedConfigurations().clone();
             boolean initWParams = false;
             if (types.contains(ConfigurationType.Parameters)) {
                 types.remove(ConfigurationType.Parameters);
                 initWParams = true;
             }
-            final Configuration<?>[] configs = usecase.getConfigurationList(types);
+            // filter to only requested configs
+            final Map<ConfigurationType, Configuration<?>> configs = JCmsHelper.getConfigurations(types, configurations);
             if (initWParams) {
                 // obmit parameters if configured
                 next = controller.invoke(dac, configs, parameters);
             } else {
                 next = controller.invoke(dac, configs, null);
             }
+            // merge altered configs back
+            configurations.putAll(configs);
+
             if (next != null) {
                 break;
             }
@@ -170,7 +176,8 @@ public class UsecaseAgent {
      * @return value
      */
     @SuppressWarnings("unchecked")
-    public static String applyCaching(final Configuration<?>[] configs, final NALKey key, final String content) {
+    public static String applyCaching(final Map<ConfigurationType, Configuration<?>> configs, final NALKey key,
+            final String content) {
         /**
          * caching should support two modes after an specified timeout e.g. 60
          * seconds ofter after config changes e.g. onChange
@@ -198,8 +205,8 @@ public class UsecaseAgent {
             if (configs == null) {
                 return null;
             }
-            for (final Configuration<?> config : configs) {
-                hashKey.append(config.hashCode());
+            for (final Entry<ConfigurationType, Configuration<?>> config : configs.entrySet()) {
+                hashKey.append(config.getValue().hashCode());
             }
         } else {
             // 0> timeout in seconds, hash the NALKey

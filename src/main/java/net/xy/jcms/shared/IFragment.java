@@ -27,7 +27,7 @@ public interface IFragment extends IComponent {
      * 
      * @param name
      *            the fragments name
-     * @return an configuration object with proper set parent and childs
+     * @return the fragments requested configuration
      */
     @Override
     public FragmentConfiguration getConfiguration();
@@ -37,6 +37,7 @@ public interface IFragment extends IComponent {
      * 
      * @param out
      * @param config
+     *            prior requested evaluated config
      */
     public void render(final IOutWriter out, final FragmentConfiguration config);
 }

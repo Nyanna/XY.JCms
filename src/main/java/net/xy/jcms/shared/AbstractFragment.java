@@ -16,7 +16,7 @@ import net.xy.jcms.controller.configurations.ComponentConfiguration;
 import net.xy.jcms.controller.configurations.FragmentConfiguration;
 
 /**
- * common implementation of an fragment
+ * common implementation of an fragment. is an child of ComponentConfiguration.
  * 
  * @author Xyan
  * 

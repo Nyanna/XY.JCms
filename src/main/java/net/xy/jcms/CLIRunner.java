@@ -32,6 +32,7 @@ import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
 import net.xy.jcms.shared.DebugUtils;
 import net.xy.jcms.shared.IDataAccessContext;
 import net.xy.jcms.shared.IOutWriter;
+import net.xy.jcms.shared.JCmsHelper;
 import net.xy.jcms.shared.cache.XYCache;
 
 /**
@@ -133,6 +134,7 @@ public class CLIRunner {
 
         Usecase usecase;
         NALKey cacheKey;
+        Map<ConfigurationType, Configuration<?>> configs;
         do {
             /**
              * find the corresponding usecase
@@ -149,7 +151,8 @@ public class CLIRunner {
              * run the controllers for the usecase, maybe redirect to another
              * usecase.
              */
-            forward = UsecaseAgent.executeController(usecase, dac, forward.getParameters());
+            configs = usecase.getConfigurations(ConfigurationType.CONTROLLERAPPLICABLE);
+            forward = UsecaseAgent.executeController(usecase.getControllerList(), configs, dac, forward.getParameters());
         } while (forward != null);
 
         // no response adapter for the console is needed
@@ -159,8 +162,9 @@ public class CLIRunner {
          * same configuration leads to the same result. realized through hashing
          * and persistance.
          */
-        final String output = UsecaseAgent.applyCaching(usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE),
-                cacheKey, null);
+        final Map<ConfigurationType, Configuration<?>> viewConfigs = JCmsHelper.getConfigurations(
+                ConfigurationType.VIEWAPPLICABLE, configs);
+        final String output = UsecaseAgent.applyCaching(viewConfigs, cacheKey, null);
 
         if (output != null) {
             System.out.append(output);
@@ -169,8 +173,7 @@ public class CLIRunner {
              * get the configurationtree for the usecase from an empty run
              * through the componenttree
              */
-            final Configuration<?>[] viewConfig = usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE);
-            final ComponentConfiguration confTree = ViewRunner.runConfiguration(viewConfig);
+            final ComponentConfiguration confTree = ViewRunner.runConfiguration(viewConfigs);
 
             /**
              * run and return the rendering tree through streamprocessing to the
@@ -182,8 +185,7 @@ public class CLIRunner {
             /**
              * caches the ouput for the future
              */
-            UsecaseAgent.applyCaching(usecase.getConfigurationList(ConfigurationType.VIEWAPPLICABLE), cacheKey, out
-                    .getBuffer().toString());
+            UsecaseAgent.applyCaching(viewConfigs, cacheKey, out.getBuffer().toString());
         }
 
     }

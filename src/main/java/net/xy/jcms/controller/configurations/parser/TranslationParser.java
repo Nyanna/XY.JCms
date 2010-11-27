@@ -56,8 +56,7 @@ public class TranslationParser {
      * @return value
      * @throws XMLStreamException
      * @throws ClassNotFoundException
-     * @throws IllegalAccessException
-     * @throws InstantiationException
+     *             in case there are problems with an params type converter
      */
     public static TranslationRule[] parse(final InputStream in, final ClassLoader loader) throws XMLStreamException,
              ClassNotFoundException {

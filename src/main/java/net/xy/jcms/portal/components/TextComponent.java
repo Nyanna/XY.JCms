@@ -24,7 +24,7 @@ import net.xy.jcms.shared.IRenderer;
 import net.xy.jcms.shared.IOutWriter;
 
 /**
- * an simple text displaying component
+ * an simple text displaying component, can renders an styled container.
  * 
  * @author Xyan
  * 

@@ -13,7 +13,7 @@
 package net.xy.jcms.controller.configurations;
 
 /**
- * simple closure object
+ * simple closure object, for returning two values
  * 
  * @author Xyan
  * 

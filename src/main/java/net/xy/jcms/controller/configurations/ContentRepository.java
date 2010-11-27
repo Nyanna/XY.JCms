@@ -12,6 +12,7 @@
  */
 package net.xy.jcms.controller.configurations;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import net.xy.jcms.shared.DebugUtils;
@@ -44,9 +45,41 @@ public class ContentRepository extends Configuration<Map<String, Object>> {
         super(TYPE, configurationValue);
     }
 
+    /**
+     * creates an new content repository based upon an old repository and given
+     * content
+     * 
+     * @param config
+     * @param configurationValue
+     */
+    public ContentRepository(final ContentRepository config, final Map<String, Object> configurationValue) {
+        super(TYPE, mergeConfig(config, configurationValue));
+    }
+
+    /**
+     * copies an content config and overwrites it with given values
+     * 
+     * @param config
+     * @param configurationValue
+     * @return
+     */
+    private static Map<String, Object> mergeConfig(final ContentRepository config,
+            final Map<String, Object> configurationValue) {
+        final Map<String, Object> result = new HashMap<String, Object>(config.getConfigurationValue());
+        result.putAll(configurationValue);
+        return result;
+    }
+
     @Override
-    public void mergeConfiguration(final Configuration<Map<String, Object>> otherConfig) {
-        getConfigurationValue().putAll(otherConfig.getConfigurationValue());
+    public ContentRepository mergeConfiguration(final Configuration<Map<String, Object>> otherConfig) {
+        return mergeConfiguration(otherConfig.getConfigurationValue());
+    }
+
+    @Override
+    public ContentRepository mergeConfiguration(final Map<String, Object> otherConfig) {
+        final Map<String, Object> result = new HashMap<String, Object>(getConfigurationValue());
+        result.putAll(otherConfig);
+        return new ContentRepository(result);
     }
 
     /**
@@ -64,14 +97,10 @@ public class ContentRepository extends Configuration<Map<String, Object>> {
     }
 
     /**
-     * inserts content to these key
-     * 
-     * @param key
-     * @param content
+     * stores found config requests to save iteration strategies
      */
-    public void putContent(final String key, final Object content) {
-        getConfigurationValue().put(key, content);
-    }
+    private final Map<String, Match<String, Object>> cache = enableCache ? new HashMap<String, Match<String, Object>>()
+            : null;
 
     /**
      * gets an key based content object and where it was found, closure
@@ -85,6 +114,13 @@ public class ContentRepository extends Configuration<Map<String, Object>> {
      */
     public Match<String, Object> getContentMatch(final String key, final Class<?> type,
             final ComponentConfiguration config) {
+        final String fullPathKey = ConfigurationIterationStrategy.fullPath(config, key);
+        if (enableCache) {
+            final Match<String, Object> cached = cache.get(fullPathKey);
+            if (cached != null) {
+                return cached;
+            }
+        }
         final Match<String, Object> got = new Match<String, Object>(null, null);
         // 1. try full path
         String pathKey = ConfigurationIterationStrategy.fullPath(config, key);
@@ -102,7 +138,11 @@ public class ContentRepository extends Configuration<Map<String, Object>> {
                 return got;
             }
         }
-        return new Match<String, Object>(pathKey, found);
+        final Match<String, Object> mFound = new Match<String, Object>(pathKey, found);
+        if (enableCache) {
+            cache.put(fullPathKey, mFound);
+        }
+        return mFound;
     }
 
     @Override
