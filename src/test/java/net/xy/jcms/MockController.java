@@ -19,18 +19,17 @@ package net.xy.jcms;
 import java.util.Map;
 
 import net.xy.jcms.controller.NavigationAbstractionLayer.NALKey;
-import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.MessageConfiguration;
-import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
 import net.xy.jcms.shared.IController;
 import net.xy.jcms.shared.IDataAccessContext;
+import net.xy.jcms.shared.types.Model;
 
 import org.junit.Assert;
 
 public class MockController implements IController {
 
     @Override
-    public NALKey invoke(final IDataAccessContext dac, final Map<ConfigurationType, Configuration<?>> configuration) {
+    public NALKey invoke(final IDataAccessContext dac, final Model configuration) {
         Assert.assertTrue(configuration.get(MessageConfiguration.TYPE) instanceof MessageConfiguration);
         final MessageConfiguration mess = (MessageConfiguration) configuration.get(MessageConfiguration.TYPE);
         if (mess != null) {
@@ -40,7 +39,7 @@ public class MockController implements IController {
     }
 
     @Override
-    public NALKey invoke(final IDataAccessContext dac, final Map<ConfigurationType, Configuration<?>> configuration,
+    public NALKey invoke(final IDataAccessContext dac, final Model configuration,
             final Map<Object, Object> parameters) {
         Assert.assertTrue(configuration.get(MessageConfiguration.TYPE) instanceof MessageConfiguration);
         final MessageConfiguration mess = (MessageConfiguration) configuration.get(MessageConfiguration.TYPE);

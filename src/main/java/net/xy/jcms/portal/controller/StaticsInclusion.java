@@ -20,11 +20,10 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 
 import net.xy.jcms.controller.NavigationAbstractionLayer.NALKey;
-import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.ContentRepository;
 import net.xy.jcms.controller.configurations.ControllerConfiguration;
-import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
 import net.xy.jcms.shared.IDataAccessContext;
+import net.xy.jcms.shared.types.Model;
 import net.xy.jcms.shared.types.StringList;
 import net.xy.jcms.shared.types.StringMap;
 
@@ -42,12 +41,12 @@ abstract public class StaticsInclusion extends Controller {
     private static final String INSTRUCTION_SECTION = "include";
 
     @Override
-    public NALKey invoke(final IDataAccessContext dac, final Map<ConfigurationType, Configuration<?>> configuration) {
+    public NALKey invoke(final IDataAccessContext dac, final Model configuration) {
         return invoke(dac, configuration, new HashMap<Object, Object>());
     }
 
     @Override
-    public NALKey invoke(final IDataAccessContext dac, final Map<ConfigurationType, Configuration<?>> configuration,
+    public NALKey invoke(final IDataAccessContext dac, final Model configuration,
             final Map<Object, Object> parameters) {
         final ControllerConfiguration configK = (ControllerConfiguration) configuration.get(ControllerConfiguration.TYPE);
         final ContentRepository configC = (ContentRepository) configuration.get(ContentRepository.TYPE);
@@ -66,7 +65,7 @@ abstract public class StaticsInclusion extends Controller {
      */
     @SuppressWarnings("unchecked")
     private void proccess(final ControllerConfiguration configK, final ContentRepository configC,
-            final Map<ConfigurationType, Configuration<?>> configuration, final IDataAccessContext dac) {
+            final Model configuration, final IDataAccessContext dac) {
         final Map<String, Object> aggregatedContent = new HashMap<String, Object>();
         final Map<String, Object> ownC = getControllerConfig(configK);
         if (ownC.get(INSTRUCTION_SECTION) instanceof List) {

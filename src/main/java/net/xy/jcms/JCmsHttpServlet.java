@@ -15,7 +15,6 @@ package net.xy.jcms;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.DecimalFormat;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -33,7 +32,6 @@ import net.xy.jcms.controller.UsecaseAgent.NoUsecaseFound;
 import net.xy.jcms.controller.UsecaseConfiguration.Usecase;
 import net.xy.jcms.controller.ViewRunner;
 import net.xy.jcms.controller.configurations.ComponentConfiguration;
-import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
 import net.xy.jcms.shared.IDataAccessContext;
 import net.xy.jcms.shared.JCmsHelper;
@@ -41,6 +39,7 @@ import net.xy.jcms.shared.adapter.HttpProtocolRequestAdapter;
 import net.xy.jcms.shared.adapter.HttpProtocolResponseAdapter;
 import net.xy.jcms.shared.adapter.HttpRequestDataAccessContext;
 import net.xy.jcms.shared.adapter.ServletOutputStreamAdapter;
+import net.xy.jcms.shared.types.Model;
 
 /**
  * The following injections have to be made: ITranslationConfigurationAdapter -
@@ -106,7 +105,7 @@ public class JCmsHttpServlet extends HttpServlet {
         NALKey forward = HttpProtocolRequestAdapter.apply(request, firstForward);
         NALKey cacheKey;
         Usecase usecase;
-        Map<ConfigurationType, Configuration<?>> configs;
+        Model configs;
         do {
             /**
              * find the corresponding usecase
@@ -137,7 +136,7 @@ public class JCmsHttpServlet extends HttpServlet {
          * the same configuration leads to the same result. realized through
          * hashing and persistance.
          */
-        final Map<ConfigurationType, Configuration<?>> viewConfigs = JCmsHelper.getConfigurations(
+        final Model viewConfigs = JCmsHelper.getConfigurations(
                 ConfigurationType.VIEWAPPLICABLE, configs);
         final String output = UsecaseAgent.applyCaching(viewConfigs, cacheKey, null);
 

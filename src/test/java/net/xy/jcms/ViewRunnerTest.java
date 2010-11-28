@@ -20,7 +20,6 @@ import org.junit.Test;
 
 import net.xy.jcms.controller.ViewRunner;
 import net.xy.jcms.controller.configurations.ComponentConfiguration;
-import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.FragmentConfiguration;
 import net.xy.jcms.controller.configurations.MessageConfiguration;
 import net.xy.jcms.controller.configurations.RenderKitConfiguration;
@@ -34,6 +33,7 @@ import net.xy.jcms.shared.AbstractFragment;
 import net.xy.jcms.shared.IFragment;
 import net.xy.jcms.shared.IOutWriter;
 import net.xy.jcms.shared.IRenderer;
+import net.xy.jcms.shared.types.Model;
 
 public class ViewRunnerTest {
 
@@ -86,7 +86,7 @@ public class ViewRunnerTest {
 
     @Test
     public void testViewRunner() {
-        final Map<ConfigurationType, Configuration<?>> test = new HashMap<Configuration.ConfigurationType, Configuration<?>>();
+        final Model test = new Model();
         test.put(ConfigurationType.TemplateConfiguration, new TemplateConfiguration(new HashMap<String, IFragment>() {
             private static final long serialVersionUID = -4045340286970438413L;
 

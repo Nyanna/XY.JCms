@@ -12,9 +12,6 @@
  */
 package net.xy.jcms.controller;
 
-import java.util.Map;
-
-import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
 import net.xy.jcms.controller.configurations.ComponentConfiguration;
 import net.xy.jcms.controller.configurations.ContentRepository;
@@ -24,6 +21,7 @@ import net.xy.jcms.controller.configurations.TemplateConfiguration;
 import net.xy.jcms.controller.configurations.UIConfiguration;
 import net.xy.jcms.shared.IFragment;
 import net.xy.jcms.shared.IOutWriter;
+import net.xy.jcms.shared.types.Model;
 
 /**
  * these runner gets the configuration tree and performs the output rendering
@@ -44,7 +42,7 @@ public class ViewRunner {
      *            view applicable configurations
      * @return value
      */
-    public static ComponentConfiguration runConfiguration(final Map<ConfigurationType, Configuration<?>> configurations) {
+    public static ComponentConfiguration runConfiguration(final Model configurations) {
         final TemplateConfiguration tmplConfig = (TemplateConfiguration) configurations
                 .get(ConfigurationType.TemplateConfiguration);
         if (tmplConfig != null) {
@@ -68,7 +66,7 @@ public class ViewRunner {
      * @return value
      */
     private static ComponentConfiguration initializeConfigurations(final ComponentConfiguration rootConfig,
-            final Map<ConfigurationType, Configuration<?>> model) {
+            final Model model) {
         ComponentConfiguration
                 .initialize(rootConfig,
                         (ContentRepository) model.get(ConfigurationType.ContentRepository),

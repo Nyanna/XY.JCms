@@ -18,8 +18,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.text.DecimalFormat;
 import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.xml.stream.XMLStreamException;
 import org.apache.log4j.Logger;
@@ -28,7 +26,6 @@ import net.xy.jcms.controller.TranslationConfiguration;
 import net.xy.jcms.controller.UsecaseConfiguration;
 import net.xy.jcms.controller.TranslationConfiguration.TranslationRule;
 import net.xy.jcms.controller.UsecaseConfiguration.Usecase;
-import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.ITranslationConfigurationAdapter;
 import net.xy.jcms.controller.configurations.IUsecaseConfigurationAdapter;
 import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
@@ -36,6 +33,7 @@ import net.xy.jcms.controller.configurations.parser.TranslationParser;
 import net.xy.jcms.controller.configurations.parser.UsecaseParser;
 import net.xy.jcms.controller.configurations.parser.XMLValidator;
 import net.xy.jcms.controller.configurations.parser.XMLValidator.XMLValidationException;
+import net.xy.jcms.shared.types.Model;
 
 /**
  * global helper class with various functions
@@ -132,31 +130,15 @@ public class JCmsHelper {
     }
 
     /**
-     * gets an configuration out of an configurationlist
-     * 
-     * @param configuration
-     * @return value
-     */
-    public static Configuration<?> getConfigurationByType(final ConfigurationType type,
-            final Configuration<?>[] configuration) {
-        for (final Configuration<?> config : configuration) {
-            if (type.equals(config.getConfigurationType())) {
-                return config;
-            }
-        }
-        return null;
-    }
-
-    /**
      * filters out specific types of configurations
      * 
      * @param types
      * @param configurations
      * @return an filtered selection of the given configs
      */
-    public static Map<ConfigurationType, Configuration<?>> getConfigurations(final EnumSet<ConfigurationType> types,
-            final Map<ConfigurationType, Configuration<?>> configurations) {
-        final Map<ConfigurationType, Configuration<?>> returnedConfig = new HashMap<Configuration.ConfigurationType, Configuration<?>>();
+    public static Model getConfigurations(final EnumSet<ConfigurationType> types,
+            final Model configurations) {
+        final Model returnedConfig = new Model();
         for (final ConfigurationType type : types) {
             returnedConfig.put(type, configurations.get(type));
         }

@@ -20,11 +20,10 @@ import java.util.Map.Entry;
 import net.xy.jcms.controller.NavigationAbstractionLayer.NALKey;
 import net.xy.jcms.controller.TranslationConfiguration.GroupCouldNotBeFilled;
 import net.xy.jcms.controller.TranslationConfiguration.InvalidBuildRule;
-import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.ContentRepository;
 import net.xy.jcms.controller.configurations.ControllerConfiguration;
-import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
 import net.xy.jcms.shared.IDataAccessContext;
+import net.xy.jcms.shared.types.Model;
 import net.xy.jcms.shared.types.StringList;
 
 /**
@@ -41,12 +40,12 @@ public abstract class NavigationAggregation<LINKOBJECT> extends Controller {
     private static final String INSTRUCTION_SECTION = "navigation";
 
     @Override
-    public NALKey invoke(final IDataAccessContext dac, final Map<ConfigurationType, Configuration<?>> configuration) {
+    public NALKey invoke(final IDataAccessContext dac, final Model configuration) {
         return invoke(dac, configuration, null);
     }
 
     @Override
-    public NALKey invoke(final IDataAccessContext dac, final Map<ConfigurationType, Configuration<?>> configuration,
+    public NALKey invoke(final IDataAccessContext dac, final Model configuration,
             final Map<Object, Object> parameters) {
         try {
             proccess(dac, configuration, parameters);
@@ -69,7 +68,7 @@ public abstract class NavigationAggregation<LINKOBJECT> extends Controller {
      * @throws GroupCouldNotBeFilled
      */
     @SuppressWarnings("unchecked")
-    private void proccess(final IDataAccessContext dac, final Map<ConfigurationType, Configuration<?>> configuration,
+    private void proccess(final IDataAccessContext dac, final Model configuration,
             final Map<Object, Object> parameters)
             throws GroupCouldNotBeFilled, InvalidBuildRule {
 
@@ -115,7 +114,7 @@ public abstract class NavigationAggregation<LINKOBJECT> extends Controller {
      * @return
      */
     protected abstract LINKOBJECT getLinkDTO(final String href, final String usecaseId,
-            final Map<ConfigurationType, Configuration<?>> configuration,
+            final Model configuration,
             final Map<Object, Object> parameters);
 
     /**
@@ -126,6 +125,6 @@ public abstract class NavigationAggregation<LINKOBJECT> extends Controller {
      * @param dtos
      */
     protected abstract void saveLinkDTOs(final StringList targets, final List<LINKOBJECT> dtos,
-            final Map<ConfigurationType, Configuration<?>> configuration, final Map<Object, Object> parameters);
+            final Model configuration, final Map<Object, Object> parameters);
 
 }

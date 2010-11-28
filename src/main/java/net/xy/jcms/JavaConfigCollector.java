@@ -40,6 +40,7 @@ import net.xy.jcms.controller.configurations.UIConfiguration.UI;
 import net.xy.jcms.controller.configurations.UIConfigurationProxy;
 import net.xy.jcms.shared.IDataAccessContext;
 import net.xy.jcms.shared.JCmsHelper;
+import net.xy.jcms.shared.types.Model;
 import net.xy.jcms.JavaRunner.JavaDataAccessContext;
 
 import org.apache.commons.lang.StringUtils;
@@ -69,7 +70,7 @@ public class JavaConfigCollector {
      * @return value
      * @throws ExecutionException
      */
-    public static Map<ConfigurationType, Configuration<?>> getConfig(final String request, final Map<String, Object> params,
+    public static Model getConfig(final String request, final Map<String, Object> params,
             IDataAccessContext dac) throws ExecutionException {
         /**
          * DAC would be obmitted, or fresh created
@@ -91,7 +92,7 @@ public class JavaConfigCollector {
         // NALKey forward = fillWithParams(firstForward,parrams);
 
         Usecase usecase;
-        Map<ConfigurationType, Configuration<?>> configs;
+        Model configs;
         do {
             /**
              * find the corresponding usecase
@@ -121,7 +122,7 @@ public class JavaConfigCollector {
          * get the configurationtree for the usecase from an empty run through
          * the componenttree
          */
-        final Map<ConfigurationType, Configuration<?>> viewConfigs = JCmsHelper.getConfigurations(
+        final Model viewConfigs = JCmsHelper.getConfigurations(
                 ConfigurationType.VIEWAPPLICABLE, configs);
         @SuppressWarnings("unused")
         final ComponentConfiguration confTree = ViewRunner.runConfiguration(viewConfigs);
@@ -148,7 +149,7 @@ public class JavaConfigCollector {
         try {
             final long start = System.currentTimeMillis();
             // LOG.info("Configuration aggregation started: " + start);
-            final Map<ConfigurationType, Configuration<?>> configs = getConfig(request, params, dac);
+            final Model configs = getConfig(request, params, dac);
             LOG.info("Execution succeeded in milliseconds "
                     + new DecimalFormat("###,###,### \u039C").format((System.currentTimeMillis() - start)));
 

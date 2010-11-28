@@ -14,40 +14,36 @@
  * You should have received a copy of the GNU General Public License
  * along with XY.JCms. If not, see <http://www.gnu.org/licenses/>.
  */
-package net.xy.jcms.shared;
+package net.xy.jcms.shared.types;
 
-import java.util.Map;
+import java.util.HashMap;
 
-import net.xy.jcms.controller.NavigationAbstractionLayer.NALKey;
-import net.xy.jcms.shared.types.Model;
+import net.xy.jcms.controller.configurations.Configuration;
+import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
 
 /**
- * interface for the dynamicly loaded controllers.
+ * an simply typesation for an configuration container object
  * 
  * @author Xyan
  * 
  */
-public interface IController {
+public class Model extends HashMap<ConfigurationType, Configuration<?>> {
+
+    private static final long serialVersionUID = 1335232176002098094L;
 
     /**
-     * main funtion of an controller. will be invoked when no parameters are
-     * obmitted.
-     * 
-     * @param dac
-     * @param configuration
-     * @return value
+     * default
      */
-    NALKey invoke(final IDataAccessContext dac, final Model configuration);
+    public Model() {
+    }
 
     /**
-     * if obmited configuration parameters are specified in the usecase config
-     * this method will be called instead.
+     * simple unwraps to an map
      * 
-     * @param dac
-     * @param configuration
-     * @param parameters
-     * @return value
+     * @param model
      */
-    NALKey invoke(final IDataAccessContext dac, final Model configuration,
-            Map<Object, Object> parameters);
+    public Model(final Model model) {
+        super(model);
+    }
+
 }

@@ -35,6 +35,7 @@ import net.xy.jcms.shared.DebugUtils;
 import net.xy.jcms.shared.IDataAccessContext;
 import net.xy.jcms.shared.JCmsHelper;
 import net.xy.jcms.shared.cache.XYCache;
+import net.xy.jcms.shared.types.Model;
 
 /**
  * Agent determing the usecase from an NALKey.
@@ -136,8 +137,7 @@ public class UsecaseAgent {
      *         redirect
      * @throws ClassNotFoundException
      */
-    public static NALKey executeController(final Controller[] ctrlList,
-            final Map<ConfigurationType, Configuration<?>> configurations,
+    public static NALKey executeController(final Controller[] ctrlList, final Model configurations,
             final IDataAccessContext dac, final Map<Object, Object> parameters) {
         NALKey next = null;
         for (final Controller controller : ctrlList) {
@@ -148,7 +148,7 @@ public class UsecaseAgent {
                 initWParams = true;
             }
             // filter to only requested configs
-            final Map<ConfigurationType, Configuration<?>> configs = JCmsHelper.getConfigurations(types, configurations);
+            final Model configs = JCmsHelper.getConfigurations(types, configurations);
             if (initWParams) {
                 // obmit parameters if configured
                 next = controller.invoke(dac, configs, parameters);
@@ -176,7 +176,7 @@ public class UsecaseAgent {
      * @return value
      */
     @SuppressWarnings("unchecked")
-    public static String applyCaching(final Map<ConfigurationType, Configuration<?>> configs, final NALKey key,
+    public static String applyCaching(final Model configs, final NALKey key,
             final String content) {
         /**
          * caching should support two modes after an specified timeout e.g. 60

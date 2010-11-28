@@ -14,7 +14,6 @@ package net.xy.jcms.controller;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang.StringUtils;
@@ -25,6 +24,7 @@ import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
 import net.xy.jcms.controller.configurations.IUsecaseConfigurationAdapter;
 import net.xy.jcms.shared.IController;
 import net.xy.jcms.shared.IDataAccessContext;
+import net.xy.jcms.shared.types.Model;
 
 /**
  * Configuration object describing the usecases and its behavior
@@ -67,7 +67,7 @@ public class UsecaseConfiguration {
          * and only configuration no other configuration would be delivered to
          * all involved code.
          */
-        private final Map<ConfigurationType, Configuration<?>> configurationList;
+        private final Model configurationList;
 
         /**
          * default constructor
@@ -95,8 +95,8 @@ public class UsecaseConfiguration {
          * @return value
          */
         @SuppressWarnings({ "rawtypes" })
-        private static Map<ConfigurationType, Configuration<?>> mergeConfigurations(final Configuration<?>[] mergeList) {
-            final Map<ConfigurationType, Configuration<?>> returnedConfig = new HashMap<ConfigurationType, Configuration<?>>();
+        private static Model mergeConfigurations(final Configuration<?>[] mergeList) {
+            final Model returnedConfig = new Model();
             for (final Configuration config : mergeList) {
                 if (returnedConfig.containsKey(config.getConfigurationType())) {
                     // merge
@@ -142,8 +142,8 @@ public class UsecaseConfiguration {
          * 
          * @return an copy of the inertanl config map
          */
-        public Map<ConfigurationType, Configuration<?>> getConfigurations() {
-            return new HashMap<Configuration.ConfigurationType, Configuration<?>>(configurationList);
+        public Model getConfigurations() {
+            return new Model(configurationList);
         }
 
         /**
@@ -152,8 +152,8 @@ public class UsecaseConfiguration {
          * @param types
          * @return n copy of the inertanl config map
          */
-        public Map<ConfigurationType, Configuration<?>> getConfigurations(final EnumSet<ConfigurationType> types) {
-            final Map<ConfigurationType, Configuration<?>> returnedConfig = new HashMap<Configuration.ConfigurationType, Configuration<?>>();
+        public Model getConfigurations(final EnumSet<ConfigurationType> types) {
+            final Model returnedConfig = new Model();
             for (final ConfigurationType type : types) {
                 if (!configurationList.containsKey(type)) {
                     final Configuration<?> emptyConf = Configuration.initByString(type, StringUtils.EMPTY, null);
@@ -294,7 +294,7 @@ public class UsecaseConfiguration {
          * @return value
          * @throws ClassNotFoundException
          */
-        public NALKey invoke(final IDataAccessContext dac, final Map<ConfigurationType, Configuration<?>> configuration,
+        public NALKey invoke(final IDataAccessContext dac, final Model configuration,
                 final Map<Object, Object> parameters) {
             if (parameters != null) {
                 return controllerInstance.invoke(dac, configuration, parameters);
