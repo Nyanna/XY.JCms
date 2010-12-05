@@ -33,6 +33,10 @@
 -componenttree caching support
 -CLI tool insert UC from xml
 -CLI tool insert ranslation from xml
+-Local Test coverage
+	1. junit tests for isolated components
+	2. junit tests for rendering predefined usecases
+	3. dbrun to check if UCs would run with local build/changed components
 
 -more jj usecases and components, inclusive fully functional jj order
 
@@ -43,3 +47,25 @@
 -site personalisation examples
 -Staging Concept/Implementation
 -Versioning Concept/Implementation
+-Test coverage, output mask validation
+
+
+
+#
+# Concept Release cycle
+#
+
+#Developer
+1. develope
+2. run local test coverage > checkin
+3. diff got commited in stage db
+
+#Manager
+1. create usecase from components
+2. engine validates UC
+3. checkin into stage db
+
+#Both
+4. ci runs local test coverage
+5. qa runs diff tests
+6. stage db envolves
