@@ -38,7 +38,9 @@ import net.xy.jcms.controller.configurations.pool.ControllerPool;
 import net.xy.jcms.shared.IDataAccessContext;
 
 /**
- * adapter do load and retrieve usescases from an db
+ * adapter do load and retrieve usescases from an db.
+ * Each usecase shares an common classlaoder and is encapsulated in its own db
+ * classlaoder.
  * 
  * @author Xyan
  * 
@@ -55,9 +57,9 @@ public class UsecaseDBConnector implements IUsecaseConfigurationAdapter {
     private final Connection connection;
 
     /**
-     * classloader parend for the usecase classloaders
+     * classloader parent for the usecase classloaders
      */
-    private final ClassLoader loader;
+    private final ClassLoader parentLoader;
 
     /**
      * cache for storing loading results
@@ -65,24 +67,27 @@ public class UsecaseDBConnector implements IUsecaseConfigurationAdapter {
     private Usecase[] ucCache;
 
     /**
-     * constructor needs dm connection to retrieve usescases
+     * constructor needs db connection to retrieve usescases
      * 
      * @param connection
+     *            will be set to readonly
+     * @param parentLoader
+     *            to load common classes to all usecases
      * @throws SQLException
      */
-    public UsecaseDBConnector(final Connection connection, final ClassLoader loader) throws SQLException {
+    public UsecaseDBConnector(final Connection connection, final ClassLoader parentLoader) throws SQLException {
         this.connection = connection;
-        this.loader = loader;
+        this.parentLoader = parentLoader;
         connection.setReadOnly(true);
     }
 
     @Override
     public Usecase[] getUsecaseList(final IDataAccessContext dac) {
-        if (ucCache != null) {
+        if (dac.getProperty("flushConfig") == null && ucCache != null) {
             return ucCache;
         }
         try {
-            ucCache = loadUCs(dac, connection, loader);
+            ucCache = loadUCs(dac, connection, parentLoader);
             return ucCache;
         } catch (final SQLException e) {
             LOG.fatal("Could load usecases from DB.", e);
@@ -101,7 +106,8 @@ public class UsecaseDBConnector implements IUsecaseConfigurationAdapter {
      * @throws SQLException
      * @throws ClassNotFoundException
      */
-    private static Usecase[] loadUCs(final IDataAccessContext dac, final Connection connection, final ClassLoader loader)
+    private static Usecase[] loadUCs(final IDataAccessContext dac, final Connection connection,
+            final ClassLoader parentLoader)
             throws SQLException, ClassNotFoundException {
         final Statement query = connection.createStatement();
         if (!query.execute("SELECT * FROM Usecases WHERE Enabled = true;")) {
@@ -110,7 +116,7 @@ public class UsecaseDBConnector implements IUsecaseConfigurationAdapter {
         final ResultSet result = query.getResultSet();
         final List<Usecase> cases = new LinkedList<Usecase>();
         while (result.next()) {
-            cases.add(loadUC(dac, result, connection, loader));
+            cases.add(loadUC(dac, result, connection, parentLoader));
         }
         return cases.toArray(new Usecase[cases.size()]);
     }
@@ -127,8 +133,8 @@ public class UsecaseDBConnector implements IUsecaseConfigurationAdapter {
      */
     static private Usecase loadUC(final IDataAccessContext dac, final ResultSet result, final Connection connection,
             final ClassLoader parentLoader) throws SQLException, ClassNotFoundException {
-        // Usecase's own classloader newly instantiated all the usecase need if
-        // not already loaded
+        // Usecase's own classloader newly instantiated all the usecase needs if
+        // not already loaded by the common classloader
         final ClassLoader loader = new DBClassLoader(connection, parentLoader);
         final String uniqueId = result.getString("uniqueId");
         final String id = result.getString("id");

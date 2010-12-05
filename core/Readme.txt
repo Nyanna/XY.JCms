@@ -31,6 +31,8 @@
 -single usecase controller example
 -generic controller managed configuration
 -componenttree caching support
+-CLI tool insert UC from xml
+-CLI tool insert ranslation from xml
 
 -more jj usecases and components, inclusive fully functional jj order
 
@@ -39,3 +41,5 @@
 # Phase 3 will cover
 #
 -site personalisation examples
+-Staging Concept/Implementation
+-Versioning Concept/Implementation

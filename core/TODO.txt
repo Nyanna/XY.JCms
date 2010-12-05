@@ -4,8 +4,6 @@
 -think about an portalkit plugin mechanism
 
 
-
-
 #Performace conclusion
 
 1. Class initialization - no problem after startup phase - all components got cached

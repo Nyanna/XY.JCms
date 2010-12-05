@@ -32,6 +32,7 @@ import net.xy.jcms.controller.UsecaseConfiguration.Usecase;
 import net.xy.jcms.controller.configurations.ITranslationConfigurationAdapter;
 import net.xy.jcms.controller.configurations.IUsecaseConfigurationAdapter;
 import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
+import net.xy.jcms.controller.configurations.parser.TranslationDBConnector;
 import net.xy.jcms.controller.configurations.parser.TranslationParser;
 import net.xy.jcms.controller.configurations.parser.UsecaseDBConnector;
 import net.xy.jcms.controller.configurations.parser.UsecaseParser;
@@ -193,6 +194,22 @@ public class JCmsHelper {
     }
 
     /**
+     * sets DB sql connector adaptern for TRanslation and Usecase Configuration
+     * using the same readonly connection.
+     * 
+     * @param sqlUrl
+     * @param user
+     * @param passwd
+     * @throws SQLException
+     */
+    public static void setDBAdapter(final String sqlUrl, final String user, final String passwd) throws SQLException {
+        final Connection connection = DriverManager.getConnection(sqlUrl, user, passwd);
+        UsecaseConfiguration.setUsecaseAdapter(new UsecaseDBConnector(connection, JCmsHelper.class.getClassLoader()));
+        TranslationConfiguration.setTranslationAdapter(new TranslationDBConnector(connection, JCmsHelper.class
+                .getClassLoader()));
+    }
+
+    /**
      * sets an sql db adapter for usecases
      * 
      * @param sqlUrl
@@ -201,5 +218,19 @@ public class JCmsHelper {
     public static void setDBUCLoader(final String sqlUrl, final String user, final String passwd) throws SQLException {
         final Connection connection = DriverManager.getConnection(sqlUrl, user, passwd);
         UsecaseConfiguration.setUsecaseAdapter(new UsecaseDBConnector(connection, JCmsHelper.class.getClassLoader()));
+    }
+
+    /**
+     * sets an sql adapter for loading translation rules
+     * 
+     * @param sqlUrl
+     * @param user
+     * @param passwd
+     * @throws SQLException
+     */
+    public static void setDBRuleLoader(final String sqlUrl, final String user, final String passwd) throws SQLException {
+        final Connection connection = DriverManager.getConnection(sqlUrl, user, passwd);
+        TranslationConfiguration.setTranslationAdapter(new TranslationDBConnector(connection, JCmsHelper.class
+                .getClassLoader()));
     }
 }

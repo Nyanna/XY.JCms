@@ -49,24 +49,28 @@ public class DBClassLoader extends ClassLoader {
      * @param parent
      */
     public DBClassLoader(final Connection connection, final ClassLoader parent) {
+        super(parent);
+        if (parent == null) {
+            throw new IllegalArgumentException(
+                    "ClassLoader is only intended to be inserted in an CL tree parent can't be null.");
+        }
         this.connection = connection;
     }
 
     @Override
     public Class<?> loadClass(final String name) throws ClassNotFoundException {
-        final Class<?> clazz = super.loadClass(name);
-        if (clazz != null) {
-            return clazz;
-        }
-        return loadClassFromDB(name);
+        return loadClass(name, true);
     }
 
     @Override
     protected synchronized Class<?> loadClass(final String name, final boolean resolve) throws ClassNotFoundException {
-        final Class<?> clazz = super.loadClass(name, resolve);
-        if (clazz != null) {
-            return clazz;
+        try {
+            // first try parent
+            return getParent().loadClass(name);
+        } catch (final ClassNotFoundException ex) {
         }
+
+        // parent hasn't that class try to load self
         return loadClassFromDB(name);
     }
 
@@ -79,20 +83,19 @@ public class DBClassLoader extends ClassLoader {
         Statement query;
         try {
             query = connection.createStatement();
-            if (!query.execute("SELECT * FROM Classes WHERE name = '" + name + "' LIMIT 1;")) {
-                throw new ClassNotFoundException("Retrieving classes from DB returned no results.");
-            }
-            final ResultSet result = query.getResultSet();
-            if (result.first()) {
-                final Blob code = result.getBlob("bytecode");
-                final Class<?> clazz = defineClass(name, code.getBytes(1, (int) code.length() + 1), 0, (int) code.length());
-                resolveClass(clazz);
-                cache.put(name, clazz);
-                return clazz;
+            if (query.execute("SELECT * FROM Classes WHERE name = '" + name + "' LIMIT 1;")) {
+                final ResultSet result = query.getResultSet();
+                if (result.first()) {
+                    final Blob code = result.getBlob("bytecode");
+                    final Class<?> clazz = defineClass(name, code.getBytes(1, (int) code.length()), 0, (int) code.length());
+                    resolveClass(clazz);
+                    cache.put(name, clazz);
+                    return clazz;
+                }
             }
         } catch (final SQLException e) {
-            throw new ClassNotFoundException("Loading an class from DB as last chacne was not possible due an Error.", e);
+            throw new ClassNotFoundException("Loading an class from DB was not possible due an SQL Error.", e);
         }
-        throw new ClassNotFoundException("Loading an class from DB as last chacne was not possible.");
+        throw new ClassNotFoundException("Class couldn't be loaded from parent or db.");
     }
 }

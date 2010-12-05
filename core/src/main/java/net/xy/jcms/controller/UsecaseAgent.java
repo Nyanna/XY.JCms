@@ -89,9 +89,8 @@ public class UsecaseAgent {
         final Usecase foundCase = UsecaseConfiguration.findUsecaseForStruct(struct, dac);
         if (foundCase == null) {
             // try to find most general error usecase
-            final Usecase foundErrorCase = UsecaseConfiguration.findUsecaseForStruct(new NALKey(ERROR_USECASE_ID,
-                    struct),
-                    dac);
+            final Usecase foundErrorCase = UsecaseConfiguration
+                    .findUsecaseForStruct(new NALKey(ERROR_USECASE_ID), dac);
             if (foundErrorCase == null) {
                 throw new NoUsecaseFound("No usecase were found for the request. " + DebugUtils.printFields(struct));
             }

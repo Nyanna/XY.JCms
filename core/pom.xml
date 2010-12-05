@@ -11,7 +11,7 @@
 	<artifactId>core</artifactId>
 	<version>SNAPSHOT</version>
 
-	<name>core</name>
+	<name>Core package</name>
 	<description>Core package of JCms providing the Infrastructure</description>
 	<url>http://github.com/Nyanna/XY.JCms</url>
 

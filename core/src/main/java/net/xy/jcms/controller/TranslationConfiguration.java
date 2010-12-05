@@ -86,7 +86,11 @@ public abstract class TranslationConfiguration {
             }
             this.buildOff = buildOff;
             this.usecase = usecase;
-            this.parameters = parameters;
+            if (parameters == null) {
+                this.parameters = new ArrayList<RuleParameter>();
+            } else {
+                this.parameters = parameters;
+            }
         }
 
         /**
@@ -127,7 +131,8 @@ public abstract class TranslationConfiguration {
     }
 
     /**
-     * specifies an parameter to which regexp group it belongs and the typeconverter used.
+     * specifies an parameter to which regexp group it belongs and the
+     * typeconverter used.
      * 
      * @author Xyan
      * 
