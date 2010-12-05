@@ -74,22 +74,25 @@ public class UsecaseConfigurationTest {
             @Override
             public Usecase[] getUsecaseList(final IDataAccessContext dac) {
                 return new Usecase[] {
-                        new Usecase("contentgroup", "first test", new Parameter[] { new Parameter("contentgroup",
-                                "de.jamba.ContentGroup") }, new Controller[] { new Controller(
-                                new MockController(),
-                                EnumSet.of(ConfigurationType.MessageConfiguration))
+                        new Usecase("contentgroup", "first test with an very extensive description to bypass ex",
+                                new Parameter[] { new Parameter("contentgroup",
+                                        "de.jamba.ContentGroup") }, new Controller[] { new Controller(
+                                        new MockController(),
+                                        EnumSet.of(ConfigurationType.MessageConfiguration))
 
-                        }, new Configuration[] { new MessageConfiguration(new Properties() {
-                            private static final long serialVersionUID = 4127043651680566300L;
-                            {
-                                put("test", "test");
-                            }
+                                }, new Configuration[] { new MessageConfiguration(new Properties() {
+                                    private static final long serialVersionUID = 4127043651680566300L;
+                                    {
+                                        put("test", "test");
+                                    }
 
-                        }) }), new Usecase("subcategory", "first test", new Parameter[] {}, new Controller[] {
+                                }) }),
+                        new Usecase("subcategory", "first test with an very extensive description to bypass ex",
+                                new Parameter[] {}, new Controller[] {
 
-                        }, new Configuration[] {
+                                }, new Configuration[] {
 
-                        }) };
+                                }) };
             }
 
         });

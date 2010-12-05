@@ -16,6 +16,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.EnumSet;
 
@@ -30,6 +33,7 @@ import net.xy.jcms.controller.configurations.ITranslationConfigurationAdapter;
 import net.xy.jcms.controller.configurations.IUsecaseConfigurationAdapter;
 import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
 import net.xy.jcms.controller.configurations.parser.TranslationParser;
+import net.xy.jcms.controller.configurations.parser.UsecaseDBConnector;
 import net.xy.jcms.controller.configurations.parser.UsecaseParser;
 import net.xy.jcms.controller.configurations.parser.XMLValidator;
 import net.xy.jcms.controller.configurations.parser.XMLValidator.XMLValidationException;
@@ -57,7 +61,17 @@ public class JCmsHelper {
      */
     public static void setConfiguration(final String translationConfigXml, final String usecaseConfigurationXml)
             throws XMLValidationException {
+        setTranslationConfiguration(translationConfigXml);
+        setUsecaseConfiguration(usecaseConfigurationXml);
+    }
 
+    /**
+     * sets only the translation configuration from xml
+     * 
+     * @param translationConfigXml
+     * @throws XMLValidationException
+     */
+    public static void setTranslationConfiguration(final String translationConfigXml) throws XMLValidationException {
         XMLValidator.validate(translationConfigXml, JCmsHelper.class.getClassLoader());
         TranslationConfiguration.setTranslationAdapter(new ITranslationConfigurationAdapter() {
             TranslationRule[] cache = null;
@@ -92,7 +106,15 @@ public class JCmsHelper {
                 return cache;
             }
         });
+    }
 
+    /**
+     * sets only the usecase configuration from xml
+     * 
+     * @param usecaseConfigurationXml
+     * @throws XMLValidationException
+     */
+    public static void setUsecaseConfiguration(final String usecaseConfigurationXml) throws XMLValidationException {
         XMLValidator.validate(usecaseConfigurationXml, JCmsHelper.class.getClassLoader());
         UsecaseConfiguration.setUsecaseAdapter(new IUsecaseConfigurationAdapter() {
             Usecase[] cache = null;
@@ -168,5 +190,16 @@ public class JCmsHelper {
         con.setDefaultUseCaches(false);
         con.addRequestProperty("seed", new Long(System.currentTimeMillis()).toString());
         return con.getInputStream();
+    }
+
+    /**
+     * sets an sql db adapter for usecases
+     * 
+     * @param sqlUrl
+     * @throws SQLException
+     */
+    public static void setDBUCLoader(final String sqlUrl, final String user, final String passwd) throws SQLException {
+        final Connection connection = DriverManager.getConnection(sqlUrl, user, passwd);
+        UsecaseConfiguration.setUsecaseAdapter(new UsecaseDBConnector(connection, JCmsHelper.class.getClassLoader()));
     }
 }

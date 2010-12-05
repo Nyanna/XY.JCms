@@ -1,12 +1,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>module</artifactId>
+		<groupId>xy.jcms</groupId>
+		<version>SNAPSHOT</version>
+	</parent>
+	<modelVersion>4.0.0</modelVersion>
   <groupId>xy.jcms</groupId>
   <artifactId>example-web</artifactId>
   <packaging>war</packaging>
   <version>SNAPSHOT</version>
   <name>example-web Maven Webapp</name>
-  <url>http://maven.apache.org</url>
+  <description>Provides an Introduction into using XY.JCms</description>
+  <url>http//xyan.kilu.de</url>
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -21,6 +27,14 @@
     	<scope>compile</scope>
     </dependency>
   </dependencies>
+  <scm>
+  	<developerConnection>Xyan Kruse</developerConnection>
+  	<url>git@github.com:Nyanna/XY.JCms.git</url>
+  </scm>
+  <organization>
+  	<name>XY.X.</name>
+  	<url>http//xyan.kilu.de</url>
+  </organization>
   <build>
 		<plugins>
 			<plugin>

@@ -16,7 +16,6 @@
  */
 package net.xy.jcms.controller.configurations.parser;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -35,7 +34,6 @@ import net.xy.jcms.controller.UsecaseConfiguration.Usecase;
 import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
 import net.xy.jcms.controller.configurations.pool.ControllerPool;
-import net.xy.jcms.shared.JCmsHelper;
 
 /**
  * parses an usecase xml configuration file
@@ -304,7 +302,7 @@ public class UsecaseParser {
             throw new IllegalArgumentException("Configuration type must be set [" + parser.getLocation() + "]");
         }
         if (include != null) {
-            config = getConfigurationByInclude(type, include, loader);
+            config = Configuration.initConfigurationByInclude(type, include, loader);
         } else {
             config = getConfigurationByBody(type, parser, loader);
         }
@@ -332,26 +330,4 @@ public class UsecaseParser {
         return Configuration.initByString(type, text, loader);
     }
 
-    /**
-     * inits the config from an included resource
-     * 
-     * @param type
-     * @param include
-     * @return
-     */
-    private static Configuration<?> getConfigurationByInclude(final ConfigurationType type, final String include,
-            final ClassLoader loader) {
-        if (include.startsWith("class://")) {
-            final String classpath = include.replaceFirst("^class://", "");
-            InputStream st;
-            try {
-                st = JCmsHelper.loadResource(classpath, loader);
-                if (st != null) {
-                    return Configuration.initByStream(type, st, loader);
-                }
-            } catch (final IOException e) {
-            }
-        }
-        throw new IllegalArgumentException("Include reffers to an invalid location!");
-    }
 }

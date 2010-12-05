@@ -1,6 +1,7 @@
 -think about an modular controller set with configuration management
 -think about like cocoon merge translation and usecase configuration, usecase hold its translations, if so implement nalkey resolution that for and back transforms the key to check if ist ordering is high enough, or check if two keys matches on the same
 -think about rendering only subcomponents pathes, or init without an use case an litle component tree an render an asingle content list, whats about inline fragment configuration in usecase.xml
+-think about an portalkit plugin mechanism
 
 
 

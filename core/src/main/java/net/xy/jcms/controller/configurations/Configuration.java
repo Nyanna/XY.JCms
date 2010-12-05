@@ -20,6 +20,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 
 import net.xy.jcms.shared.DebugUtils;
+import net.xy.jcms.shared.JCmsHelper;
 
 import org.apache.log4j.Logger;
 
@@ -279,6 +280,30 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
         } catch (final IOException e) {
         }
         return initByString(type, writer.toString(), loader);
+    }
+
+    /**
+     * inits the config from an included resource
+     * 
+     * @param type
+     * @param include
+     *            pseudo uri specifieing an resource e.g. class://lang.java.test
+     * @return
+     */
+    public static Configuration<?> initConfigurationByInclude(final ConfigurationType type, final String include,
+            final ClassLoader loader) {
+        if (include.startsWith("class://")) {
+            final String classpath = include.replaceFirst("^class://", "");
+            InputStream st;
+            try {
+                st = JCmsHelper.loadResource(classpath, loader);
+                if (st != null) {
+                    return Configuration.initByStream(type, st, loader);
+                }
+            } catch (final IOException e) {
+            }
+        }
+        throw new IllegalArgumentException("Include reffers to an invalid location!");
     }
 
     /**

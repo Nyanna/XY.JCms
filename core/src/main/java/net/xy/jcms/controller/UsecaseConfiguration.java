@@ -80,10 +80,24 @@ public class UsecaseConfiguration {
          */
         public Usecase(final String id, final String description, final Parameter[] parameterList,
                 final Controller[] controllerList, final Configuration<?>[] configurationList) {
-            this.parameterList = parameterList;
-            this.controllerList = controllerList;
+            if (parameterList != null) {
+                this.parameterList = parameterList;
+            } else {
+                this.parameterList = new Parameter[] {};
+            }
+            if (controllerList != null) {
+                this.controllerList = controllerList;
+            } else {
+                this.controllerList = new Controller[] {};
+            }
             this.configurationList = mergeConfigurations(configurationList);
+            if (StringUtils.isBlank(id) || StringUtils.isBlank(description)) {
+                throw new IllegalArgumentException("Either id or description were empty initialized.");
+            }
             this.id = id;
+            if (description.length() < 32) {
+                throw new IllegalArgumentException("Usecase description have to be at least 32 chars long.");
+            }
             this.description = description;
         }
 
