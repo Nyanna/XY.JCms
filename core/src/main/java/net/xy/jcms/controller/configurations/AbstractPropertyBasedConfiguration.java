@@ -12,6 +12,8 @@
  */
 package net.xy.jcms.controller.configurations;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
@@ -45,7 +47,8 @@ public abstract class AbstractPropertyBasedConfiguration extends Configuration<P
      * @return
      */
     protected Properties mergeConfiguration(final Properties config1, final Properties config2) {
-        final Properties result = new Properties(config1);
+        final Properties result = new Properties();
+        result.putAll(config1);
         result.putAll(config2);
         return result;
     }
@@ -67,7 +70,19 @@ public abstract class AbstractPropertyBasedConfiguration extends Configuration<P
      * @return value
      */
     protected static Properties initPropertiesByString(final String configString) {
-        final Properties properties = new Properties();
+        final Properties prop = new Properties();
+        prop.putAll(initMapByString(configString));
+        return prop;
+    }
+
+    /**
+     * parses an map out of the string in property style
+     * 
+     * @param configString
+     * @return value
+     */
+    protected static Map<String, String> initMapByString(final String configString) {
+        final Map<String, String> properties = new HashMap<String, String>();
         final String[] lines = configString.split("\n");
         String lastValue = null; // to append additional data
         String lastKey = null; // to append additional data
@@ -78,14 +93,14 @@ public abstract class AbstractPropertyBasedConfiguration extends Configuration<P
             if (!line.contains("=")) {
                 // append line to the last one
                 lastValue = lastValue + line;
-                properties.setProperty(lastKey, lastValue);
+                properties.put(lastKey, lastValue);
             } else {
                 // read an new key
                 final String[] parsed = line.trim().split("=", 2);
                 try {
                     lastKey = parsed[0].trim();
                     lastValue = parsed[1].trim();
-                    properties.setProperty(lastKey, lastValue);
+                    properties.put(lastKey, lastValue);
                 } catch (final IndexOutOfBoundsException ex) {
                     throw new IllegalArgumentException("Error by parsing body configuration line. "
                             + DebugUtils.printFields(line));

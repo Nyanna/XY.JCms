@@ -27,13 +27,13 @@ import net.xy.jcms.shared.IConverter;
 public class StringWrapper implements IConverter {
 
     @Override
-    public void fromString(final String str) {
+    public void fromString(final java.lang.String str) {
         // nothing to convert
         return;
     }
 
     @Override
-    public Object convert(final String str) {
+    public String convert(final java.lang.String str) {
         return str;
     }
 

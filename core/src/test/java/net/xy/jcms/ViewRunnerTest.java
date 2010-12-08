@@ -94,7 +94,7 @@ public class ViewRunnerTest {
                 put("root", new TestFragement());
             }
         }));
-        test.put(ConfigurationType.UIConfiguration, new UIConfiguration(new Properties() {
+        test.put(ConfigurationType.UIConfiguration, new UIConfiguration(new HashMap<String, Object>() {
             private static final long serialVersionUID = -1203791194278285716L;
 
             {

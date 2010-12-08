@@ -63,7 +63,7 @@ public class StringMap extends HashMap<String, String> implements IConverter {
     }
 
     @Override
-    public Object convert(final String str) {
+    public StringMap convert(final String str) {
         return new StringMap(str);
     }
 }

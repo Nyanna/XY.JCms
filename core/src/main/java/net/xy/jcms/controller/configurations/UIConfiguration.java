@@ -16,8 +16,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
+import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import net.xy.jcms.controller.configurations.ConfigurationIterationStrategy.ClimbUp;
+import net.xy.jcms.controller.configurations.pool.ConverterPool;
 import net.xy.jcms.shared.DebugUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -28,7 +32,7 @@ import org.apache.commons.lang.StringUtils;
  * @author xyan
  * 
  */
-public class UIConfiguration extends AbstractPropertyBasedConfiguration {
+public class UIConfiguration extends Configuration<Map<String, Object>> {
     /**
      * global type constant for this type
      */
@@ -39,8 +43,50 @@ public class UIConfiguration extends AbstractPropertyBasedConfiguration {
      * 
      * @param configurationValue
      */
-    public UIConfiguration(final Properties configurationValue) {
+    public UIConfiguration(final Map<String, Object> configurationValue) {
         super(TYPE, configurationValue);
+    }
+
+    /**
+     * converts special string notation like true:Boolean, 22:Integer to native java types.
+     * 
+     * @param loader
+     *            needed for IConverter type converters
+     * @throws ClassNotFoundException
+     */
+    public void stringTypeConversion(final ClassLoader loader) throws ClassNotFoundException {
+        for (final Entry<String, Object> entry : getConfigurationValue().entrySet()) {
+            if (String.class.isInstance(entry.getValue())) {
+                final String val = (String) entry.getValue();
+                final Matcher integer = Pattern.compile("([0-9]+):Integer", Pattern.CASE_INSENSITIVE).matcher(val);
+                if (integer.matches()) {
+                    entry.setValue(Integer.valueOf(integer.group(1)));
+                    continue;
+                }
+                final Matcher bool = Pattern.compile("(true|false):Boolean", Pattern.CASE_INSENSITIVE).matcher(val);
+                if (bool.matches()) {
+                    entry.setValue(Boolean.valueOf(integer.group(1)));
+                    continue;
+                }
+                final Matcher along = Pattern.compile("([0-9]+):Long", Pattern.CASE_INSENSITIVE).matcher(val);
+                if (along.matches()) {
+                    entry.setValue(Long.valueOf(integer.group(1)));
+                    continue;
+                }
+                final Matcher adouble = Pattern.compile("([0-9,]+):Double", Pattern.CASE_INSENSITIVE).matcher(val);
+                if (adouble.matches()) {
+                    entry.setValue(Double.valueOf(integer.group(1)));
+                    continue;
+                }
+                // matches an custom typeconverter
+                final Matcher converter = Pattern.compile("\\[(.*)\\]:([a-zA-Z0-9.$]+)", Pattern.CASE_INSENSITIVE)
+                        .matcher(val);
+                if (converter.matches()) {
+                    entry.setValue(ConverterPool.get(converter.group(2), loader).convert(converter.group(1)));
+                    continue;
+                }
+            }
+        }
     }
 
     /**
@@ -88,7 +134,7 @@ public class UIConfiguration extends AbstractPropertyBasedConfiguration {
             final ClimbUp strategy = new ClimbUp(config, ui.getKey());
             for (final String pathKey : strategy) {
                 retrievalStack.add(pathKey);
-                final Object found = getConfigurationValue().getProperty(pathKey);
+                final Object found = getConfigurationValue().get(pathKey);
                 if (rightType(ui, found)) {
                     // type check based on class parameter
                     value = new Match<String, Object>(pathKey, found);
@@ -151,9 +197,18 @@ public class UIConfiguration extends AbstractPropertyBasedConfiguration {
      * 
      * @param configString
      * @return value
+     * @throws ClassNotFoundException
      */
-    public static UIConfiguration initByString(final String configString) {
-        return new UIConfiguration(AbstractPropertyBasedConfiguration.initPropertiesByString(configString));
+    public static UIConfiguration initByString(final String configString, final ClassLoader loader) {
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+        final UIConfiguration config = new UIConfiguration(
+                (Map) AbstractPropertyBasedConfiguration.initMapByString(configString));
+        try {
+            config.stringTypeConversion(loader);
+        } catch (final ClassNotFoundException e) {
+            throw new IllegalArgumentException("An referenced typeconverter couldn't be loaded.", e);
+        }
+        return config;
     }
 
     /**
@@ -281,13 +336,38 @@ public class UIConfiguration extends AbstractPropertyBasedConfiguration {
     }
 
     @Override
-    public UIConfiguration mergeConfiguration(final Configuration<Properties> otherConfig2) {
+    public UIConfiguration mergeConfiguration(final Configuration<Map<String, Object>> otherConfig2) {
         return mergeConfiguration(otherConfig2.getConfigurationValue());
     }
 
     @Override
-    public UIConfiguration mergeConfiguration(final Properties otherConfig2) {
+    public UIConfiguration mergeConfiguration(final Map<String, Object> otherConfig2) {
         return new UIConfiguration(mergeConfiguration(getConfigurationValue(), otherConfig2));
+    }
+
+    /**
+     * merges two config objects of this type
+     * 
+     * @param config1
+     * @param config2
+     * @return
+     */
+    protected Map<String, Object> mergeConfiguration(final Map<String, Object> config1,
+            final Map<String, Object> config2) {
+        final Map<String, Object> result = new HashMap<String, Object>();
+        result.putAll(config1);
+        result.putAll(config2);
+        return result;
+    }
+
+    @Override
+    public int hashCode() {
+        return getConfigurationValue().hashCode();
+    }
+
+    @Override
+    public boolean equals(final Object object) {
+        return getConfigurationValue().equals(object);
     }
 
 }

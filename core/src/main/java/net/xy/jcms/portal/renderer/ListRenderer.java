@@ -25,8 +25,8 @@ package net.xy.jcms.portal.renderer;
 public class ListRenderer extends BaseRenderer implements IListRenderer {
 
     @Override
-    public StringBuilder renderContainerStart(final String style) {
-        return renderStartTag("ul", style);
+    public StringBuilder renderContainerStart(final String style, final String id) {
+        return renderStartTag("ul", style, id);
     }
 
     @Override
@@ -42,6 +42,11 @@ public class ListRenderer extends BaseRenderer implements IListRenderer {
     @Override
     public StringBuilder renderListItemEnd() {
         return renderEndTag("li");
+    }
+
+    @Override
+    public StringBuilder renderCounting(final int position) {
+        return new StringBuilder("<span class=\"position\">#").append(position).append("</span>");
     }
 
 }

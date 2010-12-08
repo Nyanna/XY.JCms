@@ -24,17 +24,32 @@ import org.apache.commons.lang.StringUtils;
  * 
  */
 public class BaseRenderer implements IBaseRenderer {
+    // TODO [LOW] make renderTag methods protected and remove from interface
 
     @Override
     public StringBuilder renderStartTag(final String tag) {
-        return new StringBuilder("<").append(tag).append(">");
+        return renderStartTag(tag, null, null);
     }
 
     @Override
     public StringBuilder renderStartTag(final String tag, final String style) {
+        return renderStartTag(tag, style, null);
+    }
+
+    /**
+     * 
+     * @param tag
+     * @param style
+     * @param id
+     * @return
+     */
+    protected StringBuilder renderStartTag(final String tag, final String style, final String id) {
         final StringBuilder ret = new StringBuilder("<").append(tag);
         if (StringUtils.isNotBlank(style)) {
             ret.append(" class=\"").append(style.trim()).append("\"");
+        }
+        if (StringUtils.isNotBlank(id)) {
+            ret.append(" id=\"").append(id.trim()).append("\"");
         }
         return ret.append(" >");
     }
@@ -63,7 +78,7 @@ public class BaseRenderer implements IBaseRenderer {
 
     @Override
     public StringBuilder renderScriptInclude(final String scriptUri) {
-        return new StringBuilder("<script src=\"").append("scriptUri").append("\" type=\"text/javascript\"></script>");
+        return new StringBuilder("<script src=\"").append(scriptUri).append("\" type=\"text/javascript\"></script>");
     }
 
     @Override
@@ -95,6 +110,23 @@ public class BaseRenderer implements IBaseRenderer {
             ret.append(" title=\"").append(title).append("\"");
         }
         return ret.append("/>");
+    }
+
+    @Override
+    public StringBuilder renderJavaScriptStart() {
+        return new StringBuilder("<script type=\"text/javascript\">\r\n" +
+                "// <![CDATA[");
+    }
+
+    @Override
+    public StringBuilder renderJavaScriptEnd() {
+        return new StringBuilder("// ]]>\r\n" +
+                "</script>");
+    }
+
+    @Override
+    public StringBuilder renderHeading(final int lvl, final String containment) {
+        return new StringBuilder(renderStartTag("h" + lvl)).append(containment).append(renderEndTag("h" + lvl));
     }
 
 }

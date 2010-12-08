@@ -47,7 +47,7 @@ public class StringList extends ArrayList<String> implements IConverter {
     }
 
     @Override
-    public Object convert(final String str) {
+    public StringList convert(final String str) {
         return new StringList(str);
     }
 }

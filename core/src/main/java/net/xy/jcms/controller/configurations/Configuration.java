@@ -236,6 +236,8 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
      * 
      * @param type
      * @param in
+     * @param loader
+     *            needed to load configuration components like typeconverters, renderer and fragments
      * @return value
      */
     public static Configuration<?> initByString(final ConfigurationType type, final String in, final ClassLoader loader) {
@@ -243,7 +245,7 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
         case TemplateConfiguration:
             return TemplateConfiguration.initByString(in, loader);
         case UIConfiguration:
-            return UIConfiguration.initByString(in);
+            return UIConfiguration.initByString(in, loader);
         case MessageConfiguration:
             return MessageConfiguration.initByString(in);
         case RenderKitConfiguration:

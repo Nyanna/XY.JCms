@@ -498,6 +498,16 @@ public abstract class ComponentConfiguration {
      * @param key
      * @return value
      */
+    public Double getUIConfigDouble(final String key) {
+        return (Double) getUIConfig(key);
+    }
+
+    /**
+     * simple castign wrapper for an ui config object
+     * 
+     * @param key
+     * @return value
+     */
     public Boolean getUIConfigBoolean(final String key) {
         return (Boolean) getUIConfig(key);
     }

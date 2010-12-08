@@ -19,6 +19,7 @@ package net.xy.jcms.shared;
 /**
  * an interface for loose coupled type conversion from/to property strings. can be used for human readable configuration
  * mainly via xml.
+ * Converter need the possibility to get instantiated by an parameterless constructor.
  * 
  * @author Xyan
  * 

@@ -12,8 +12,8 @@
  */
 package net.xy.jcms.controller.configurations;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.TreeMap;
 
 /**
@@ -38,7 +38,7 @@ public class UIConfigurationProxy extends UIConfiguration {
      * default empty config
      */
     public UIConfigurationProxy() {
-        super(new Properties());
+        super(new HashMap<String, Object>());
     }
 
     /**

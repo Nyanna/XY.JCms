@@ -104,4 +104,28 @@ public interface IBaseRenderer extends IRenderer {
      * @return value
      */
     public StringBuilder renderImage(final String src, final String alt, final String title);
+
+    /**
+     * renders javascript opening tag inclusive CDATA
+     * 
+     * @return value
+     */
+    public StringBuilder renderJavaScriptStart();
+
+    /**
+     * renders javascript closing tag inclusive CDATA
+     * 
+     * @return value
+     */
+    public StringBuilder renderJavaScriptEnd();
+
+    /**
+     * renders an heading with the given lvl
+     * 
+     * @param lvl
+     * @param containment
+     *            heading text
+     * @return value
+     */
+    public StringBuilder renderHeading(int lvl, final String containment);
 }
