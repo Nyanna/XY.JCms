@@ -24,15 +24,24 @@ import org.apache.commons.lang.StringUtils;
  * 
  */
 public class BaseRenderer implements IBaseRenderer {
-    // TODO [LOW] make renderTag methods protected and remove from interface
 
-    @Override
-    public StringBuilder renderStartTag(final String tag) {
+    /**
+     * renders an xml starttag without attributes
+     * 
+     * @return value
+     */
+    protected StringBuilder renderStartTag(final String tag) {
         return renderStartTag(tag, null, null);
     }
 
-    @Override
-    public StringBuilder renderStartTag(final String tag, final String style) {
+    /**
+     * renders an xml starttag with an style attribute
+     * 
+     * @param tag
+     * @param style
+     * @return value
+     */
+    protected StringBuilder renderStartTag(final String tag, final String style) {
         return renderStartTag(tag, style, null);
     }
 
@@ -54,8 +63,14 @@ public class BaseRenderer implements IBaseRenderer {
         return ret.append(" >");
     }
 
-    @Override
-    public StringBuilder renderStartTag(final String tag, final Map<String, String> attributes) {
+    /**
+     * renders an xml starttag with an variable attribute list
+     * 
+     * @param tag
+     * @param attributes
+     * @return value
+     */
+    protected StringBuilder renderStartTag(final String tag, final Map<String, String> attributes) {
         final StringBuilder ret = new StringBuilder("<").append(tag);
         if (attributes != null && !attributes.isEmpty()) {
             for (final Entry<String, String> attrib : attributes.entrySet()) {
@@ -65,8 +80,12 @@ public class BaseRenderer implements IBaseRenderer {
         return ret.append(" >");
     }
 
-    @Override
-    public StringBuilder renderEndTag(final String tag) {
+    /**
+     * renders an xml endtag
+     * 
+     * @return value
+     */
+    protected StringBuilder renderEndTag(final String tag) {
         return new StringBuilder("</").append(tag).append(">");
     }
 
@@ -127,6 +146,16 @@ public class BaseRenderer implements IBaseRenderer {
     @Override
     public StringBuilder renderHeading(final int lvl, final String containment) {
         return new StringBuilder(renderStartTag("h" + lvl)).append(containment).append(renderEndTag("h" + lvl));
+    }
+
+    @Override
+    public StringBuilder renderPageStart(final Map<String, String> attributes) {
+        return renderStartTag("body", attributes);
+    }
+
+    @Override
+    public StringBuilder renderPageEnd() {
+        return renderEndTag("body");
     }
 
 }

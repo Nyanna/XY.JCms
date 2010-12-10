@@ -25,38 +25,6 @@ import net.xy.jcms.shared.IRenderer;
 public interface IBaseRenderer extends IRenderer {
 
     /**
-     * renders an xml starttag without attributes
-     * 
-     * @return value
-     */
-    public StringBuilder renderStartTag(final String tag);
-
-    /**
-     * renders an xml starttag with an style attribute
-     * 
-     * @param tag
-     * @param style
-     * @return value
-     */
-    public StringBuilder renderStartTag(final String tag, final String style);
-
-    /**
-     * renders an xml starttag with an variable attribute list
-     * 
-     * @param tag
-     * @param attributes
-     * @return value
-     */
-    public StringBuilder renderStartTag(final String tag, final Map<String, String> attributes);
-
-    /**
-     * renders an xml endtag
-     * 
-     * @return value
-     */
-    public StringBuilder renderEndTag(final String tag);
-
-    /**
      * method for rendering meta link tags in html
      * 
      * @param href
@@ -128,4 +96,19 @@ public interface IBaseRenderer extends IRenderer {
      * @return value
      */
     public StringBuilder renderHeading(int lvl, final String containment);
+
+    /**
+     * renders page or body elements
+     * 
+     * @param attributes
+     * @return value
+     */
+    public StringBuilder renderPageStart(final Map<String, String> attributes);
+
+    /**
+     * renders page or body endtags
+     * 
+     * @return value
+     */
+    public StringBuilder renderPageEnd();
 }

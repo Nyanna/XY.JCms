@@ -132,7 +132,8 @@ public class TranslationDBConnector implements ITranslationConfigurationAdapter 
         final String reactOn = result.getString("reactOn");
         final String buildOff = result.getString("buildOff");
         final String usecase = result.getString("usecase");
-        // TODO [LOW] implement building mapping support for mapped types
+        // TODO [LOW] implement building mapping support for mapped types as in
+        // xml 23234 = funsounds
         final List<RuleParameter> params = parseParameters(result.getString("parameters"), connection, loader);
         return new TranslationRule(reactOn, buildOff, usecase, params);
     }

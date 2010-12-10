@@ -92,7 +92,7 @@ public class JCmsHelper {
                     con.addRequestProperty("seed", new Long(start).toString());
                     cache = TranslationParser.parse(con.getInputStream(), this.getClass().getClassLoader());
                     LOG.info("Parsing and converting of Translationrule xml config tok:  "
-                            + new DecimalFormat("###,###,### \u039C").format((System.currentTimeMillis() - start)));
+                            + new DecimalFormat("###,###,### ms").format((System.currentTimeMillis() - start)));
                 } catch (final XMLStreamException e) {
                     ex = e;
                 } catch (final IOException e) {
@@ -135,7 +135,7 @@ public class JCmsHelper {
                     con.addRequestProperty("seed", new Long(start).toString());
                     cache = UsecaseParser.parse(con.getInputStream(), this.getClass().getClassLoader());
                     LOG.info("Parsing and converting of Usecase xml config tok:   "
-                            + new DecimalFormat("###,###,### \u039C").format((System.currentTimeMillis() - start)));
+                            + new DecimalFormat("###,###,### ms").format((System.currentTimeMillis() - start)));
                 } catch (final XMLStreamException e) {
                     ex = e;
                 } catch (final IOException e) {

@@ -19,6 +19,8 @@ package net.xy.jcms.shared.types;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import org.apache.commons.lang.StringUtils;
+
 import net.xy.jcms.shared.IConverter;
 
 /**
@@ -33,7 +35,7 @@ public class StringList extends ArrayList<String> implements IConverter {
 
     @Override
     public void fromString(final String str) {
-        if (str != null) {
+        if (StringUtils.isNotBlank(str)) {
             final String[] list = str.trim().split(",");
             addAll(Arrays.asList(list));
         }

@@ -116,7 +116,8 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
      */
     private final String configurationSource;
 
-    // TODO write source from extern configuration in config i forgot, hm think
+    // TODO [LOW] write source from extern configuration in config i forgot, hm
+    // think
     // about merging strategy
 
     /**
@@ -237,7 +238,8 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
      * @param type
      * @param in
      * @param loader
-     *            needed to load configuration components like typeconverters, renderer and fragments
+     *            needed to load configuration components like typeconverters,
+     *            renderer and fragments
      * @return value
      */
     public static Configuration<?> initByString(final ConfigurationType type, final String in, final ClassLoader loader) {
