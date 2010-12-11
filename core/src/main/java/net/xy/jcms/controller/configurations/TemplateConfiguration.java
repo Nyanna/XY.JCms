@@ -97,7 +97,8 @@ public class TemplateConfiguration extends Configuration<Map<String, IFragment>>
             }
             return value;
         } else {
-            throw new IllegalArgumentException("An mendatory fragment/template definition was not found!");
+            throw new IllegalArgumentException("An mendatory fragment/template definition was not found! "
+                    + DebugUtils.printFields(tmplName, fullPathKey));
         }
     }
 

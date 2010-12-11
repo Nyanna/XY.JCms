@@ -61,8 +61,13 @@ public class ContentRepositoryProxy extends ContentRepository {
 
     @Override
     public Object getContent(final String key, final Class<?> type, final ComponentConfiguration config) {
-        final Match<String, Object> value = super.getContentMatch(key, type, config);
-        if (value.getValue() != null) {
+        Match<String, Object> value = null;
+        try {
+            value = super.getContentMatch(key, type, config);
+        } catch (final IllegalArgumentException ex) {
+        }
+
+        if (value != null && value.getValue() != null) {
             presentContent.put(value.getPath(), value.getValue().getClass());
             return value.getValue();
         } else {

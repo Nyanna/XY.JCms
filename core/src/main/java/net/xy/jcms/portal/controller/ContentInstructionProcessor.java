@@ -25,8 +25,10 @@ import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -46,8 +48,29 @@ public class ContentInstructionProcessor {
     /**
      * an dynamic threadpool is used to fullfill requests
      */
-    private static final ExecutorService THREADPOOL = new ThreadPoolExecutor(0, 1000, 1200L, TimeUnit.SECONDS,
+    private static final ExecutorService THREADPOOL = new ThreadPoolExecutor(50, 1000, 1200L, TimeUnit.SECONDS,
             new SynchronousQueue<Runnable>());
+    static {
+        ((ThreadPoolExecutor) THREADPOOL).setThreadFactory(new DeamonFactory());
+    }
+
+    /**
+     * an simple wrapper class using the default but setting all threads to
+     * deamons cuz they can simply abborted on shutdown.
+     * 
+     * @author Xyan
+     */
+    private static class DeamonFactory implements ThreadFactory {
+        private static final ThreadFactory DEFAULT = Executors.defaultThreadFactory();
+
+        @Override
+        public Thread newThread(final Runnable r) {
+            final Thread t = DEFAULT.newThread(r);
+            t.setDaemon(true);
+            return t;
+        }
+
+    }
 
     /**
      * usual entry method which preconstructs three lists:

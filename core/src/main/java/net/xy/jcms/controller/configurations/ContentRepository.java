@@ -121,13 +121,13 @@ public class ContentRepository extends Configuration<Map<String, Object>> {
                 return cached;
             }
         }
-        final Match<String, Object> got = new Match<String, Object>(null, null);
         // 1. try full path
         String pathKey = ConfigurationIterationStrategy.fullPath(config, key);
         Object found = getConfigurationValue().get(pathKey);
         if (found != null && !type.isInstance(found)) {
             LOG.error("Content was found but has not the right type. " + DebugUtils.printFields(key, type));
-            return got;
+            throw new IllegalArgumentException("An mendatory content object was found but hasn't the exspected type."
+                    + DebugUtils.printFields(key, fullPathKey));
         }
 
         if (found == null) {
@@ -135,7 +135,8 @@ public class ContentRepository extends Configuration<Map<String, Object>> {
             pathKey = ConfigurationIterationStrategy.componentId(config, key);
             found = getConfigurationValue().get(pathKey);
             if (!type.isInstance(found)) {
-                return got;
+                throw new IllegalArgumentException("An mendatory content object was not found."
+                        + DebugUtils.printFields(key, fullPathKey));
             }
         }
         final Match<String, Object> mFound = new Match<String, Object>(pathKey, found);

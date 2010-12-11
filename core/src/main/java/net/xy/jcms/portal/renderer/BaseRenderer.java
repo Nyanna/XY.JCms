@@ -134,12 +134,12 @@ public class BaseRenderer implements IBaseRenderer {
     @Override
     public StringBuilder renderJavaScriptStart() {
         return new StringBuilder("<script type=\"text/javascript\">\r\n" +
-                "// <![CDATA[");
+                "// <![CDATA[\r\n");
     }
 
     @Override
     public StringBuilder renderJavaScriptEnd() {
-        return new StringBuilder("// ]]>\r\n" +
+        return new StringBuilder("\r\n// ]]>\r\n" +
                 "</script>");
     }
 
