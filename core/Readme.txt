@@ -26,11 +26,10 @@
 #
 
 -the db schemata and connectors
--an browser based usecase configurator
--partial component tree rendering
--single usecase controller example
--generic controller managed configuration
--componenttree caching support
+?an browser based usecase configurator
+?partial component tree rendering & caching
+?single usecase controller example
+?generic controller managed configuration
 -CLI tool insert UC from xml
 -CLI tool insert ranslation from xml
 -Local Test coverage
