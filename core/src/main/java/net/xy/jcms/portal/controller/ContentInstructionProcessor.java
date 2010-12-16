@@ -69,7 +69,6 @@ public class ContentInstructionProcessor {
             t.setDaemon(true);
             return t;
         }
-
     }
 
     /**
@@ -94,35 +93,36 @@ public class ContentInstructionProcessor {
     public static void processInstructions(final List<Instruction> instructions, final IContentCaller cCaller)
             throws DependencyValidityError {
         // instruction which can be started directly
-        final List<Instruction> nonDepInstr = new ArrayList<ContentInstructionProcessor.Instruction>();
+        final List<Instruction> nonDepInstrs = new ArrayList<ContentInstructionProcessor.Instruction>();
         // map representing dependencies a => c,d,e
-        final Map<String, List<String>> dependencys = new HashMap<String, List<String>>();
-        // overall list of all instruction for better performance stored in an
-        // RAM struct
+        final Map<String, List<String>> depInstrs = new HashMap<String, List<String>>();
+        // overall list of all instruction for better performance stored in an RAM struct
         final Map<String, Instruction> instructionSet = new HashMap<String, ContentInstructionProcessor.Instruction>();
 
         // fill the instructions
         for (final Instruction instruction : instructions) {
-            // fill in lists
-            if (instruction.depends.isEmpty()) {
-                nonDepInstr.add(instruction);
+            // instruction.checkDone(deps)
+            if (instruction.depends.isEmpty() || instruction.isDone()) {
+                nonDepInstrs.add(instruction);
             } else {
-                dependencys.put(instruction.id, new ArrayList<String>(instruction.depends));
+                depInstrs.put(instruction.id, new ArrayList<String>(instruction.depends));
             }
-            // pre init result future to instruction
-            final Callable<Object> task = new Callable<Object>() {
-                @Override
-                public Object call() throws Exception {
-                    return processInstruction(instruction, dependencys, instructionSet, cCaller);
-                }
-            };
-            instruction.setFuture(new FutureTask<Object>(task));
+            // pre init result future to instruction if not already done
+            if (!instruction.isDone()) {
+                final Callable<Object> task = new Callable<Object>() {
+                    @Override
+                    public Object call() throws Exception {
+                        return processInstruction(instruction, depInstrs, instructionSet, cCaller);
+                    }
+                };
+                instruction.initFuture(task);
+            }
             // fill to overall set
             instructionSet.put(instruction.id, instruction);
         }
 
         // check if all depends exists or if an instruction depends itself
-        for (final Entry<String, List<String>> depInstr : dependencys.entrySet()) {
+        for (final Entry<String, List<String>> depInstr : depInstrs.entrySet()) {
             if (depInstr.getValue().contains(depInstr.getKey())) {
                 throw new DependencyValidityError("An instruction depends on itself causing an recursion.");
             }
@@ -131,8 +131,8 @@ public class ContentInstructionProcessor {
             }
         }
 
-        for (final Instruction instruction : nonDepInstr) {
-            THREADPOOL.execute(instruction.getFutureTask());
+        for (final Instruction instruction : nonDepInstrs) {
+            dispacthInstruction(instruction, depInstrs, instructionSet, cCaller);
         }
     }
 
@@ -177,30 +177,97 @@ public class ContentInstructionProcessor {
         final Object result = cCaller.call(instruction, getAll(instruction.depends, instructionSet));
 
         final String id = instruction.id;
+        removeDependentAndDispatch(id, dependencys, instructionSet, cCaller);
+        return result;
+    }
+
+    /**
+     * removes all dependencies and dispatches instruction which have nore more dependencies left
+     * 
+     * @param id
+     * @param dependencys
+     * @param instructionSet
+     * @param cCaller
+     */
+    private static void removeDependentAndDispatch(final String id, final Map<String, List<String>> dependencys,
+            final Map<String, Instruction> instructionSet, final IContentCaller cCaller) {
         for (final Entry<String, List<String>> depInstr : dependencys.entrySet()) {
             // list of instruction which requiere the result of the actual
             // proceesed instruction
             final List<String> upon = depInstr.getValue();
-            final boolean causeCall;
-            synchronized (upon) {
-                // if an dependency is solved romove it
-                if (upon.contains(id)) {
-                    upon.remove(id);
-                    // if this was the last dependency call the instruction in
-                    // an new thread
-                    causeCall = upon.isEmpty();
-                } else {
-                    // i havn't removed the last dependency
-                    causeCall = false;
-                }
-            }
+            final boolean causeCall = removeDependent(upon, id);
 
             if (causeCall) {
                 // create thread, call instruction
-                THREADPOOL.execute(instructionSet.get(depInstr.getKey()).getFutureTask());
+                final Instruction instr = instructionSet.get(depInstr.getKey());
+                dispacthInstruction(instr, dependencys, instructionSet, cCaller);
             }
         }
-        return result;
+    }
+
+    /**
+     * method decides if an new thread should dispatched or if the task is ready and can be removed from depList
+     * 
+     * @param instruction
+     * @param depInstrs
+     * @param instructionSet
+     * @param cCaller
+     */
+    private static void dispacthInstruction(final Instruction instruction, final Map<String, List<String>> depInstrs,
+            final Map<String, Instruction> instructionSet, final IContentCaller cCaller) {
+        // check if an new thread is requiered or is the content already cached
+        if (!instruction.isDone()) {
+            final Map<String, Instruction> deps = getAll(instruction.depends, instructionSet);
+            boolean allDepsReady = true;
+            // if an dep is not ready skip cache check and preprare thread
+            for (final Entry<String, Instruction> depResult : deps.entrySet()) {
+                if (!depResult.getValue().isDone()) {
+                    allDepsReady = false;
+                    break;
+                }
+            }
+            if (allDepsReady) {
+                final Object result = cCaller.getFromCache(instruction, deps);
+                if (result != null) {
+                    instruction.setResultContent(result);
+                }
+            }
+        }
+
+        if (instruction.isDone()) {
+            // if already done just remove dependencies
+            removeDependentAndDispatch(instruction.id, depInstrs, instructionSet, cCaller);
+        } else {
+            // if not done dispatch an new thread
+            THREADPOOL.execute(instruction.getFutureTask());
+        }
+    }
+
+    /**
+     * removes an dependency (more an id) from an dependency list (Stringlist). This method is internally synchronized
+     * only the last thread gets an true.
+     * 
+     * @param upon
+     *            the dependency list
+     * @param id
+     *            the id to be removed
+     * @return true when the list afterwards is empty
+     */
+    private static boolean removeDependent(final List<String> upon, final String id) {
+        final boolean causeCall;
+        synchronized (upon) {
+            // if an dependency is solved romove it
+            if (upon.contains(id)) {
+                upon.remove(id);
+                // if this was the last dependency call the instruction in
+                // an new thread
+                causeCall = upon.isEmpty();
+            } else {
+                // i havn't removed the last dependency
+                causeCall = false;
+            }
+        }
+        return causeCall;
     }
 
     /**
@@ -210,7 +277,8 @@ public class ContentInstructionProcessor {
      * @param instructionSet
      * @return
      */
-    private static Map<String, Instruction> getAll(final List<String> depends, final Map<String, Instruction> instructionSet) {
+    private static Map<String, Instruction> getAll(final List<String> depends,
+            final Map<String, Instruction> instructionSet) {
         final Map<String, Instruction> sub = new HashMap<String, Instruction>();
         for (final String dep : depends) {
             sub.put(dep, instructionSet.get(dep));
@@ -245,6 +313,11 @@ public class ContentInstructionProcessor {
         private FutureTask<Object> result = null;
 
         /**
+         * from cache retrieved result content
+         */
+        private Object resultContent = null;
+
+        /**
          * default, null values are permited also empty strings
          * 
          * @param id
@@ -272,6 +345,9 @@ public class ContentInstructionProcessor {
          * @throws InterruptedException
          */
         public Object getResult() throws InterruptedException, ExecutionException {
+            if (resultContent != null) {
+                return resultContent;
+            }
             return result.get();
         }
 
@@ -286,6 +362,9 @@ public class ContentInstructionProcessor {
          */
         public Object getResult(final int timeout) throws InterruptedException, ExecutionException,
                 TimeoutException {
+            if (resultContent != null) {
+                return resultContent;
+            }
             return result.get(Long.valueOf(timeout), TimeUnit.SECONDS);
         }
 
@@ -299,18 +378,28 @@ public class ContentInstructionProcessor {
          * @throws ExecutionException
          * @throws TimeoutException
          */
-        public Object getResult(final long timeout, final TimeUnit unit) throws InterruptedException, ExecutionException,
+        public Object getResult(final long timeout, final TimeUnit unit) throws InterruptedException,
+                ExecutionException,
                 TimeoutException {
+            if (resultContent != null) {
+                return resultContent;
+            }
             return result.get(timeout, unit);
         }
 
         /**
-         * public method to check future state etc
+         * wrapps isDone from future
          * 
-         * @return future
+         * @return if the future already done
          */
-        public FutureTask<Object> getFuture() {
-            return result;
+        public boolean isDone() {
+            if (resultContent != null) {
+                return Boolean.TRUE;
+            }
+            if (result == null) {
+                return Boolean.FALSE;
+            }
+            return result.isDone();
         }
 
         /**
@@ -327,8 +416,17 @@ public class ContentInstructionProcessor {
          * 
          * @param result
          */
-        void setFuture(final FutureTask<Object> result) {
-            this.result = result;
+        void initFuture(final Callable<Object> task) {
+            result = new FutureTask<Object>(task);
+        }
+
+        /**
+         * overwrites future result handling with concrete object mostly from cache
+         * 
+         * @param content
+         */
+        void setResultContent(final Object content) {
+            resultContent = content;
         }
     }
 
@@ -351,5 +449,14 @@ public class ContentInstructionProcessor {
          * @return content
          */
         public Object call(final Instruction instruction, final Map<String, Instruction> resultSet);
+
+        /**
+         * this method should return the content from cache only if not cached it should return null
+         * 
+         * @param instruction
+         * @param resultSet
+         * @return content if it was cached otherwise null
+         */
+        public Object getFromCache(final Instruction instruction, final Map<String, Instruction> resultSet);
     }
 }

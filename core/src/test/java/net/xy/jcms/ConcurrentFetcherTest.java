@@ -82,7 +82,7 @@ public class ConcurrentFetcherTest {
         }, new HashMap<String, String>()));
         ContentInstructionProcessor.processInstructions(ins, new MockCaller());
         for (final Instruction instr : ins) {
-            while (!instr.getFuture().isDone()) {
+            while (!instr.isDone()) {
                 // wait until all is done
             }
         }
@@ -108,6 +108,11 @@ public class ConcurrentFetcherTest {
             System.out.append("\nFetched: " + instruction.id + "|" + instruction.depends + "\n"
                         + "It was depending on: " + deps);
             return instruction.id;
+        }
+
+        @Override
+        public Object getFromCache(final Instruction instruction, final Map<String, Instruction> resultSet) {
+            return null;
         }
     }
 }

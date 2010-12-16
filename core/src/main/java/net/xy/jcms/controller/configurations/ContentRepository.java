@@ -127,7 +127,7 @@ public class ContentRepository extends Configuration<Map<String, Object>> {
         if (found != null && !type.isInstance(found)) {
             LOG.error("Content was found but has not the right type. " + DebugUtils.printFields(key, type));
             throw new IllegalArgumentException("An mendatory content object was found but hasn't the exspected type."
-                    + DebugUtils.printFields(key, fullPathKey));
+                    + DebugUtils.printFields(key, fullPathKey, found.getClass()));
         }
 
         if (found == null) {

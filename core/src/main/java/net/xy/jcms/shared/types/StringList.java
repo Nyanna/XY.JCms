@@ -37,7 +37,9 @@ public class StringList extends ArrayList<String> implements IConverter {
     public void fromString(final String str) {
         if (StringUtils.isNotBlank(str)) {
             final String[] list = str.trim().split(",");
-            addAll(Arrays.asList(list));
+            if (list.length > 0) {
+                addAll(Arrays.asList(list));
+            }
         }
     }
 
