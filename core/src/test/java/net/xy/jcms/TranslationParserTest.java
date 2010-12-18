@@ -18,8 +18,8 @@ package net.xy.jcms;
 
 import javax.xml.stream.XMLStreamException;
 
-import net.xy.jcms.controller.TranslationConfiguration.TranslationRule;
 import net.xy.jcms.controller.configurations.parser.TranslationParser;
+import net.xy.jcms.controller.translation.TranslationRule;
 
 import org.junit.Assert;
 import org.junit.Test;

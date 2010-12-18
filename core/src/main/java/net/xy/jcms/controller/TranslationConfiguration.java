@@ -16,14 +16,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import net.xy.jcms.controller.NavigationAbstractionLayer.NALKey;
 import net.xy.jcms.controller.configurations.ITranslationConfigurationAdapter;
-import net.xy.jcms.shared.DebugUtils;
+import net.xy.jcms.controller.translation.RuleParameter;
+import net.xy.jcms.controller.translation.TranslationRule;
 import net.xy.jcms.shared.IConverter;
 import net.xy.jcms.shared.IDataAccessContext;
 import net.xy.jcms.shared.types.StringMap;
@@ -39,166 +38,6 @@ public abstract class TranslationConfiguration {
      * logger
      */
     static final Logger LOG = Logger.getLogger(TranslationConfiguration.class);
-
-    /**
-     * describes an path translation rule to convert human readable path's in an
-     * semantic navigation key. Rule is immutable.
-     * 
-     * @author xyan
-     * 
-     */
-    final public static class TranslationRule {
-        /**
-         * holds the pattern
-         */
-        private final Pattern reactOn;
-
-        /**
-         * holds the path build pattern for backtranslation
-         */
-        private final String buildOff;
-
-        /**
-         * holds the usecase for which the rule is applied
-         */
-        private final String usecase;
-
-        /**
-         * holds tha parameter list describing the parameter transformation
-         */
-        private final List<RuleParameter> parameters;
-
-        /**
-         * default constructor
-         * 
-         * @param reacton
-         * @param level
-         * @param usecase
-         * @param parameters
-         */
-        public TranslationRule(final String reactOn, final String buildOff, final String usecase,
-                final List<RuleParameter> parameters) {
-            this.reactOn = Pattern.compile(reactOn);
-            if (!this.reactOn.matcher(buildOff).matches()) {
-                throw new IllegalArgumentException(
-                        "BuildOff rules doesn't match on reactsOn! Check Translation rule configuration. "
-                                + DebugUtils.printFields(reactOn, buildOff));
-            }
-            this.buildOff = buildOff;
-            this.usecase = usecase;
-            if (parameters == null) {
-                this.parameters = new ArrayList<RuleParameter>();
-            } else {
-                this.parameters = parameters;
-            }
-        }
-
-        /**
-         * returns the pattern
-         * 
-         * @return value
-         */
-        public Pattern getReacton() {
-            return reactOn;
-        }
-
-        /**
-         * returns the usecaseid
-         * 
-         * @return value
-         */
-        public String getUsecase() {
-            return usecase;
-        }
-
-        /**
-         * returns the parameter transformationrule list
-         * 
-         * @return value
-         */
-        public List<RuleParameter> getParameters() {
-            return parameters;
-        }
-
-        /**
-         * gets the reactOn matching build pattern
-         * 
-         * @return value
-         */
-        public String getBuildOff() {
-            return buildOff;
-        }
-    }
-
-    /**
-     * specifies an parameter to which regexp group it belongs and the
-     * typeconverter used.
-     * 
-     * @author Xyan
-     * 
-     */
-    final public static class RuleParameter {
-        /**
-         * holds the name of the parameter applied for
-         */
-        private final String parameterName;
-
-        /**
-         * if an regexp substitution is needed stores the pattern subgroup which
-         * will be transformed to an parameter
-         */
-        private final Integer aplicatesToGroup;
-
-        /**
-         * hold the typeconverter which converts the string value to an
-         * programatic type
-         */
-        private final IConverter converter;
-
-        /**
-         * default constructor
-         * 
-         * @param parameterName
-         * @param aplicatesToGroup
-         * @param converter
-         */
-        public RuleParameter(final String parameterName, final int aplicatesToGroup, final IConverter converter) {
-            if (StringUtils.isBlank(parameterName)) {
-                throw new IllegalArgumentException("Parameter name can't be blank.");
-            }
-            this.parameterName = parameterName;
-            this.aplicatesToGroup = aplicatesToGroup;
-            this.converter = converter;
-            // TODO [LOW] implement usecase params without regexp
-        }
-
-        /**
-         * returns the parameters name which should be set
-         * 
-         * @return value
-         */
-        public String getParameterName() {
-            return parameterName;
-        }
-
-        /**
-         * returns the substitution group or null
-         * 
-         * @return value
-         */
-        public Integer getAplicatesToGroup() {
-            return aplicatesToGroup;
-        }
-
-        /**
-         * returns the type converter or null
-         * 
-         * @return value
-         */
-        public IConverter getConverter() {
-            return converter;
-        }
-    }
 
     /**
      * uses the key to find an translationrule and builds an path

@@ -14,9 +14,9 @@ package net.xy.jcms;
 
 import java.util.ArrayList;
 
-import net.xy.jcms.controller.TranslationConfiguration.RuleParameter;
-import net.xy.jcms.controller.TranslationConfiguration.TranslationRule;
 import net.xy.jcms.controller.configurations.ITranslationConfigurationAdapter;
+import net.xy.jcms.controller.translation.RuleParameter;
+import net.xy.jcms.controller.translation.TranslationRule;
 import net.xy.jcms.shared.IDataAccessContext;
 import net.xy.jcms.shared.types.StringWrapper;
 

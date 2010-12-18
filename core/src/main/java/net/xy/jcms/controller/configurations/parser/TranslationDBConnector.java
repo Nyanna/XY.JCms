@@ -27,10 +27,10 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-import net.xy.jcms.controller.TranslationConfiguration.RuleParameter;
-import net.xy.jcms.controller.TranslationConfiguration.TranslationRule;
 import net.xy.jcms.controller.configurations.ITranslationConfigurationAdapter;
 import net.xy.jcms.controller.configurations.pool.ConverterPool;
+import net.xy.jcms.controller.translation.RuleParameter;
+import net.xy.jcms.controller.translation.TranslationRule;
 import net.xy.jcms.shared.IDataAccessContext;
 
 /**

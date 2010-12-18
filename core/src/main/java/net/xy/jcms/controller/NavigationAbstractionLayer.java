@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 
 import net.xy.jcms.controller.TranslationConfiguration.GroupCouldNotBeFilled;
 import net.xy.jcms.controller.TranslationConfiguration.InvalidBuildRule;
-import net.xy.jcms.controller.TranslationConfiguration.TranslationRule;
+import net.xy.jcms.controller.translation.TranslationRule;
 import net.xy.jcms.shared.IDataAccessContext;
 
 /**

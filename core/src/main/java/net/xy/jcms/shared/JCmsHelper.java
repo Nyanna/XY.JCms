@@ -27,8 +27,6 @@ import org.apache.log4j.Logger;
 
 import net.xy.jcms.controller.TranslationConfiguration;
 import net.xy.jcms.controller.UsecaseConfiguration;
-import net.xy.jcms.controller.TranslationConfiguration.TranslationRule;
-import net.xy.jcms.controller.UsecaseConfiguration.Usecase;
 import net.xy.jcms.controller.configurations.ITranslationConfigurationAdapter;
 import net.xy.jcms.controller.configurations.IUsecaseConfigurationAdapter;
 import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
@@ -38,6 +36,8 @@ import net.xy.jcms.controller.configurations.parser.UsecaseDBConnector;
 import net.xy.jcms.controller.configurations.parser.UsecaseParser;
 import net.xy.jcms.controller.configurations.parser.XMLValidator;
 import net.xy.jcms.controller.configurations.parser.XMLValidator.XMLValidationException;
+import net.xy.jcms.controller.translation.TranslationRule;
+import net.xy.jcms.controller.usecase.Usecase;
 import net.xy.jcms.shared.types.Model;
 
 /**

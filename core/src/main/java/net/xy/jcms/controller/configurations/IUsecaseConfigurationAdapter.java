@@ -16,7 +16,7 @@
  */
 package net.xy.jcms.controller.configurations;
 
-import net.xy.jcms.controller.UsecaseConfiguration.Usecase;
+import net.xy.jcms.controller.usecase.Usecase;
 import net.xy.jcms.shared.IDataAccessContext;
 
 /**

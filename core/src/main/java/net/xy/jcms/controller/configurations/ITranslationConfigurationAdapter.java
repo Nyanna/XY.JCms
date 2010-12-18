@@ -16,7 +16,7 @@
  */
 package net.xy.jcms.controller.configurations;
 
-import net.xy.jcms.controller.TranslationConfiguration.TranslationRule;
+import net.xy.jcms.controller.translation.TranslationRule;
 import net.xy.jcms.shared.IDataAccessContext;
 
 /**

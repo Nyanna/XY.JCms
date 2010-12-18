@@ -28,13 +28,13 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
-import net.xy.jcms.controller.UsecaseConfiguration.Controller;
-import net.xy.jcms.controller.UsecaseConfiguration.Parameter;
-import net.xy.jcms.controller.UsecaseConfiguration.Usecase;
 import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
 import net.xy.jcms.controller.configurations.IUsecaseConfigurationAdapter;
 import net.xy.jcms.controller.configurations.pool.ControllerPool;
+import net.xy.jcms.controller.usecase.Controller;
+import net.xy.jcms.controller.usecase.Parameter;
+import net.xy.jcms.controller.usecase.Usecase;
 import net.xy.jcms.shared.IDataAccessContext;
 
 /**

@@ -18,8 +18,8 @@ package net.xy.jcms;
 
 import javax.xml.stream.XMLStreamException;
 
-import net.xy.jcms.controller.UsecaseConfiguration.Usecase;
 import net.xy.jcms.controller.configurations.parser.UsecaseParser;
+import net.xy.jcms.controller.usecase.Usecase;
 
 import org.junit.Test;
 import org.junit.Assert;
