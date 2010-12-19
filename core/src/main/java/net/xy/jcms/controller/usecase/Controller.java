@@ -17,6 +17,7 @@ import java.util.Map;
 
 import net.xy.jcms.controller.NavigationAbstractionLayer.NALKey;
 import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
+import net.xy.jcms.persistence.usecase.ControllerDTO;
 import net.xy.jcms.shared.IController;
 import net.xy.jcms.shared.IDataAccessContext;
 import net.xy.jcms.shared.types.Model;
@@ -82,5 +83,18 @@ final public class Controller {
     @Override
     public String toString() {
         return "id=" + controllerInstance.getClass().getName() + " configurations=" + getObmitedConfigurations();
+    }
+
+    /**
+     * this method converts this controller data to an transferable dto. note
+     * just the classpath will be passed.
+     * 
+     * @return dto
+     */
+    public ControllerDTO toDTO() {
+        final ControllerDTO dto = new ControllerDTO();
+        dto.setControllerInstance(controllerInstance.getClass().getName());
+        dto.setObmitedConfigurations(obmitedConfigurations);
+        return dto;
     }
 }

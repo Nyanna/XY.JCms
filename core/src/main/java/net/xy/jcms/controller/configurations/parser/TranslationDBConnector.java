@@ -36,6 +36,8 @@ import net.xy.jcms.shared.IDataAccessContext;
 /**
  * implements an connector for retrieving the translation configuration from db.
  * The whole rule list shares an classloader for its type converters.
+ * Note: this db connector don't supports special translation builtin parameter
+ * mapping
  * 
  * @author Xyan
  * 
@@ -132,8 +134,6 @@ public class TranslationDBConnector implements ITranslationConfigurationAdapter 
         final String reactOn = result.getString("reactOn");
         final String buildOff = result.getString("buildOff");
         final String usecase = result.getString("usecase");
-        // TODO [LOW] implement building mapping support for mapped types as in
-        // xml 23234 = funsounds
         final List<RuleParameter> params = parseParameters(result.getString("parameters"), connection, loader);
         return new TranslationRule(reactOn, buildOff, usecase, params);
     }

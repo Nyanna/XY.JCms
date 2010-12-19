@@ -7,6 +7,12 @@
 		<class>net.xy.jcms.persistence.translation.TranslationRuleDTO</class>
 		<class>net.xy.jcms.persistence.translation.RuleParameterDTO</class>
 		<class>net.xy.jcms.persistence.translation.TranslationRulesDTO</class>
+		
+		<class>net.xy.jcms.persistence.usecase.UsecasesDTO</class>
+		<class>net.xy.jcms.persistence.usecase.UsecaseDTO</class>
+		<class>net.xy.jcms.persistence.usecase.ParameterDTO</class>
+		<class>net.xy.jcms.persistence.usecase.ControllerDTO</class>
+		<class>net.xy.jcms.persistence.usecase.ConfigurationDTO</class>
 
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />

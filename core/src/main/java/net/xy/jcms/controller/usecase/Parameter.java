@@ -12,6 +12,8 @@
  */
 package net.xy.jcms.controller.usecase;
 
+import net.xy.jcms.persistence.usecase.ParameterDTO;
+
 /**
  * object describing the input parameters originated to the clients request.
  * 
@@ -63,5 +65,17 @@ final public class Parameter {
     @Override
     public String toString() {
         return "key=" + getParameterKey() + " type=" + getParameterType();
+    }
+
+    /**
+     * method converting this parameter to an dto
+     * 
+     * @return dto
+     */
+    public ParameterDTO toDTO() {
+        final ParameterDTO dto = new ParameterDTO();
+        dto.setParameterKey(parameterKey);
+        dto.setParameterType(parameterType);
+        return dto;
     }
 }

@@ -12,10 +12,17 @@
  */
 package net.xy.jcms.controller.usecase;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
+import java.util.Map.Entry;
 
 import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
+import net.xy.jcms.persistence.usecase.ConfigurationDTO;
+import net.xy.jcms.persistence.usecase.ControllerDTO;
+import net.xy.jcms.persistence.usecase.ParameterDTO;
+import net.xy.jcms.persistence.usecase.UsecaseDTO;
 import net.xy.jcms.shared.types.Model;
 
 import org.apache.commons.lang.StringUtils;
@@ -189,5 +196,35 @@ final public class Usecase {
     public String toString() {
         return "id=" + getId() + " description=\"" + getDescription() + "\" parameter=" + getParameterList()
                 + " controller=" + getControllerList() + " configuration=" + getConfigurations();
+    }
+
+    /**
+     * method converts this usecase to an tranferable dto
+     * 
+     * @return dto
+     */
+    public UsecaseDTO toDTO() {
+        final UsecaseDTO dto = new UsecaseDTO();
+        dto.setId(id);
+        dto.setDescription(description);
+        final List<ParameterDTO> params = new ArrayList<ParameterDTO>();
+        for (final Parameter param : getParameterList()) {
+            params.add(param.toDTO());
+        }
+        dto.setParameterList(params);
+        final List<ControllerDTO> controller = new ArrayList<ControllerDTO>();
+        for (final Controller ctrl : getControllerList()) {
+            controller.add(ctrl.toDTO());
+        }
+        dto.setControllerList(controller);
+        final List<ConfigurationDTO> configs = new ArrayList<ConfigurationDTO>();
+        for (final Entry<ConfigurationType, Configuration<?>> conf : configurationList.entrySet()) {
+            final ConfigurationDTO cdto = new ConfigurationDTO();
+            cdto.setConfigurationType(conf.getKey());
+            configs.add(cdto);
+            // TODO [LOW] config dto model
+        }
+        dto.setConfigurationList(configs);
+        return dto;
     }
 }

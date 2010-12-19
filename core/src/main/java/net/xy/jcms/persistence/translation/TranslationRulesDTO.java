@@ -15,7 +15,9 @@ package net.xy.jcms.persistence.translation;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -36,10 +38,10 @@ public class TranslationRulesDTO implements Serializable {
 
     @Id
     protected int id = 0;
-    List<TranslationRuleDTO> rules = null;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<TranslationRuleDTO> rules = null;
 
     @XmlElement(name = "rule")
-    @OneToMany
     public List<TranslationRuleDTO> getRules() {
         return rules;
     }

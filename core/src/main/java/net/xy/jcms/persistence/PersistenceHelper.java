@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU General Public License along with XY.JCms. If not, see
  * <http://www.gnu.org/licenses/>.
  */
-package net.xy.jcms.persistence.translation;
+package net.xy.jcms.persistence;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -24,7 +24,14 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
+import net.xy.jcms.controller.configurations.parser.TranslationConverter;
+import net.xy.jcms.controller.configurations.parser.UsecaseConverter;
 import net.xy.jcms.controller.translation.TranslationRule;
+import net.xy.jcms.controller.usecase.Usecase;
+import net.xy.jcms.persistence.translation.TranslationRuleDTO;
+import net.xy.jcms.persistence.translation.TranslationRulesDTO;
+import net.xy.jcms.persistence.usecase.UsecaseDTO;
+import net.xy.jcms.persistence.usecase.UsecasesDTO;
 
 /**
  * TRanslation config persistance helper for JAXB & JPA
@@ -32,7 +39,7 @@ import net.xy.jcms.controller.translation.TranslationRule;
  * @author Xyan
  * 
  */
-public class TranslationPersistence {
+public class PersistenceHelper {
 
     /**
      * store method dedicated to database persistance using JPA
@@ -71,6 +78,20 @@ public class TranslationPersistence {
             em.getTransaction().commit();
             em.close();
         }
+
+        /**
+         * saves an usecase in the db
+         * 
+         * @param acase
+         */
+        public static void saveUsecase(final Usecase acase) {
+            final EntityManager em = getEMF().createEntityManager();
+            em.getTransaction().begin();
+            final UsecaseDTO dto = acase.toDTO();
+            em.persist(dto);
+            em.getTransaction().commit();
+            em.close();
+        }
     }
 
     /**
@@ -93,7 +114,7 @@ public class TranslationPersistence {
          */
         private static JAXBContext getContext() throws JAXBException {
             if (context == null) {
-                context = JAXBContext.newInstance(TranslationRulesDTO.class);
+                context = JAXBContext.newInstance(new Class[] { TranslationRulesDTO.class, UsecasesDTO.class });
             }
             return context;
         }
@@ -116,10 +137,13 @@ public class TranslationPersistence {
          * @param infile
          * @return translation
          * @throws JAXBException
+         * @throws ClassNotFoundException
+         *             in case of an type converter couldn't be loaded
          */
-        public static TranslationRuleDTO loadTranslation(final File infile) throws JAXBException {
+        public static TranslationRule loadTranslation(final File infile, final ClassLoader loader) throws JAXBException,
+                ClassNotFoundException {
             final Unmarshaller m = getContext().createUnmarshaller();
-            return (TranslationRuleDTO) m.unmarshal(infile);
+            return TranslationConverter.convert((TranslationRuleDTO) m.unmarshal(infile), loader);
         }
 
         /**
@@ -146,10 +170,75 @@ public class TranslationPersistence {
          * @param infile
          * @return
          * @throws JAXBException
+         * @throws ClassNotFoundException
+         *             in case of an type converter couldn't be loaded
          */
-        public static TranslationRulesDTO loadTranslations(final File infile) throws JAXBException {
+        public static List<TranslationRule> loadTranslations(final File infile, final ClassLoader loader)
+                throws JAXBException, ClassNotFoundException {
             final Unmarshaller m = getContext().createUnmarshaller();
-            return (TranslationRulesDTO) m.unmarshal(infile);
+            return TranslationConverter.convert((TranslationRulesDTO) m.unmarshal(infile), loader);
+        }
+
+        /**
+         * method saves an usecase to an xml outfile
+         * 
+         * @param out
+         * @param acase
+         * @throws JAXBException
+         */
+        public static void saveUsecase(final File out, final Usecase acase) throws JAXBException {
+            final Marshaller m = getContext().createMarshaller();
+            m.marshal(acase.toDTO(), out);
+        }
+
+        /**
+         * loads an single usecase from an xml
+         * 
+         * @param infile
+         * @param loader
+         * @return usecase
+         * @throws JAXBException
+         * @throws ClassNotFoundException
+         *             in case of an usecase dependency could not be loaded
+         */
+        public static Usecase loadUsecase(final File infile, final ClassLoader loader) throws JAXBException,
+                ClassNotFoundException {
+            final Unmarshaller m = getContext().createUnmarshaller();
+            return UsecaseConverter.convert((UsecaseDTO) m.unmarshal(infile), loader);
+        }
+
+        /**
+         * method saves an whole list of usecases to an xml outfile
+         * 
+         * @param outfile
+         * @param usecases
+         * @throws JAXBException
+         */
+        public static void saveUsecases(final File outfile, final List<Usecase> usecases) throws JAXBException {
+            final Marshaller m = getContext().createMarshaller();
+            final List<UsecaseDTO> caseDTOs = new ArrayList<UsecaseDTO>();
+            for (final Usecase acase : usecases) {
+                caseDTOs.add(acase.toDTO());
+            }
+            final UsecasesDTO dto = new UsecasesDTO();
+            dto.setUsecases(caseDTOs);
+            m.marshal(dto, outfile);
+        }
+
+        /**
+         * converts an usecase config xml back to an list of usecases
+         * 
+         * @param infile
+         * @param loader
+         * @return usecases
+         * @throws JAXBException
+         * @throws ClassNotFoundException
+         *             in case of an usecase dependency could not be loaded
+         */
+        public static List<Usecase> loadUsecases(final File infile, final ClassLoader loader)
+                throws JAXBException, ClassNotFoundException {
+            final Unmarshaller m = getContext().createUnmarshaller();
+            return UsecaseConverter.convert((UsecasesDTO) m.unmarshal(infile), loader);
         }
     }
 }

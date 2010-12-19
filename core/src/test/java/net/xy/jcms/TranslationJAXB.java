@@ -20,10 +20,11 @@ import javax.xml.stream.XMLStreamException;
 
 import org.junit.Test;
 
-import net.xy.jcms.controller.configurations.parser.TranslationConverter;
 import net.xy.jcms.controller.configurations.parser.TranslationParser;
+import net.xy.jcms.controller.configurations.parser.UsecaseParser;
 import net.xy.jcms.controller.translation.TranslationRule;
-import net.xy.jcms.persistence.translation.TranslationPersistence;
+import net.xy.jcms.controller.usecase.Usecase;
+import net.xy.jcms.persistence.PersistenceHelper;
 
 /**
  * simple test that imports translation rules and usecases to db via JPA
@@ -34,7 +35,7 @@ import net.xy.jcms.persistence.translation.TranslationPersistence;
 public class TranslationJAXB {
 
     // @Test
-    public void testThis() throws ClassNotFoundException, JAXBException {
+    public void testTranslationXMLTransfer() throws ClassNotFoundException, JAXBException {
         TranslationRule[] rules = null;
         try {
             rules = TranslationParser.parse(Thread.currentThread().getContextClassLoader()
@@ -45,21 +46,18 @@ public class TranslationJAXB {
         }
         for (final TranslationRule rule : rules) {
             final File out = new File(rule.getUsecase() + "_" + rule.getParameters().size() + ".xml");
-            TranslationPersistence.XML.saveTranslation(out, rule);
-            TranslationConverter.convert(TranslationPersistence.XML.loadTranslation(out), Thread.currentThread()
-                    .getContextClassLoader());
+            PersistenceHelper.XML.saveTranslation(out, rule);
+            PersistenceHelper.XML.loadTranslation(out, Thread.currentThread().getContextClassLoader());
             out.deleteOnExit();
-
         }
         final File all = new File("All.xml");
-        TranslationPersistence.XML.saveTranslations(all, Arrays.asList(rules));
-        TranslationConverter.convert(TranslationPersistence.XML.loadTranslations(all), Thread.currentThread()
-                .getContextClassLoader());
+        PersistenceHelper.XML.saveTranslations(all, Arrays.asList(rules));
+        PersistenceHelper.XML.loadTranslations(all, Thread.currentThread().getContextClassLoader());
         all.deleteOnExit();
     }
 
-    @Test
-    public void testDB() throws ClassNotFoundException {
+    // @Test
+    public void testTranslationDBTransfer() throws ClassNotFoundException {
         TranslationRule[] rules = null;
         try {
             rules = TranslationParser.parse(Thread.currentThread().getContextClassLoader()
@@ -69,8 +67,44 @@ public class TranslationJAXB {
             e.printStackTrace();
         }
         for (final TranslationRule rule : rules) {
-            TranslationPersistence.DB.saveTranslation(rule);
+            PersistenceHelper.DB.saveTranslation(rule);
+        }
+    }
 
+    // @Test
+    public void testUsecaseXMLTransfer() throws ClassNotFoundException, JAXBException {
+        Usecase[] cases = null;
+        try {
+            cases = UsecaseParser.parse(Thread.currentThread().getContextClassLoader()
+                    .getResourceAsStream("net/xy/jcms/ExampleUsecases.xml"), Thread.currentThread()
+                    .getContextClassLoader());
+        } catch (final XMLStreamException e) {
+            e.printStackTrace();
+        }
+        for (final Usecase acase : cases) {
+            final File out = new File(acase.getId() + "_" + acase.getParameterList().length + ".xml");
+            PersistenceHelper.XML.saveUsecase(out, acase);
+            PersistenceHelper.XML.loadUsecase(out, Thread.currentThread().getContextClassLoader());
+            out.deleteOnExit();
+        }
+        final File all = new File("All.xml");
+        PersistenceHelper.XML.saveUsecases(all, Arrays.asList(cases));
+        PersistenceHelper.XML.loadUsecases(all, Thread.currentThread().getContextClassLoader());
+        all.deleteOnExit();
+    }
+
+    @Test
+    public void testUsecaseDBTransfer() throws ClassNotFoundException {
+        Usecase[] cases = null;
+        try {
+            cases = UsecaseParser.parse(Thread.currentThread().getContextClassLoader()
+                    .getResourceAsStream("net/xy/jcms/ExampleUsecases.xml"), Thread.currentThread()
+                    .getContextClassLoader());
+        } catch (final XMLStreamException e) {
+            e.printStackTrace();
+        }
+        for (final Usecase acase : cases) {
+            PersistenceHelper.DB.saveUsecase(acase);
         }
     }
 }
