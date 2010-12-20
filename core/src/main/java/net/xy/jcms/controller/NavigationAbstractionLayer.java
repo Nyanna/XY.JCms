@@ -74,7 +74,16 @@ public class NavigationAbstractionLayer {
          */
         public NALKey(final String id, final NALKey old) {
             this(id);
-            setParameters(old.getParameters());
+            setParameters(new HashMap<Object, Object>(old.getParameters()));
+        }
+
+        /**
+         * copy constructor
+         * 
+         * @param old
+         */
+        public NALKey(final NALKey old) {
+            this(old.id, old);
         }
 
         /**

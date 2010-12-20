@@ -1,6 +1,7 @@
 package net.xy.jcms.persistence.usecase;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -9,10 +10,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
+import net.xy.jcms.persistence.XmlMapEntry;
 
 /**
  * main container for an usecase configuration holding its type and real data
@@ -22,7 +25,7 @@ import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
  * 
  */
 @XmlRootElement(name = "configuration")
-@XmlType(propOrder = { "configurationType" })
+@XmlType(propOrder = { "configurationType", "mapping" })
 @Table(name = "usecase_configuration")
 @Entity
 public class ConfigurationDTO implements Serializable {
@@ -33,6 +36,7 @@ public class ConfigurationDTO implements Serializable {
     protected int id = 0;
     @Enumerated(EnumType.STRING)
     private ConfigurationType configurationType = null;
+    private List<XmlMapEntry> mapping = null;
 
     @XmlAttribute(name = "type", required = true)
     public ConfigurationType getConfigurationType() {
@@ -63,5 +67,14 @@ public class ConfigurationDTO implements Serializable {
             hash = hash * 3 + configurationType.hashCode();
         }
         return hash;
+    }
+
+    @XmlElement(name = "entry")
+    public List<XmlMapEntry> getMapping() {
+        return mapping;
+    }
+
+    public void setMapping(final List<XmlMapEntry> mapping) {
+        this.mapping = mapping;
     }
 }

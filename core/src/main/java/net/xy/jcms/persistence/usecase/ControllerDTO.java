@@ -1,7 +1,7 @@
 package net.xy.jcms.persistence.usecase;
 
 import java.io.Serializable;
-import java.util.EnumSet;
+import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -30,7 +30,7 @@ public class ControllerDTO implements Serializable {
     @GeneratedValue
     protected int id = 0;
     private String controllerInstance = null;
-    private EnumSet<ConfigurationType> obmitedConfigurations = null;
+    private Set<ConfigurationType> obmitedConfigurations = null;
 
     @XmlAttribute(name = "path", required = true)
     public String getControllerInstance() {
@@ -42,11 +42,11 @@ public class ControllerDTO implements Serializable {
     }
 
     @XmlAttribute(name = "obmitConfig")
-    public EnumSet<ConfigurationType> getObmitedConfigurations() {
+    public Set<ConfigurationType> getObmitedConfigurations() {
         return obmitedConfigurations;
     }
 
-    public void setObmitedConfigurations(final EnumSet<ConfigurationType> obmitedConfigurations) {
+    public void setObmitedConfigurations(final Set<ConfigurationType> obmitedConfigurations) {
         this.obmitedConfigurations = obmitedConfigurations;
     }
 

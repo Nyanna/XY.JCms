@@ -79,6 +79,20 @@ abstract public class Controller implements IController {
     public static String buildUriForUsecase(final String targetUsecaseStr, final IDataAccessContext dac)
             throws GroupCouldNotBeFilled, InvalidBuildRule {
         final NALKey key = parseKeyString(targetUsecaseStr);
+        return buildUriForKey(key, dac);
+    }
+
+    /**
+     * Build an url path out from an NALKey
+     * 
+     * @param key
+     * @param dac
+     * @return the ready parameter appended URI/URL
+     * @throws GroupCouldNotBeFilled
+     * @throws InvalidBuildRule
+     */
+    public static String buildUriForKey(final NALKey key, final IDataAccessContext dac)
+            throws GroupCouldNotBeFilled, InvalidBuildRule {
         final TranslationRule rule = NavigationAbstractionLayer.findRuleForKey(key, dac);
         if (rule == null) {
             throw new IllegalArgumentException("No usecase could be found for the configured key. "

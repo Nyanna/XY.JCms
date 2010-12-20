@@ -19,6 +19,7 @@ import java.util.Map.Entry;
 
 import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
+import net.xy.jcms.controller.configurations.MessageConfiguration;
 import net.xy.jcms.persistence.usecase.ConfigurationDTO;
 import net.xy.jcms.persistence.usecase.ControllerDTO;
 import net.xy.jcms.persistence.usecase.ParameterDTO;
@@ -219,8 +220,16 @@ final public class Usecase {
         dto.setControllerList(controller);
         final List<ConfigurationDTO> configs = new ArrayList<ConfigurationDTO>();
         for (final Entry<ConfigurationType, Configuration<?>> conf : configurationList.entrySet()) {
-            final ConfigurationDTO cdto = new ConfigurationDTO();
-            cdto.setConfigurationType(conf.getKey());
+            final ConfigurationDTO cdto;
+            switch (conf.getKey()) {
+            case MessageConfiguration:
+                cdto = ((MessageConfiguration) conf.getValue()).toDTO();
+                break;
+            default:
+                cdto = new ConfigurationDTO();
+                cdto.setConfigurationType(conf.getKey());
+                break;
+            }
             configs.add(cdto);
             // TODO [LOW] config dto model
         }

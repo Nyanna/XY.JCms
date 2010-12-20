@@ -19,6 +19,8 @@ import java.util.Map;
 import java.util.Properties;
 
 import net.xy.jcms.controller.configurations.ConfigurationIterationStrategy.FullPathOrRoot;
+import net.xy.jcms.persistence.XmlMapEntry;
+import net.xy.jcms.persistence.usecase.ConfigurationDTO;
 import net.xy.jcms.shared.DebugUtils;
 
 /**
@@ -132,6 +134,18 @@ public class MessageConfiguration extends AbstractPropertyBasedConfiguration {
     @Override
     public MessageConfiguration mergeConfiguration(final Properties otherConfig2) {
         return new MessageConfiguration(mergeConfiguration(getConfigurationValue(), otherConfig2));
+    }
+
+    /**
+     * converts this config to an dto
+     * 
+     * @return dto
+     */
+    public ConfigurationDTO toDTO() {
+        final ConfigurationDTO ret = new ConfigurationDTO();
+        ret.setConfigurationType(TYPE);
+        ret.setMapping(XmlMapEntry.convert(getConfigurationValue()));
+        return ret;
     }
 
 }

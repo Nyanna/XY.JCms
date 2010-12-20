@@ -12,8 +12,7 @@
  */
 package net.xy.jcms.controller.translation;
 
-import java.util.HashMap;
-
+import net.xy.jcms.persistence.XmlMapEntry;
 import net.xy.jcms.persistence.translation.RuleParameterDTO;
 import net.xy.jcms.shared.IConverter;
 import net.xy.jcms.shared.types.StringMap;
@@ -99,7 +98,7 @@ final public class RuleParameter {
         dto.setAplicatesToGroup(aplicatesToGroup);
         dto.setConverter(converter.getClass().getName());
         if (converter instanceof StringMap) {
-            dto.setBuildInMap(new HashMap<String, String>((StringMap) converter));
+            dto.setBuildInMap(XmlMapEntry.convert((StringMap) converter));
         }
         dto.setParameterName(parameterName);
         return dto;

@@ -21,6 +21,12 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.EnumSet;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.xml.stream.XMLStreamException;
 import org.apache.log4j.Logger;
@@ -232,5 +238,40 @@ public class JCmsHelper {
         final Connection connection = DriverManager.getConnection(sqlUrl, user, passwd);
         TranslationConfiguration.setTranslationAdapter(new TranslationDBConnector(connection, JCmsHelper.class
                 .getClassLoader()));
+    }
+
+    /**
+     * instantioates and configures an performant deamon threadpool
+     * 
+     * @param corePoolSize
+     * @param maximumPoolSize
+     * @param keepAliveTime
+     *            in seconds
+     * @return threadpool instance
+     */
+    public static ExecutorService getThreadPool(final int corePoolSize, final int maximumPoolSize,
+            final long keepAliveTime) {
+        final ThreadPoolExecutor pool = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime,
+                TimeUnit.SECONDS,
+                new SynchronousQueue<Runnable>());
+        pool.setThreadFactory(new DeamonFactory());
+        return pool;
+    }
+
+    /**
+     * an simple wrapper class using the default but setting all threads to
+     * deamons cuz they can simply abborted on shutdown.
+     * 
+     * @author Xyan
+     */
+    private static class DeamonFactory implements ThreadFactory {
+        private static final ThreadFactory DEFAULT = Executors.defaultThreadFactory();
+
+        @Override
+        public Thread newThread(final Runnable r) {
+            final Thread t = DEFAULT.newThread(r);
+            t.setDaemon(true);
+            return t;
+        }
     }
 }

@@ -13,7 +13,7 @@
 package net.xy.jcms.persistence.translation;
 
 import java.io.Serializable;
-import java.util.Map;
+import java.util.List;
 
 import javax.persistence.CollectionTable;
 import javax.persistence.ElementCollection;
@@ -22,7 +22,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import net.xy.jcms.persistence.XmlMapEntry;
 
 /**
  * transfer object for translation parameters compatible with JAXB & JPA
@@ -44,7 +47,7 @@ public class RuleParameterDTO implements Serializable {
     private String converter = null;
     @ElementCollection
     @CollectionTable(name = "translation_parameter_map")
-    private Map<String, String> buildInMap = null;
+    private List<XmlMapEntry> buildInMap = null;
 
     @XmlAttribute(name = "name", required = true)
     public String getParameterName() {
@@ -73,11 +76,12 @@ public class RuleParameterDTO implements Serializable {
         this.converter = converter;
     }
 
-    public Map<String, String> getBuildInMap() {
+    @XmlElement(name = "map")
+    public List<XmlMapEntry> getBuildInMap() {
         return buildInMap;
     }
 
-    public void setBuildInMap(final Map<String, String> buildInMap) {
+    public void setBuildInMap(final List<XmlMapEntry> buildInMap) {
         this.buildInMap = buildInMap;
     }
 

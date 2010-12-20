@@ -58,13 +58,38 @@ public class UsecaseParser {
             ClassNotFoundException {
         final XMLInputFactory factory = XMLInputFactory.newInstance();
         factory.setProperty("javax.xml.stream.isCoalescing", true);
-        // not supported be the reference implementation
+        // not supported by the reference implementation
         // factory.setProperty(XMLInputFactory.IS_VALIDATING, Boolean.TRUE);
         final XMLStreamReader parser = factory.createXMLStreamReader(in);
         while (parser.hasNext()) {
             final int event = parser.next();
             if (event == XMLStreamConstants.START_ELEMENT && parser.getName().getLocalPart().equals("usecases")) {
                 return parseUsecases(parser, loader);
+            }
+        }
+        throw new IllegalArgumentException("No usecases section found. [" + parser.getLocation() + "]");
+    }
+
+    /**
+     * method for parsing single usecase xml files. one per file.
+     * 
+     * @param in
+     * @param loader
+     * @return parsed usecase
+     * @throws XMLStreamException
+     * @throws ClassNotFoundException
+     */
+    public static Usecase parseSingle(final InputStream in, final ClassLoader loader) throws XMLStreamException,
+            ClassNotFoundException {
+        final XMLInputFactory factory = XMLInputFactory.newInstance();
+        factory.setProperty("javax.xml.stream.isCoalescing", true);
+        // not supported by the reference implementation
+        // factory.setProperty(XMLInputFactory.IS_VALIDATING, Boolean.TRUE);
+        final XMLStreamReader parser = factory.createXMLStreamReader(in);
+        while (parser.hasNext()) {
+            final int event = parser.next();
+            if (event == XMLStreamConstants.START_ELEMENT && parser.getName().getLocalPart().equals("usecase")) {
+                return parseUsecase(parser, loader);
             }
         }
         throw new IllegalArgumentException("No usecases section found. [" + parser.getLocation() + "]");
