@@ -78,4 +78,29 @@ final public class Parameter {
         dto.setParameterType(parameterType);
         return dto;
     }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!this.getClass().isInstance(obj)) {
+            return false;
+        }
+        final Parameter oo = (Parameter) obj;
+        return (parameterKey == oo.parameterKey || parameterKey != null && parameterKey.equals(oo.parameterKey)) &&
+                   (parameterType == oo.parameterType || parameterType != null && parameterType.equals(oo.parameterType));
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 348;
+        if (parameterKey != null) {
+            hash = hash * 3 + parameterKey.hashCode();
+        }
+        if (parameterType != null) {
+            hash = hash * 3 + parameterType.hashCode();
+        }
+        return hash;
+    }
 }

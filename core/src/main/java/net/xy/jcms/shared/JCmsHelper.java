@@ -91,12 +91,8 @@ public class JCmsHelper {
                 Exception ex = null;
                 try {
                     final long start = System.currentTimeMillis();
-                    final URLConnection con = this.getClass().getClassLoader()
-                            .getResource(translationConfigXml).openConnection();
-                    con.setUseCaches(false);
-                    con.setDefaultUseCaches(false);
-                    con.addRequestProperty("seed", new Long(start).toString());
-                    cache = TranslationParser.parse(con.getInputStream(), this.getClass().getClassLoader());
+                    final ClassLoader cl = this.getClass().getClassLoader();
+                    cache = TranslationParser.parse(loadResource(translationConfigXml, cl), cl);
                     LOG.info("Parsing and converting of Translationrule xml config tok:  "
                             + new DecimalFormat("###,###,### ms").format((System.currentTimeMillis() - start)));
                 } catch (final XMLStreamException e) {
@@ -134,12 +130,8 @@ public class JCmsHelper {
                 Exception ex = null;
                 try {
                     final long start = System.currentTimeMillis();
-                    final URLConnection con = this.getClass().getClassLoader()
-                            .getResource(usecaseConfigurationXml).openConnection();
-                    con.setUseCaches(false);
-                    con.setDefaultUseCaches(false);
-                    con.addRequestProperty("seed", new Long(start).toString());
-                    cache = UsecaseParser.parse(con.getInputStream(), this.getClass().getClassLoader());
+                    final ClassLoader cl = this.getClass().getClassLoader();
+                    cache = UsecaseParser.parse(loadResource(usecaseConfigurationXml, cl), cl);
                     LOG.info("Parsing and converting of Usecase xml config tok:   "
                             + new DecimalFormat("###,###,### ms").format((System.currentTimeMillis() - start)));
                 } catch (final XMLStreamException e) {

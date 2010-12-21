@@ -16,12 +16,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
 
 import net.xy.jcms.controller.configurations.ConfigurationIterationStrategy.ClimbUp;
 import net.xy.jcms.controller.configurations.pool.RendererPool;
+import net.xy.jcms.persistence.XmlMapEntry;
+import net.xy.jcms.persistence.usecase.ConfigurationDTO;
 import net.xy.jcms.shared.DebugUtils;
 import net.xy.jcms.shared.IRenderer;
 
@@ -32,7 +33,7 @@ import net.xy.jcms.shared.IRenderer;
  * @author Xyan
  * 
  */
-public class RenderKitConfiguration extends Configuration<Map<?, IRenderer>> {
+public class RenderKitConfiguration extends Configuration<Map<String, IRenderer>> {
     /**
      * gloabl type constant for this type
      */
@@ -43,8 +44,8 @@ public class RenderKitConfiguration extends Configuration<Map<?, IRenderer>> {
      * 
      * @param configurationValue
      */
-    public RenderKitConfiguration(final Map<?, IRenderer> configurationValue) {
-        super(TYPE, convert(configurationValue));
+    public RenderKitConfiguration(final Map<String, IRenderer> configurationValue) {
+        super(TYPE, configurationValue);
     }
 
     /**
@@ -107,13 +108,13 @@ public class RenderKitConfiguration extends Configuration<Map<?, IRenderer>> {
     }
 
     @Override
-    public RenderKitConfiguration mergeConfiguration(final Configuration<Map<?, IRenderer>> otherConfig) {
+    public RenderKitConfiguration mergeConfiguration(final Configuration<Map<String, IRenderer>> otherConfig) {
         return mergeConfiguration(otherConfig.getConfigurationValue());
     }
 
     @Override
-    public RenderKitConfiguration mergeConfiguration(final Map<?, IRenderer> otherConfig) {
-        final Map<Object, IRenderer> result = new HashMap<Object, IRenderer>(getConfigurationValue());
+    public RenderKitConfiguration mergeConfiguration(final Map<String, IRenderer> otherConfig) {
+        final Map<String, IRenderer> result = new HashMap<String, IRenderer>(getConfigurationValue());
         result.putAll(otherConfig);
         return new RenderKitConfiguration(result);
     }
@@ -126,27 +127,6 @@ public class RenderKitConfiguration extends Configuration<Map<?, IRenderer>> {
     @Override
     public boolean equals(final Object object) {
         return getConfigurationValue().equals(object);
-    }
-
-    /**
-     * converts an incoming config to simple class names
-     * 
-     * @param config
-     * @return value
-     */
-    private static Map<String, IRenderer> convert(final Map<?, IRenderer> config) {
-        final Map<String, IRenderer> result = new HashMap<String, IRenderer>();
-        if (config == null) {
-            return result;
-        }
-        for (final Entry<?, IRenderer> entry : config.entrySet()) {
-            if (entry.getKey() instanceof Class<?>) {
-                result.put(((Class<?>) entry.getKey()).getName(), entry.getValue());
-            } else {
-                result.put((String) entry.getKey(), entry.getValue());
-            }
-        }
-        return result;
     }
 
     /**
@@ -177,6 +157,18 @@ public class RenderKitConfiguration extends Configuration<Map<?, IRenderer>> {
             }
         }
         return new RenderKitConfiguration(result);
+    }
+
+    /**
+     * converts this configuration into an dto
+     * 
+     * @return dto
+     */
+    public ConfigurationDTO toDTO() {
+        final ConfigurationDTO ret = new ConfigurationDTO();
+        ret.setConfigurationType(TYPE);
+        ret.setMapping(XmlMapEntry.convert(getConfigurationValue()));
+        return ret;
     }
 
 }

@@ -16,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.EnumSet;
 import java.util.HashMap;
 
@@ -274,7 +275,12 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
     public static Configuration<?> initByStream(final ConfigurationType type, final InputStream stream,
             final ClassLoader loader) {
         final StringBuilder writer = new StringBuilder();
-        final BufferedReader reader = new BufferedReader(new InputStreamReader(stream), 1024);
+        BufferedReader reader;
+        try {
+            reader = new BufferedReader(new InputStreamReader(stream, "UTF-8"), 1024);
+        } catch (final UnsupportedEncodingException e) {
+            throw new UnsupportedOperationException("Mendatory charachterset UTF-8 is not supported on this system.", e);
+        }
         final char[] buffer = new char[1024];
         try {
             int n;

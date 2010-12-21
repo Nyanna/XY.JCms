@@ -120,6 +120,26 @@ public class PersistenceHelper {
         }
 
         /**
+         * init only one marshaLer instance
+         */
+        private static Marshaller marshaller = null;
+
+        /**
+         * gets an singleton marshaller instance
+         * 
+         * @return marshaller
+         * @throws JAXBException
+         */
+        private static Marshaller getMarshaller() throws JAXBException {
+            if (marshaller == null) {
+                marshaller = getContext().createMarshaller();
+                marshaller.setProperty("jaxb.encoding", "UTF-8");
+                marshaller.setProperty("jaxb.formatted.output", Boolean.TRUE);
+            }
+            return marshaller;
+        }
+
+        /**
          * save an translation to an outfile
          * 
          * @param outFile
@@ -127,8 +147,7 @@ public class PersistenceHelper {
          * @throws JAXBException
          */
         public static void saveTranslation(final File outFile, final TranslationRule rule) throws JAXBException {
-            final Marshaller m = getContext().createMarshaller();
-            m.marshal(rule.toDTO(), outFile);
+            getMarshaller().marshal(rule.toDTO(), outFile);
         }
 
         /**
@@ -154,14 +173,13 @@ public class PersistenceHelper {
          * @throws JAXBException
          */
         public static void saveTranslations(final File outFile, final List<TranslationRule> rules) throws JAXBException {
-            final Marshaller m = getContext().createMarshaller();
             final List<TranslationRuleDTO> ruleDTOs = new ArrayList<TranslationRuleDTO>();
             for (final TranslationRule rule : rules) {
                 ruleDTOs.add(rule.toDTO());
             }
             final TranslationRulesDTO dto = new TranslationRulesDTO();
             dto.setRules(ruleDTOs);
-            m.marshal(dto, outFile);
+            getMarshaller().marshal(dto, outFile);
         }
 
         /**
@@ -187,8 +205,7 @@ public class PersistenceHelper {
          * @throws JAXBException
          */
         public static void saveUsecase(final File out, final Usecase acase) throws JAXBException {
-            final Marshaller m = getContext().createMarshaller();
-            m.marshal(acase.toDTO(), out);
+            getMarshaller().marshal(acase.toDTO(), out);
         }
 
         /**
@@ -215,14 +232,13 @@ public class PersistenceHelper {
          * @throws JAXBException
          */
         public static void saveUsecases(final File outfile, final List<Usecase> usecases) throws JAXBException {
-            final Marshaller m = getContext().createMarshaller();
             final List<UsecaseDTO> caseDTOs = new ArrayList<UsecaseDTO>();
             for (final Usecase acase : usecases) {
                 caseDTOs.add(acase.toDTO());
             }
             final UsecasesDTO dto = new UsecasesDTO();
             dto.setUsecases(caseDTOs);
-            m.marshal(dto, outfile);
+            getMarshaller().marshal(dto, outfile);
         }
 
         /**

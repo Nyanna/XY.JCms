@@ -21,6 +21,8 @@ import org.apache.commons.lang.StringUtils;
 import net.xy.jcms.controller.configurations.ConfigurationIterationStrategy.ClimbUp;
 import net.xy.jcms.controller.configurations.parser.FragmentXMLParser;
 import net.xy.jcms.controller.configurations.pool.TemplatePool;
+import net.xy.jcms.persistence.XmlMapEntry;
+import net.xy.jcms.persistence.usecase.ConfigurationDTO;
 import net.xy.jcms.shared.DebugUtils;
 import net.xy.jcms.shared.IFragment;
 import net.xy.jcms.shared.JCmsHelper;
@@ -170,6 +172,18 @@ public class TemplateConfiguration extends Configuration<Map<String, IFragment>>
             }
         }
         return new TemplateConfiguration(result);
+    }
+
+    /**
+     * converts this configuration into an dto
+     * 
+     * @return dto
+     */
+    public ConfigurationDTO toDTO() {
+        final ConfigurationDTO ret = new ConfigurationDTO();
+        ret.setConfigurationType(TYPE);
+        ret.setMapping(XmlMapEntry.convert(getConfigurationValue()));
+        return ret;
     }
 
 }

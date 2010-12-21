@@ -42,7 +42,7 @@ public class RenderKitConfigurationProxy extends RenderKitConfiguration {
      * default empty proxy
      */
     public RenderKitConfigurationProxy() {
-        super(new HashMap<Object, IRenderer>());
+        super(new HashMap<String, IRenderer>());
     }
 
     /**
@@ -74,7 +74,8 @@ public class RenderKitConfigurationProxy extends RenderKitConfiguration {
             if (!missingIfaces.contains(simple)) {
                 missingIfaces.add(simple);
             }
-            return new IRenderer() {};
+            return new IRenderer() {
+            };
         }
     }
 

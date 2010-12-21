@@ -126,4 +126,37 @@ final public class TranslationRule {
         dto.setParameters(params);
         return dto;
     }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!this.getClass().isInstance(obj)) {
+            return false;
+        }
+        final TranslationRule oo = (TranslationRule) obj;
+        return (reactOn == oo.reactOn || reactOn != null && reactOn.pattern().equals(oo.reactOn.pattern())) &&
+                (buildOff == oo.buildOff || buildOff != null && buildOff.equals(oo.buildOff)) &&
+                (usecase == oo.usecase || usecase != null && usecase.equals(oo.usecase)) &&
+                (parameters == oo.parameters || parameters != null && parameters.equals(oo.parameters));
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 768;
+        if (reactOn != null) {
+            hash = hash * 3 + reactOn.pattern().hashCode();
+        }
+        if (buildOff != null) {
+            hash = hash * 3 + buildOff.hashCode();
+        }
+        if (usecase != null) {
+            hash = hash * 3 + usecase.hashCode();
+        }
+        if (parameters != null) {
+            hash = hash * 3 + parameters.hashCode();
+        }
+        return hash;
+    }
 }

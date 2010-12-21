@@ -13,6 +13,7 @@
 package net.xy.jcms.controller.usecase;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map.Entry;
@@ -20,6 +21,8 @@ import java.util.Map.Entry;
 import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
 import net.xy.jcms.controller.configurations.MessageConfiguration;
+import net.xy.jcms.controller.configurations.RenderKitConfiguration;
+import net.xy.jcms.controller.configurations.TemplateConfiguration;
 import net.xy.jcms.persistence.usecase.ConfigurationDTO;
 import net.xy.jcms.persistence.usecase.ControllerDTO;
 import net.xy.jcms.persistence.usecase.ParameterDTO;
@@ -50,12 +53,12 @@ final public class Usecase {
      * the request/input parameters, KeyChain, Cookies, Post etc... All
      * these parameters are mendatory and will be validated.
      */
-    private final Parameter[] parameterList;
+    private final List<Parameter> parameterList;
 
     /**
      * an list of applied controllers
      */
-    private final Controller[] controllerList;
+    private final List<Controller> controllerList;
 
     /**
      * an list of connected configurations. note: these list is the whole
@@ -76,14 +79,14 @@ final public class Usecase {
     public Usecase(final String id, final String description, final Parameter[] parameterList,
             final Controller[] controllerList, final Configuration<?>[] configurationList) {
         if (parameterList != null) {
-            this.parameterList = parameterList;
+            this.parameterList = Arrays.asList(parameterList);
         } else {
-            this.parameterList = new Parameter[] {};
+            this.parameterList = new ArrayList<Parameter>();
         }
         if (controllerList != null) {
-            this.controllerList = controllerList;
+            this.controllerList = Arrays.asList(controllerList);
         } else {
-            this.controllerList = new Controller[] {};
+            this.controllerList = new ArrayList<Controller>();
         }
         this.configurationList = mergeConfigurations(configurationList);
         if (StringUtils.isBlank(id) || StringUtils.isBlank(description)) {
@@ -134,7 +137,7 @@ final public class Usecase {
      * @return value
      */
     public Parameter[] getParameterList() {
-        return parameterList;
+        return parameterList.toArray(new Parameter[parameterList.size()]);
     }
 
     /**
@@ -143,7 +146,7 @@ final public class Usecase {
      * @return value
      */
     public Controller[] getControllerList() {
-        return controllerList;
+        return controllerList.toArray(new Controller[controllerList.size()]);
     }
 
     /**
@@ -225,6 +228,14 @@ final public class Usecase {
             case MessageConfiguration:
                 cdto = ((MessageConfiguration) conf.getValue()).toDTO();
                 break;
+            case RenderKitConfiguration:
+                cdto = ((RenderKitConfiguration) conf.getValue()).toDTO();
+                break;
+            case TemplateConfiguration:
+                cdto = ((TemplateConfiguration) conf.getValue()).toDTO();
+                break;
+            case ControllerConfiguration:
+            case UIConfiguration:
             default:
                 cdto = new ConfigurationDTO();
                 cdto.setConfigurationType(conf.getKey());
@@ -235,5 +246,45 @@ final public class Usecase {
         }
         dto.setConfigurationList(configs);
         return dto;
+    }
+
+    /**
+     * actual configuration is excluded from equals and hashing
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!this.getClass().isInstance(obj)) {
+            return false;
+        }
+        final Usecase oo = (Usecase) obj;
+        return (id == oo.id || id != null && id.equals(oo.id))
+                && (description == oo.description || description != null && description.equals(oo.description))
+                && (parameterList == oo.parameterList || parameterList != null && parameterList.equals(oo.parameterList))
+                && (controllerList == oo.controllerList || controllerList != null
+                        && controllerList.equals(oo.controllerList));
+    }
+
+    /**
+     * actual configuration is excluded from equals and hashing
+     */
+    @Override
+    public int hashCode() {
+        int hash = 246;
+        if (id != null) {
+            hash = hash * 3 + id.hashCode();
+        }
+        if (description != null) {
+            hash = hash * 3 + description.hashCode();
+        }
+        if (parameterList != null) {
+            hash = hash * 3 + parameterList.hashCode();
+        }
+        if (controllerList != null) {
+            hash = hash * 3 + controllerList.hashCode();
+        }
+        return hash;
     }
 }

@@ -103,4 +103,43 @@ final public class RuleParameter {
         dto.setParameterName(parameterName);
         return dto;
     }
+
+    /**
+     * converter equals and hash is based upon classpath
+     */
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!this.getClass().isInstance(obj)) {
+            return false;
+        }
+        final RuleParameter oo = (RuleParameter) obj;
+        return (parameterName == oo.parameterName || parameterName != null && parameterName.equals(oo.parameterName))
+                &&
+                (aplicatesToGroup == oo.aplicatesToGroup || aplicatesToGroup != null
+                        && aplicatesToGroup.equals(oo.aplicatesToGroup))
+                &&
+                (converter == oo.converter || converter != null
+                        && converter.getClass().getName().equals(oo.converter.getClass().getName()));
+    }
+
+    /**
+     * converter equals and hash is based upon classpath
+     */
+    @Override
+    public int hashCode() {
+        int hash = 741;
+        if (parameterName != null) {
+            hash = hash * 3 + parameterName.hashCode();
+        }
+        if (aplicatesToGroup != null) {
+            hash = hash * 3 + aplicatesToGroup.hashCode();
+        }
+        if (converter != null) {
+            hash = hash * 3 + converter.getClass().getName().hashCode();
+        }
+        return hash;
+    }
 }
