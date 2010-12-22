@@ -111,4 +111,30 @@ abstract public class Controller implements IController {
      * @return
      */
     protected abstract Map<String, Object> getControllerConfig(final ControllerConfiguration configK);
+
+    /**
+     * helper method to get config
+     * always returns an object and never null if the default was not null
+     * 
+     * @param indentifier
+     * @param binding
+     *            can be null
+     * @param parameters
+     *            can be null
+     * @param def
+     *            default if not found in configs
+     * @return value
+     */
+    static public Object getConfig(final String indentifier, final Map<String, String> binding,
+            final Map<Object, Object> parameters, final Object def) {
+        Object ret;
+        if (binding != null && binding.containsKey(indentifier)) {
+            ret = binding.get(indentifier);
+        } else if (parameters != null && parameters.containsKey(indentifier)) {
+            ret = parameters.get(indentifier);
+        } else {
+            ret = def;
+        }
+        return ret;
+    }
 }
