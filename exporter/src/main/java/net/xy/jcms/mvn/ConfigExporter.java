@@ -13,6 +13,7 @@
 package net.xy.jcms.mvn;
 
 import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -28,6 +29,7 @@ import net.xy.jcms.shared.JCmsHelper;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.xeustechnologies.jcl.JarClassLoader;
 
 /**
  * class for importing converting and exporting usecase and translation
@@ -130,13 +132,42 @@ public class ConfigExporter extends AbstractMojo {
      */
     String outUsecaseScheme;
 
+    /**
+     * dir in which additional librarys resides
+     * 
+     * @parameter expression="${basedir}/target/lib"
+     */
+    private File libdir;
+
+    /**
+     * dir in which additional classes resides
+     * 
+     * @parameter expression="${basedir}/target/classes"
+     */
+    private File classDir;
+
+    /**
+     * dir in which additional resources resides loaded before classDir
+     * 
+     * @parameter expression="${basedir}/src/main/java"
+     */
+    private File rscDir;
+
+    static {
+        System.setProperty("jcl.isolateLogging", "false");
+    }
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         getLog().info("Starting Import/Export operations.");
-        final ClassLoader loader = Thread.currentThread().getContextClassLoader();
-        final List<Usecase> uc = new LinkedList<Usecase>();
-        final List<TranslationRule> tr = new LinkedList<TranslationRule>();
         try {
+            final JarClassLoader jcl = new JarClassLoader(new URL[] {
+                    rscDir.toURI().toURL(),
+                    classDir.toURI().toURL(),
+                    libdir.toURI().toURL() });
+            final ClassLoader loader = jcl;
+            final List<Usecase> uc = new LinkedList<Usecase>();
+            final List<TranslationRule> tr = new LinkedList<TranslationRule>();
             // import
             // translations
             if (inTranslationRootFile != null) {

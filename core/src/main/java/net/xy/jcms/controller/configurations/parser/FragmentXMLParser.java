@@ -84,27 +84,19 @@ public class FragmentXMLParser {
     }
 
     /**
-     * parses an dynamic fragment from an inputstream
+     * parse an dynamic fragment out from an string
      * 
      * @param classPath
-     *            of resource to load
+     *            names resource origin of the stream
+     * @param stream
+     *            converted to an string
      * @param loader
-     *            for loading component instances
-     * @return value
+     * @return fragment
      * @throws ClassNotFoundException
      * @throws IOException
      */
-    public static IFragment parse(final String classPath, final ClassLoader loader) throws ClassNotFoundException,
-            IOException {
-        final InputStream st = JCmsHelper.loadResource(classPath, loader);
-        String stream = null;
-        if (st != null) {
-            stream = getStringFromStream(st);
-        }
-        if (StringUtils.isBlank(stream)) {
-            throw new IllegalArgumentException("Stream could not be read or is empty");
-        }
-
+    public static IFragment parse(final String classPath, final String stream, final ClassLoader loader)
+            throws ClassNotFoundException {
         final DynamicFragment ret = new DynamicFragment(classPath);
         int pointer = 0; // where every run begins
         do {
@@ -139,5 +131,29 @@ public class FragmentXMLParser {
             }
         } while (true);
         return ret;
+    }
+
+    /**
+     * parses an dynamic fragment from an inputstream
+     * 
+     * @param classPath
+     *            of resource to load
+     * @param loader
+     *            for loading component instances
+     * @return value
+     * @throws ClassNotFoundException
+     * @throws IOException
+     */
+    public static IFragment parse(final String classPath, final ClassLoader loader) throws ClassNotFoundException,
+            IOException {
+        final InputStream st = JCmsHelper.loadResource(classPath, loader);
+        String stream = null;
+        if (st != null) {
+            stream = getStringFromStream(st);
+        }
+        if (StringUtils.isBlank(stream)) {
+            throw new IllegalArgumentException("Stream could not be read or is empty");
+        }
+        return parse(classPath, stream, loader);
     }
 }

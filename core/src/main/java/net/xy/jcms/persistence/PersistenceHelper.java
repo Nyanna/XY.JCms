@@ -125,6 +125,8 @@ public class PersistenceHelper {
          */
         public static List<TranslationRule> loadAllTranslation(final ClassLoader loader) throws ClassNotFoundException {
             final EntityManager em = getEMF().createEntityManager();
+            em.clear();
+            getEMF().getCache().evictAll();
             final TypedQuery<TranslationRuleDTO> query = em.createQuery("SELECT r FROM TranslationRuleDTO r",
                     TranslationRuleDTO.class);
             final List<TranslationRule> result = new LinkedList<TranslationRule>();
@@ -178,6 +180,8 @@ public class PersistenceHelper {
          */
         public static List<Usecase> loadAllUsecases(final ClassLoader loader) throws ClassNotFoundException {
             final EntityManager em = getEMF().createEntityManager();
+            em.clear();
+            getEMF().getCache().evictAll();
             final TypedQuery<UsecaseDTO> query = em.createQuery("SELECT r FROM UsecaseDTO r", UsecaseDTO.class);
             final List<Usecase> result = new ArrayList<Usecase>();
             for (final UsecaseDTO dto : query.getResultList()) {

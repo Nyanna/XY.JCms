@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<usecases>
+    <usecase id="subcategory">
+        <description> sld ead asd alksdas dliasudish ad asd asuzd uas ukdza sdzas dkuuas dzsaukdz ku</description>
+        <parameter>
+            <param valueType="java.lang.Integer" key="catalogid"/>
+        </parameter>
+        <controller/>
+        <configurations/>
+    </usecase>
+    <usecase id="userLogin">
+        <description> sld ead asd alksdas dliasudish ad asd asuzd uas ukdza sdzas dkuuas dzsaukdz ku</description>
+        <parameter>
+            <param valueType="net.xyan.NavigationAbstractionLayer.NALKeyList" key="lvp"/>
+        </parameter>
+        <controller/>
+        <configurations/>
+    </usecase>
+    <usecase id="contentgroup">
+        <description> sld ead asd alksdas dliasudish ad asd asuzd uas ukdza sdzas dkuuas dzsaukdz ku</description>
+        <parameter>
+            <param valueType="de.jamba.ContentGroup" key="contentgroup"/>
+        </parameter>
+        <controller/>
+        <configurations>
+            <configuration type="UIConfiguration">
+                <ui value="..." valueType="String" key="id_maincontentbox1"/>
+                <ui value="bind_maincontentbox1;" valueType="String" key="id_contentboxXYZ.content"/>
+            </configuration>
+            <configuration type="TemplateConfiguration">
+                <element value="net.xy.jcms.shared.compiler.DynamicFragment" key="root">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#xD;
+&lt;root&gt;&#xD;
+	&lt;In&gt;&lt;/In&gt;&#xD;
+	&lt;!--component name=&quot;testus&quot; class=&quot;net.xy.jcms.portal.components.TextComponent&quot;--&gt;&#xD;
+	&lt;between&gt;&lt;/between&gt;&#xD;
+	&lt;!--template name=&quot;steronus&quot;--&gt;&#xD;
+	&lt;end&gt;&lt;/end&gt;&#xD;
+&lt;/root&gt;</element>
+            </configuration>
+            <configuration type="ControllerConfiguration">
+                <content>	bind_maincontentbox1 = ...
+</content>
+            </configuration>
+        </configurations>
+    </usecase>
+    <usecase id="features">
+        <description>Feature page for testing and demonstration purpose</description>
+        <parameter/>
+        <controller/>
+        <configurations>
+            <configuration type="UIConfiguration">
+                <ui value="sfgdfgdfgdfg" valueType="String" key="pageBody.test1"/>
+                <ui value="7" valueType="Integer" key="afsgd.adgf"/>
+                <ui value="is:pop,hi:pop,this:pop" valueType="net.xy.jcms.shared.types.StringMap" key="bbbplusaaa"/>
+            </configuration>
+            <configuration type="TemplateConfiguration">
+                <element value="net.xy.jcms.shared.compiler.DynamicFragment" key="root">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#xD;
+&lt;root&gt;&#xD;
+	&lt;In&gt;&lt;/In&gt;&#xD;
+	&lt;!--component name=&quot;testus&quot; class=&quot;net.xy.jcms.portal.components.TextComponent&quot;--&gt;&#xD;
+	&lt;between&gt;&lt;/between&gt;&#xD;
+	&lt;!--template name=&quot;steronus&quot;--&gt;&#xD;
+	&lt;end&gt;&lt;/end&gt;&#xD;
+&lt;/root&gt;</element>
+            </configuration>
+            <configuration type="MessageConfiguration">
+                <entry value="a message" key="thisIs"/>
+            </configuration>
+            <configuration type="ControllerConfiguration">
+                <content>Pops{
+	finding{
+		target = fdgfdgdfgdf
+	}
+}
+</content>
+            </configuration>
+            <configuration type="RenderKitConfiguration">
+                <entry value="net.xy.jcms.portal.renderer.BaseRenderer" key="IBaseRenderer"/>
+                <entry value="net.xy.jcms.portal.renderer.TextRenderer" key="ITextRenderer"/>
+            </configuration>
+        </configurations>
+    </usecase>
+</usecases>

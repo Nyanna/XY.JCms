@@ -21,6 +21,7 @@ import net.xy.jcms.controller.configurations.pool.TemplatePool;
 import net.xy.jcms.controller.usecase.Controller;
 import net.xy.jcms.controller.usecase.Parameter;
 import net.xy.jcms.controller.usecase.Usecase;
+import net.xy.jcms.persistence.BodyEntry;
 import net.xy.jcms.persistence.MapEntry;
 import net.xy.jcms.persistence.usecase.ConfigurationDTO;
 import net.xy.jcms.persistence.usecase.ControllerDTO;
@@ -118,13 +119,19 @@ public class UsecaseConverter {
                 }
                 break;
             case TemplateConfiguration:
+                final Map<String, IFragment> confValss = new HashMap<String, IFragment>();
                 if (conf.getMapping() != null) {
-                    final Map<String, IFragment> confValss = new HashMap<String, IFragment>();
                     for (final MapEntry mapEntry : conf.getMapping()) {
                         confValss.put(mapEntry.getKey(), TemplatePool.get(mapEntry.getValue(), loader));
                     }
-                    configs.add(new TemplateConfiguration(confValss));
                 }
+                if (conf.getContainment() != null) {
+                    for (final BodyEntry mapEntry : conf.getContainment()) {
+                        confValss.put(mapEntry.getKey(),
+                                FragmentXMLParser.parse(mapEntry.getValue(), mapEntry.getContent(), loader));
+                    }
+                }
+                configs.add(new TemplateConfiguration(confValss));
                 break;
             }
         }

@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.xml.stream.XMLStreamException;
 import org.apache.log4j.Logger;
+import org.xeustechnologies.jcl.JarClassLoader;
 
 import net.xy.jcms.controller.TranslationConfiguration;
 import net.xy.jcms.controller.UsecaseConfiguration;
@@ -181,8 +182,16 @@ public class JCmsHelper {
         }
         final URL url = loader.getResource(path.trim());
         if (url == null) {
-            throw new IllegalArgumentException("Resource to load doesn't exists. "
-                    + DebugUtils.printFields(path, loader));
+            InputStream st = null;
+            if (loader instanceof JarClassLoader) {
+                // fix for jcl only implementing this method
+                st = loader.getResourceAsStream(path.trim());
+                return st;
+            }
+            if (st == null) {
+                throw new IllegalArgumentException("Resource to load doesn't exists. "
+                        + DebugUtils.printFields(path, loader));
+            }
         }
         return loadResource(url, loader);
     }
