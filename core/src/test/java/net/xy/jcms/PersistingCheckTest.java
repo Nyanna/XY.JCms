@@ -88,7 +88,7 @@ public class PersistingCheckTest {
         final File all = new File("AllUse.xml");
         PersistenceHelper.XML.saveUsecases(all, Arrays.asList(cases));
         PersistenceHelper.XML.loadUsecases(all, Thread.currentThread().getContextClassLoader());
-        // all.deleteOnExit();
+        all.deleteOnExit();
     }
 
     @Test

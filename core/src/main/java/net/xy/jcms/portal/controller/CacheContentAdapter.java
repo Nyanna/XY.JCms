@@ -1,3 +1,15 @@
+/**
+ * This file is part of XY.JCms, Copyright 2010 (C) Xyan Kruse, Xyan@gmx.net, Xyan.kilu.de
+ * 
+ * XY.JCms is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * 
+ * XY.JCms is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with XY.JCms. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package net.xy.jcms.portal.controller;
 
 import java.util.concurrent.Callable;
@@ -7,7 +19,8 @@ import java.util.concurrent.TimeUnit;
 import net.xy.jcms.portal.controller.CacheContainer.RetrievalFailure;
 
 /**
- * implements an adapter to aggregate content from cache or retrieve it in an dispached thread via an threadpool
+ * implements an adapter to aggregate content from cache or retrieve it in an
+ * dispached thread via an threadpool
  * 
  * @author xyan
  * 
@@ -19,7 +32,8 @@ public class CacheContentAdapter<CONTENT> {
     private final CacheContainer<CONTENT> link;
 
     /**
-     * constructor first checks for cached content otherwise it starts and new task and links the future.
+     * constructor first checks for cached content otherwise it starts and new
+     * task and links the future.
      * 
      * @param cacheKey
      * @param callback
@@ -57,7 +71,8 @@ public class CacheContentAdapter<CONTENT> {
     }
 
     /**
-     * retrieves content already existend from cache or it directs to the blocking future
+     * retrieves content already existend from cache or it directs to the
+     * blocking future
      * 
      * @param timeout
      * @param unit
@@ -79,7 +94,8 @@ public class CacheContentAdapter<CONTENT> {
     public static interface ICallback<CONTENT> {
 
         /**
-         * method should check if the content is already cached otherwise return null
+         * method should check if the content is already cached otherwise return
+         * null
          * 
          * @param cacheKey
          * @return null if contetn not cached
@@ -87,7 +103,8 @@ public class CacheContentAdapter<CONTENT> {
         public CONTENT callForCached(final String cacheKey);
 
         /**
-         * method is called in an new thread context and should aggregate the content
+         * method is called in an new thread context and should aggregate the
+         * content
          * 
          * @return content
          */
