@@ -411,15 +411,15 @@ public class UIConfiguration extends Configuration<Map<String, Object>> {
             } else if (entry.getValue() instanceof Integer) {
                 val.setValue(entry.getValue().toString());
                 val.setType("Integer");
+            } else if (entry.getValue() instanceof Boolean) {
+                val.setValue(entry.getValue().toString());
+                val.setType("Boolean");
             } else if (entry.getValue() instanceof Long) {
                 val.setValue(entry.getValue().toString());
                 val.setType("Long");
             } else if (entry.getValue() instanceof Double) {
                 val.setValue(entry.getValue().toString());
-                val.setType("Doulbe");
-            } else if (entry.getValue() instanceof Boolean) {
-                val.setValue(entry.getValue().toString());
-                val.setType("Boolean");
+                val.setType("Double");
             } else {
                 final IConverter converter = converterMap.get(entry.getValue().getClass());
                 if (converter != null) {
@@ -427,12 +427,47 @@ public class UIConfiguration extends Configuration<Map<String, Object>> {
                     val.setType(converter.getClass().getName());
                 } else {
                     throw new IllegalArgumentException(
-                            "Cant destinguish the configuration type to convert into string representation.");
+                            "Cant destinguish the converter type to convert into string representation.");
                 }
             }
             conf.add(val);
         }
         ret.setUiconfig(conf);
+        return ret;
+    }
+
+    /**
+     * method for converting an entry list back to an usable config
+     * 
+     * @param entries
+     * @return
+     * @throws ClassNotFoundException
+     */
+    public static UIConfiguration fromEntryList(final List<UIEntryDTO> entries, final ClassLoader loader)
+            throws ClassNotFoundException {
+        final UIConfiguration ret = new UIConfiguration(new HashMap<String, Object>(entries.size()));
+        for (final UIEntryDTO entry : entries) {
+            if (StringUtils.isBlank(entry.getType()) || entry.getType().equalsIgnoreCase("String")) {
+                ret.getConfigurationValue().put(entry.getKey(), entry.getValue());
+            } else if (entry.getType().equalsIgnoreCase("Integer")) {
+                ret.getConfigurationValue().put(entry.getKey(), Integer.valueOf(entry.getValue()));
+            } else if (entry.getType().equalsIgnoreCase("Boolean")) {
+                ret.getConfigurationValue().put(entry.getKey(), Boolean.valueOf(entry.getValue()));
+            } else if (entry.getType().equalsIgnoreCase("Long")) {
+                ret.getConfigurationValue().put(entry.getKey(), Long.valueOf(entry.getValue()));
+            } else if (entry.getType().equalsIgnoreCase("Double")) {
+                ret.getConfigurationValue().put(entry.getKey(), Double.valueOf(entry.getValue()));
+            } else {
+                final IConverter converter = ConverterPool.get(entry.getType(), loader);
+                if (converter != null) {
+                    ret.converterMap.put(converter.getClass(), converter);
+                    ret.getConfigurationValue().put(entry.getKey(), converter.convert(entry.getValue()));
+                } else {
+                    throw new IllegalArgumentException(
+                            "Cant destinguish the converter type to convert into string representation.");
+                }
+            }
+        }
         return ret;
     }
 }
