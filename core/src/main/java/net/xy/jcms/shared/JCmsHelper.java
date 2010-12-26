@@ -184,6 +184,22 @@ public class JCmsHelper {
             throw new IllegalArgumentException("Resource to load doesn't exists. "
                     + DebugUtils.printFields(path, loader));
         }
+        return loadResource(url, loader);
+    }
+
+    /**
+     * loads an resource with the loader returns an inputstream and prevents the
+     * vm from caching
+     * 
+     * @param path
+     * @param loader
+     * @return value
+     * @throws IOException
+     */
+    public static InputStream loadResource(final URL url, final ClassLoader loader) throws IOException {
+        if (url == null || loader == null) {
+            throw new IllegalArgumentException("Fiedls can't be empty.");
+        }
         final URLConnection con = url.openConnection();
         con.setUseCaches(false);
         con.setDefaultUseCaches(false);

@@ -27,11 +27,11 @@
 	<build>
 		<plugins>
 			<plugin>
-		        <groupId>org.apache.maven.plugins</groupId>
-		        <artifactId>maven-javadoc-plugin</artifactId>
-		        <configuration>
-		        </configuration>
-		      </plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<configuration>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 	<repositories>
@@ -41,8 +41,8 @@
 			<snapshots>
 				<enabled>true</enabled>
 			</snapshots>
-		</repository>    
-	</repositories> 
+		</repository>
+	</repositories>
 
 	<scm>
 		<developerConnection>Xyan Kruse</developerConnection>
@@ -69,30 +69,19 @@
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.persistence</groupId>
-  			<artifactId>eclipselink</artifactId>
+			<artifactId>eclipselink</artifactId>
 			<version>2.2.0-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.eclipse.persistence</groupId>
-  			<artifactId>javax.persistence</artifactId>
+			<artifactId>javax.persistence</artifactId>
 			<version>2.0.3</version>
 			<scope>compile</scope>
 		</dependency>
-		<!-- dependency>
-			<groupId>stax</groupId>
-			<artifactId>stax</artifactId>
-			<version>1.2.0</version>
-			<type>jar</type>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>stax</groupId>
-			<artifactId>stax-api</artifactId>
-			<version>1.0.1</version>
-			<type>jar</type>
-			<scope>compile</scope>
-		</dependency-->
+		<!-- dependency> <groupId>stax</groupId> <artifactId>stax</artifactId> <version>1.2.0</version> <type>jar</type> <scope>compile</scope> 
+			</dependency> <dependency> <groupId>stax</groupId> <artifactId>stax-api</artifactId> <version>1.0.1</version> <type>jar</type> 
+			<scope>compile</scope> </dependency -->
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
@@ -101,14 +90,14 @@
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
-		    <groupId>javax.servlet</groupId>
-		    <artifactId>servlet-api</artifactId>
-		    <version>2.5</version>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.xeustechnologies</groupId>
-		    <artifactId>jcl-core</artifactId>
-		    <version>2.2.2</version>
+			<groupId>org.xeustechnologies</groupId>
+			<artifactId>jcl-core</artifactId>
+			<version>2.2.2</version>
 		</dependency>
 		<dependency>
 			<groupId>mysql</groupId>

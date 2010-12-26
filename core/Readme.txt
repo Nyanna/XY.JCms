@@ -23,25 +23,22 @@
 -capable of very strong concurrency features
 -very high performance out of the box and an gain of 200% when using output caching
 -one cloudable codebase to deliver all ever needed frontends on demand in runtime
+-DTO transfer of all configuration via JAXB and JPA(eclipselink)
+-an small configset gets expanded to an independent configbase so its easy to configure and rely on
+-mvn plugin to commit and convert simple xml <> JAXB xml <> jpa context
 
 #
-# Phase 2 will cover (~64 MH +/-50%)
+# Phase 2 will cover (~40 MH +/-50%)
 #
-
--the db schemata and connectors, eclipselink
--CLI tool insert UC from xml, convert human xml to JAXB
--CLI tool insert ranslation from xml
--usecase templating esp. inheritance for mainlayout or implicite dependency loading > todo
+-usecase templating esp. inheritance for mainlayout
 -partial component tree rendering & caching - think about rendering only subcomponents pathes, or init without an use case an litle component tree an render an asingle content list
 ?single usecase controller example
 -Local Test coverage
 	1. junit tests for isolated components // whats about no markup checks ?
-	2. junit tests for rendering predefined usecases // done
 	3. dbrun to check if UCs would run with local build/changed components - implement usecase validation as maven plugin target
+?fully functional jj order
 
--more jj usecases and components, inclusive fully functional jj order
 #TODO
--overthink classloader structure and the db classlaoder| the config adapter get the same classloader as the pools, they have to load the components with that
 -xml cdata für fragmente ausserdem attribute sortierung (http://jaxb.java.net/faq/JaxbCDATASample.java), inline fragments via resource laden, obmitted config  bug for enumset db
 
 #

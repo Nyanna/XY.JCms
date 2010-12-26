@@ -121,6 +121,20 @@ public class DynamicFragment extends AbstractFragment {
      */
     private final List<String> fragments = new ArrayList<String>();
 
+    /**
+     * source resource which got parsed to build this config
+     */
+    private final String source;
+
+    /**
+     * only constructor must define sourcename
+     * 
+     * @param source
+     */
+    public DynamicFragment(final String source) {
+        this.source = source;
+    }
+
     @Override
     public FragmentConfiguration getConfiguration() {
         return new FragmentConfiguration(this) {
@@ -203,5 +217,14 @@ public class DynamicFragment extends AbstractFragment {
      */
     public List<Element> getElementList() {
         return Collections.unmodifiableList(struct);
+    }
+
+    /**
+     * returns the source path from which this template was build
+     * 
+     * @return
+     */
+    public String getSource() {
+        return source;
     }
 }

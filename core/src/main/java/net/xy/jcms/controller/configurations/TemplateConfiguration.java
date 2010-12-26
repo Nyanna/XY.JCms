@@ -12,6 +12,7 @@
  */
 package net.xy.jcms.controller.configurations;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,7 +30,6 @@ import net.xy.jcms.persistence.MapEntry;
 import net.xy.jcms.persistence.usecase.ConfigurationDTO;
 import net.xy.jcms.shared.DebugUtils;
 import net.xy.jcms.shared.IFragment;
-import net.xy.jcms.shared.JCmsHelper;
 import net.xy.jcms.shared.compiler.DynamicFragment;
 import net.xy.jcms.shared.compiler.DynamicFragment.Element;
 
@@ -162,7 +162,7 @@ public class TemplateConfiguration extends Configuration<Map<String, IFragment>>
                 final String classPath = parsed[1];
                 if (classPath.toLowerCase().endsWith(".xml")) {
                     // init template by parsing an xml
-                    result.put(name.trim(), FragmentXMLParser.parse(JCmsHelper.loadResource(classPath, loader), loader));
+                    result.put(name.trim(), FragmentXMLParser.parse(classPath, loader));
                 } else {
                     // init template by precompiled class
                     result.put(name.trim(), TemplatePool.get(classPath.trim(), loader));
@@ -221,6 +221,29 @@ public class TemplateConfiguration extends Configuration<Map<String, IFragment>>
         ret.setMapping(mlist);
         ret.setContainment(blist);
         return ret;
+    }
+
+    /**
+     * returns the list of classes and dynamic fragments used in this config as
+     * de/path/to/class removes file ending if present
+     * 
+     * @return nomarlized source pathes
+     */
+    public Map<String, String> getSources() {
+        final Map<String, String> srcs = new HashMap<String, String>();
+        for (final Entry<String, IFragment> entry : getConfigurationValue().entrySet()) {
+            if (entry.getValue() instanceof DynamicFragment) {
+                String path = ((DynamicFragment) entry.getValue()).getSource();
+                if (path.contains(".")) {
+                    path = path.substring(0, path.lastIndexOf("."));
+                }
+                srcs.put(entry.getKey(), path);
+            } else {
+                srcs.put(entry.getKey(), entry.getValue().getClass().getPackage().getName().replace(".", File.pathSeparator)
+                        + File.pathSeparator + entry.getValue().getClass().getSimpleName());
+            }
+        }
+        return srcs;
     }
 
 }

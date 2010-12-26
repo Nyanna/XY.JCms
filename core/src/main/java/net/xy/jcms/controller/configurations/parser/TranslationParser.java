@@ -60,6 +60,7 @@ public class TranslationParser {
      */
     public static TranslationRule[] parse(final InputStream in, final ClassLoader loader) throws XMLStreamException,
              ClassNotFoundException {
+        @SuppressWarnings("deprecation")
         final XMLInputFactory factory = XMLInputFactory.newInstance("com.sun.xml.internal.stream.XMLInputFactoryImpl",
                 TranslationParser.class.getClassLoader());
         LOG.info("XMLInputFactory loaded: " + factory.getClass().getName());
@@ -71,6 +72,33 @@ public class TranslationParser {
             final int event = parser.next();
             if (event == XMLStreamConstants.START_ELEMENT && parser.getName().getLocalPart().equals("rules")) {
                 return parseRules(parser, loader);
+            }
+        }
+        throw new IllegalArgumentException("No rules section found.");
+    }
+
+    /**
+     * parses an single file translation
+     * 
+     * @param in
+     * @param loader
+     * @return
+     * @throws XMLStreamException
+     * @throws ClassNotFoundException
+     *             in case there are problems with an params type converter
+     */
+    public static TranslationRule parseSingle(final InputStream in, final ClassLoader loader) throws XMLStreamException,
+            ClassNotFoundException {
+        @SuppressWarnings("deprecation")
+        final XMLInputFactory factory = XMLInputFactory.newInstance("com.sun.xml.internal.stream.XMLInputFactoryImpl",
+                TranslationParser.class.getClassLoader());
+        LOG.info("XMLInputFactory loaded: " + factory.getClass().getName());
+        factory.setProperty("javax.xml.stream.isCoalescing", true);
+        final XMLStreamReader parser = factory.createXMLStreamReader(in);
+        while (parser.hasNext()) {
+            final int event = parser.next();
+            if (event == XMLStreamConstants.START_ELEMENT && parser.getName().getLocalPart().equals("rule")) {
+                return parseRule(parser, loader);
             }
         }
         throw new IllegalArgumentException("No rules section found.");

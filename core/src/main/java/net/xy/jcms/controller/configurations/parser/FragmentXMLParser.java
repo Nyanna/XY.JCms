@@ -27,6 +27,7 @@ import org.apache.commons.lang.StringUtils;
 
 import net.xy.jcms.controller.configurations.pool.ComponentPool;
 import net.xy.jcms.shared.IFragment;
+import net.xy.jcms.shared.JCmsHelper;
 import net.xy.jcms.shared.compiler.DynamicFragment;
 
 /**
@@ -85,13 +86,17 @@ public class FragmentXMLParser {
     /**
      * parses an dynamic fragment from an inputstream
      * 
-     * @param st
+     * @param classPath
+     *            of resource to load
      * @param loader
      *            for loading component instances
      * @return value
      * @throws ClassNotFoundException
+     * @throws IOException
      */
-    public static IFragment parse(final InputStream st, final ClassLoader loader) throws ClassNotFoundException {
+    public static IFragment parse(final String classPath, final ClassLoader loader) throws ClassNotFoundException,
+            IOException {
+        final InputStream st = JCmsHelper.loadResource(classPath, loader);
         String stream = null;
         if (st != null) {
             stream = getStringFromStream(st);
@@ -100,7 +105,7 @@ public class FragmentXMLParser {
             throw new IllegalArgumentException("Stream could not be read or is empty");
         }
 
-        final DynamicFragment ret = new DynamicFragment();
+        final DynamicFragment ret = new DynamicFragment(classPath);
         int pointer = 0; // where every run begins
         do {
 

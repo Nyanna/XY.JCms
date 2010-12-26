@@ -18,9 +18,11 @@ package net.xy.jcms.controller.configurations.parser;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -31,6 +33,7 @@ import org.apache.commons.lang.StringUtils;
 
 import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
+import net.xy.jcms.controller.configurations.TemplateConfiguration;
 import net.xy.jcms.controller.configurations.pool.ControllerPool;
 import net.xy.jcms.controller.usecase.Controller;
 import net.xy.jcms.controller.usecase.Parameter;
@@ -57,12 +60,6 @@ public class UsecaseParser {
      */
     public static Usecase[] parse(final InputStream in, final ClassLoader loader) throws XMLStreamException,
             ClassNotFoundException {
-        // TODO [HIGH] implicite loading of resources into config when including
-        // an fragment
-        // de/j/mainLayout.xml will check for mainLayout.config.xml to load
-        // dependend config for this fragment
-        // relative path support .ui.comp1.comp2.val ->
-        // mainBody.ui.comp1.comp2.val
         final XMLInputFactory factory = XMLInputFactory.newInstance();
         factory.setProperty("javax.xml.stream.isCoalescing", true);
         // not supported by the reference implementation
@@ -298,6 +295,9 @@ public class UsecaseParser {
                 final Configuration<?> config = parseConfiguration(parser, loader);
                 if (config != null) {
                     configs.add(config);
+                    if (config instanceof TemplateConfiguration) {
+                        configs.addAll(loadFragmentDependencies((TemplateConfiguration) config, loader));
+                    }
                 }
             } else {
                 throw new IllegalArgumentException("Syntax error nothing allowed between configuration deffinitions. ["
@@ -305,6 +305,49 @@ public class UsecaseParser {
             }
         }
         return configs.toArray(new Configuration[configs.size()]);
+    }
+
+    /**
+     * this method checks if a included fragment is associated with dependend
+     * configurations destinguished from filename. this is done for one level.
+     * 
+     * @param config
+     * @param loader
+     * @return list of additional configs
+     */
+    private static Collection<? extends Configuration<?>> loadFragmentDependencies(final TemplateConfiguration config,
+            final ClassLoader loader) {
+        final List<Configuration<?>> configs = new ArrayList<Configuration<?>>();
+        for (final Entry<String, String> e : config.getSources().entrySet()) {
+            final List<Configuration<?>> frags = new ArrayList<Configuration<?>>();
+            if (loader.getResource(e.getValue() + ".controller.properties") != null) {
+                configs.add(Configuration.initConfigurationByInclude(ConfigurationType.ControllerConfiguration, "class://"
+                        + e.getValue() + ".controller.properties", loader));
+            }
+            if (loader.getResource(e.getValue() + ".messages.properties") != null) {
+                configs.add(Configuration.initConfigurationByInclude(ConfigurationType.MessageConfiguration,
+                        "class://" + e.getValue() + ".controller.properties", loader));
+            }
+            if (loader.getResource(e.getValue() + ".renderer.properties") != null) {
+                configs.add(Configuration.initConfigurationByInclude(ConfigurationType.RenderKitConfiguration, "class://"
+                        + e.getValue() + ".controller.properties", loader));
+            }
+            if (loader.getResource(e.getValue() + ".ui.properties") != null) {
+                configs.add(Configuration.initConfigurationByInclude(ConfigurationType.UIConfiguration,
+                        "class://" + e.getValue() + ".controller.properties", loader));
+            }
+            if (loader.getResource(e.getValue() + ".templates.properties") != null) {
+                configs.add(Configuration.initConfigurationByInclude(ConfigurationType.TemplateConfiguration,
+                        "class://" + e.getValue() + ".controller.properties", loader));
+            }
+            for (final Configuration<?> configuration : frags) {
+                // TODO [LOW] prefix .comp3.comp4 with fragment prefix via
+                // genric configuration method
+                // configuration.prependRelatives()
+            }
+            configs.addAll(frags);
+        }
+        return configs;
     }
 
     /**

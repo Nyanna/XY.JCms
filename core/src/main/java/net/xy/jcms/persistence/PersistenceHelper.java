@@ -50,10 +50,15 @@ public class PersistenceHelper {
      * 
      */
     public static class DB {
+
         /**
          * stores the manager factory
          */
         private static EntityManagerFactory emf = null;
+        /**
+         * JPA context for creating entities
+         */
+        private static String context = "fw-web";
 
         /**
          * singleton factory
@@ -62,9 +67,19 @@ public class PersistenceHelper {
          */
         private static EntityManagerFactory getEMF() {
             if (emf == null) {
-                emf = Persistence.createEntityManagerFactory("fw-web");
+                emf = Persistence.createEntityManagerFactory(context);
             }
             return emf;
+        }
+
+        /**
+         * sets another context and clears emf
+         * 
+         * @param context
+         */
+        public static void setContext(final String context) {
+            DB.context = context;
+            DB.emf = null;
         }
 
         /**
