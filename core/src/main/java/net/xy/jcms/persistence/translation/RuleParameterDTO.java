@@ -15,17 +15,20 @@ package net.xy.jcms.persistence.translation;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.persistence.CollectionTable;
-import javax.persistence.ElementCollection;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import net.xy.jcms.persistence.XmlMapEntry;
+import org.eclipse.persistence.annotations.PrivateOwned;
+
+import net.xy.jcms.persistence.MapEntry;
 
 /**
  * transfer object for translation parameters compatible with JAXB & JPA
@@ -45,9 +48,9 @@ public class RuleParameterDTO implements Serializable {
     private String parameterName = null;
     private Integer aplicatesToGroup = null;
     private String converter = null;
-    @ElementCollection
-    @CollectionTable(name = "translation_parameter_map")
-    private List<XmlMapEntry> buildInMap = null;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @PrivateOwned
+    private List<MapEntry> buildInMap = null;
 
     @XmlAttribute(name = "name", required = true)
     public String getParameterName() {
@@ -77,11 +80,11 @@ public class RuleParameterDTO implements Serializable {
     }
 
     @XmlElement(name = "map")
-    public List<XmlMapEntry> getBuildInMap() {
+    public List<MapEntry> getBuildInMap() {
         return buildInMap;
     }
 
-    public void setBuildInMap(final List<XmlMapEntry> buildInMap) {
+    public void setBuildInMap(final List<MapEntry> buildInMap) {
         this.buildInMap = buildInMap;
     }
 

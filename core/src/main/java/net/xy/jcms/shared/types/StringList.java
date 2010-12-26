@@ -18,6 +18,8 @@ package net.xy.jcms.shared.types;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -53,5 +55,19 @@ public class StringList extends ArrayList<String> implements IConverter {
     @Override
     public StringList convert(final String str) {
         return new StringList(str);
+    }
+
+    @Override
+    public String convert(final Object obj) {
+        final StringBuilder ret = new StringBuilder();
+        @SuppressWarnings("unchecked")
+        final Iterator<String> i = ((List<String>) obj).iterator();
+        while (i.hasNext()) {
+            ret.append(i.next());
+            if (i.hasNext()) {
+                ret.append(",");
+            }
+        }
+        return ret.toString();
     }
 }

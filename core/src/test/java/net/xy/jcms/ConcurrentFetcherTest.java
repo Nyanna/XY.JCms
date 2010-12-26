@@ -11,7 +11,6 @@ import java.util.concurrent.TimeoutException;
 import org.junit.Test;
 
 import net.xy.jcms.portal.controller.ContentInstructionProcessor;
-import net.xy.jcms.portal.controller.ContentInstructionProcessor.DependencyValidityError;
 import net.xy.jcms.portal.controller.ContentInstructionProcessor.IContentCaller;
 import net.xy.jcms.portal.controller.ContentInstructionProcessor.Instruction;
 
@@ -25,7 +24,7 @@ public class ConcurrentFetcherTest {
 
     @Test
     @SuppressWarnings("serial")
-    public void testFetch() throws DependencyValidityError {
+    public void testFetch() throws Exception {
         final List<Instruction> ins = new ArrayList<ContentInstructionProcessor.Instruction>();
         ins.add(new Instruction("Henne", new ArrayList<String>() {
             {

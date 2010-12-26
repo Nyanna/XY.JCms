@@ -12,7 +12,9 @@
  */
 package net.xy.jcms.shared.types;
 
-import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -24,7 +26,7 @@ import net.xy.jcms.shared.IConverter;
  * @author xyan
  * 
  */
-public class LongList extends ArrayList<java.lang.Long> implements IConverter {
+public class LongList extends LinkedList<java.lang.Long> implements IConverter {
     private static final long serialVersionUID = -2982736336731356218L;
 
     @Override
@@ -47,5 +49,19 @@ public class LongList extends ArrayList<java.lang.Long> implements IConverter {
     @Override
     public LongList convert(final String str) {
         return new LongList(str);
+    }
+
+    @Override
+    public String convert(final Object obj) {
+        final StringBuilder ret = new StringBuilder();
+        @SuppressWarnings("unchecked")
+        final Iterator<Long> i = ((List<Long>) obj).iterator();
+        while (i.hasNext()) {
+            ret.append(i.next());
+            if (i.hasNext()) {
+                ret.append(",");
+            }
+        }
+        return ret.toString();
     }
 }

@@ -67,7 +67,7 @@ public class ContentInstructionProcessor {
      *             in case simple error are present in dependencies
      */
     public static void processInstructions(final List<Instruction> instructions, final IContentCaller cCaller)
-            throws DependencyValidityError {
+            throws DependencyValidityError, Exception {
         // instruction which can be started directly
         final List<Instruction> nonDepInstrs = new ArrayList<ContentInstructionProcessor.Instruction>();
         // map representing dependencies a => c,d,e
@@ -146,9 +146,10 @@ public class ContentInstructionProcessor {
      * @param resultSet
      *            which got constantly filled with the results
      * @return result of the actual instruction
+     * @throws Exception
      */
     public static Object processInstruction(final Instruction instruction, final Map<String, List<String>> dependencys,
-            final Map<String, Instruction> instructionSet, final IContentCaller cCaller) {
+            final Map<String, Instruction> instructionSet, final IContentCaller cCaller) throws Exception {
         // call instruction get result
         final Object result = cCaller.call(instruction, getAll(instruction.depends, instructionSet));
 
@@ -164,9 +165,10 @@ public class ContentInstructionProcessor {
      * @param dependencys
      * @param instructionSet
      * @param cCaller
+     * @throws Exception
      */
     private static void removeDependentAndDispatch(final String id, final Map<String, List<String>> dependencys,
-            final Map<String, Instruction> instructionSet, final IContentCaller cCaller) {
+            final Map<String, Instruction> instructionSet, final IContentCaller cCaller) throws Exception {
         for (final Entry<String, List<String>> depInstr : dependencys.entrySet()) {
             // list of instruction which requiere the result of the actual
             // proceesed instruction
@@ -188,9 +190,10 @@ public class ContentInstructionProcessor {
      * @param depInstrs
      * @param instructionSet
      * @param cCaller
+     * @throws Exception
      */
     private static void dispacthInstruction(final Instruction instruction, final Map<String, List<String>> depInstrs,
-            final Map<String, Instruction> instructionSet, final IContentCaller cCaller) {
+            final Map<String, Instruction> instructionSet, final IContentCaller cCaller) throws Exception {
         // check if an new thread is requiered or is the content already cached
         if (!instruction.isDone()) {
             final Map<String, Instruction> deps = getAll(instruction.depends, instructionSet);
@@ -424,7 +427,7 @@ public class ContentInstructionProcessor {
          *            an set of declared dependent instructions
          * @return content
          */
-        public Object call(final Instruction instruction, final Map<String, Instruction> resultSet);
+        public Object call(final Instruction instruction, final Map<String, Instruction> resultSet) throws Exception;
 
         /**
          * this method should return the content from cache only if not cached it should return null
@@ -433,6 +436,7 @@ public class ContentInstructionProcessor {
          * @param resultSet
          * @return content if it was cached otherwise null
          */
-        public Object getFromCache(final Instruction instruction, final Map<String, Instruction> resultSet);
+        public Object getFromCache(final Instruction instruction, final Map<String, Instruction> resultSet)
+                throws Exception;
     }
 }

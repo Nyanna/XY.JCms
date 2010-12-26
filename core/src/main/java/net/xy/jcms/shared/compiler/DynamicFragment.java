@@ -17,6 +17,7 @@
 package net.xy.jcms.shared.compiler;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,6 +31,7 @@ import net.xy.jcms.controller.configurations.FragmentConfiguration;
 import net.xy.jcms.shared.AbstractFragment;
 import net.xy.jcms.shared.IComponent;
 import net.xy.jcms.shared.IOutWriter;
+import net.xy.jcms.shared.compiler.DynamicFragment.Element.ElementType;
 
 /**
  * an dynamic constructed fragment class. !Beware! never save component
@@ -40,33 +42,37 @@ import net.xy.jcms.shared.IOutWriter;
  * 
  */
 public class DynamicFragment extends AbstractFragment {
-
-    /**
-     * defines the behavior to process the element
-     * 
-     * @author Xyan
-     * 
-     */
-    private static enum ElementType {
-        Template, Static, Child;
-    }
-
     /**
      * element container
      * 
      * @author Xyan
      * 
      */
-    private static class Element {
+    public static class Element {
+        /**
+         * defines the behavior to process the element
+         * 
+         * @author Xyan
+         * 
+         */
+        public static enum ElementType {
+            Template, Static, Child;
+        }
+
         /**
          * stores the type
          */
-        final ElementType type;
+        public final ElementType type;
 
         /**
          * stores the value
          */
-        final String value;
+        public final String value;
+
+        /**
+         * stores classname of the component or null
+         */
+        public final String childComponent;
 
         /**
          * only constructor
@@ -75,29 +81,27 @@ public class DynamicFragment extends AbstractFragment {
          * @param value
          */
         public Element(final ElementType type, final String value) {
+            this(type, value, null);
+        }
+
+        /**
+         * constructor with child
+         * 
+         * @param type
+         * @param value
+         * @param child
+         */
+        public Element(final ElementType type, final String value, final IComponent child) {
             if (type == null || value == null) {
                 throw new IllegalArgumentException("Field can't be null.");
             }
             this.type = type;
             this.value = value;
-        }
-
-        /**
-         * gets the type
-         * 
-         * @return value
-         */
-        public ElementType getType() {
-            return type;
-        }
-
-        /**
-         * gets the value
-         * 
-         * @return value
-         */
-        public String getValue() {
-            return value;
+            if (child != null) {
+                childComponent = child.getClass().getName();
+            } else {
+                childComponent = null;
+            }
         }
     }
 
@@ -105,7 +109,7 @@ public class DynamicFragment extends AbstractFragment {
      * holds an ordered list of all the fragment parts, static, childs,
      * templates, this is also the rendering queue
      */
-    private final LinkedList<Element> struct = new LinkedList<Element>();
+    private final List<Element> struct = new LinkedList<Element>();
 
     /**
      * children got also separately saved in this list
@@ -145,15 +149,15 @@ public class DynamicFragment extends AbstractFragment {
     public void render(final IOutWriter out, final FragmentConfiguration config) {
         // beware of mutable operation in an pseudo static fragment instance
         for (final Element elem : struct) {
-            switch (elem.getType()) {
+            switch (elem.type) {
             case Child:
-                config.renderChild(elem.getValue(), out);
+                config.renderChild(elem.value, out);
                 break;
             case Static:
-                out.append(elem.getValue());
+                out.append(elem.value);
                 break;
             case Template:
-                config.renderTemplate(elem.getValue(), out);
+                config.renderTemplate(elem.value, out);
                 break;
             }
         }
@@ -167,7 +171,7 @@ public class DynamicFragment extends AbstractFragment {
      */
     public void addChild(final String name, final IComponent compInstance) {
         children.put(name, compInstance);
-        struct.add(new Element(ElementType.Child, name));
+        struct.add(new Element(ElementType.Child, name, compInstance));
     }
 
     /**
@@ -190,5 +194,14 @@ public class DynamicFragment extends AbstractFragment {
         if (StringUtils.isNotBlank(charachters)) {
             struct.add(new Element(ElementType.Static, charachters));
         }
+    }
+
+    /**
+     * returns an unmodifiable sight on this fragments elements
+     * 
+     * @return ordered list
+     */
+    public List<Element> getElementList() {
+        return Collections.unmodifiableList(struct);
     }
 }

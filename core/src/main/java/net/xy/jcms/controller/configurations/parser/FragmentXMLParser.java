@@ -43,16 +43,24 @@ public class FragmentXMLParser {
     private final static String END = "-->";
 
     /**
-     * pattern for an component instruction
+     * pattern for an component instruction. masks are for back conversion
      */
-    private final static Pattern COMPONENT = Pattern
+    public final static Pattern COMPONENT = Pattern
             .compile("^component name=\"([a-z0-9._\\-]{3,})\" class=\"([a-z0-9._\\-]{3,})\"", Pattern.CASE_INSENSITIVE);
+    /**
+     * back conversion use with printf and 2 parameters
+     */
+    public final static String COMPONENTMASK = BEGIN + "component name=\"%s\" class=\"%s\"" + END;
 
     /**
-     * pattern for an template inclusion
+     * pattern for an template inclusion. masks are for back conversion
      */
-    private final static Pattern TEMPLATE = Pattern.compile("^template name=\"([a-z0-9._\\-]{3,})\"",
+    public final static Pattern TEMPLATE = Pattern.compile("^template name=\"([a-z0-9._\\-]{3,})\"",
             Pattern.CASE_INSENSITIVE);
+    /**
+     * back conversion use with printf and 1 parameter
+     */
+    public final static String TEMPLATEMASK = BEGIN + "template name=\"%s\"" + END;
 
     /**
      * reads an input stream as texdata and converts to an string object

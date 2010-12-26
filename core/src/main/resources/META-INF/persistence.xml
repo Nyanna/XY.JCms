@@ -13,6 +13,10 @@
 		<class>net.xy.jcms.persistence.usecase.ParameterDTO</class>
 		<class>net.xy.jcms.persistence.usecase.ControllerDTO</class>
 		<class>net.xy.jcms.persistence.usecase.ConfigurationDTO</class>
+		<class>net.xy.jcms.persistence.usecase.UIEntryDTO</class>
+		
+		<class>net.xy.jcms.persistence.MapEntry</class>
+		<class>net.xy.jcms.persistence.BodyEntry</class>
 
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" />
@@ -21,10 +25,10 @@
 			<property name="javax.persistence.jdbc.password" value="none" />
 
 			<!-- EclipseLink should create the database schema automatically -->
-			<!--  -->
+			<!--
 			<property name="eclipselink.ddl-generation" value="drop-and-create-tables" />
 			<property name="eclipselink.ddl-generation.output-mode" value="database" />
-			 <!-- -->
+			 -->
 		</properties>
 	</persistence-unit>
 </persistence>

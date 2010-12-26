@@ -21,6 +21,7 @@ import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
 
+import net.xy.jcms.persistence.usecase.ConfigurationDTO;
 import net.xy.jcms.shared.IController;
 
 /**
@@ -233,5 +234,51 @@ public class ControllerConfiguration extends Configuration<Map<String, Map<Strin
             // flag pattern
             map.put(line.trim(), "true");
         }
+    }
+
+    /**
+     * method to convert this config back to an string
+     * 
+     * @return dto
+     */
+    public ConfigurationDTO toDTO() {
+        final ConfigurationDTO ret = new ConfigurationDTO();
+        ret.setConfigurationType(TYPE);
+        final StringBuilder conf = new StringBuilder();
+        for (final Entry<String, Map<String, Object>> section : getConfigurationValue().entrySet()) {
+            if (section.getKey().equals(GLOBAL_CONFIG)) {
+                for (final Entry<String, Object> global : section.getValue().entrySet()) {
+                    conf.append("\t").append(global.getKey()).append(" = ").append(global.getValue()).append("\n");
+                }
+            } else {
+                conf.append(section.getKey()).append("{\n");
+                for (final Entry<String, Object> ctrlVal : section.getValue().entrySet()) {
+                    if (ctrlVal.getValue() instanceof List) {
+                        // instructionlist
+                        @SuppressWarnings("rawtypes")
+                        final List inst = (List) ctrlVal.getValue();
+                        for (final Object instItem : inst) {
+                            conf.append("\t").append(ctrlVal.getKey()).append("{\n");
+                            if (instItem instanceof Map) {
+                                @SuppressWarnings("rawtypes")
+                                final Map<?, ?> instMap = (Map) instItem;
+                                for (final Entry<?, ?> entry : instMap.entrySet()) {
+                                    conf.append("\t\t").append(entry.getKey()).append(" = ").append(entry.getValue())
+                                            .append("\n");
+                                }
+                            } else {
+                                conf.append("\t\t").append(instItem).append("\n");
+                            }
+                            conf.append("\t}\n");
+                        }
+                    } else {
+                        conf.append("\t").append(ctrlVal.getKey()).append(" = ").append(ctrlVal.getValue()).append("\n");
+                    }
+                }
+                conf.append("}\n");
+            }
+        }
+        ret.setContent(conf.toString());
+        return ret;
     }
 }

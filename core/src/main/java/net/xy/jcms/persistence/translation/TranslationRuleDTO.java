@@ -25,6 +25,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.eclipse.persistence.annotations.PrivateOwned;
+
 /**
  * transfer object for translation rules compatible with JAXB & JPA
  * 
@@ -39,11 +41,12 @@ public class TranslationRuleDTO implements Serializable {
 
     // consists of usecase and parameter hash
     @Id
-    protected int id = 0;
+    public int id = 0;
     private String reactOn = null;
     private String buildOff = null;
     private String usecase = null;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @PrivateOwned
     private List<RuleParameterDTO> parameters = null;
 
     @XmlAttribute(name = "reactOn", required = true)

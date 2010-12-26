@@ -31,4 +31,15 @@
         <parameter name="catalogid" group="2" convert="net.xy.jcms.shared.types.StringWrapper"/>
     </rule>
     <rule reactOn="^Hm du willst dich also Einloggen$" buildOff="Hm du willst dich also Einloggen" usecase="userLogin"/>
+    <rule usecase="catalog" reactOn="^(.*) - Special" buildOff="Pop - Special">
+    	<parameter name="spid" convert="net.xy.jcms.shared.types.StringMap" group="1">
+        	<![CDATA[
+		       	4545435 = AAAA
+		       	345435 = BBBB
+	      		345435 = CCCC
+	      		3424234 = DDDDD
+	      		23423553 = EEEEE
+            ]]>
+    	</parameter>
+    </rule>
 </rules>

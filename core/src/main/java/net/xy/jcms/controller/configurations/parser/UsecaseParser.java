@@ -19,6 +19,7 @@ package net.xy.jcms.controller.configurations.parser;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.stream.XMLInputFactory;
@@ -56,6 +57,12 @@ public class UsecaseParser {
      */
     public static Usecase[] parse(final InputStream in, final ClassLoader loader) throws XMLStreamException,
             ClassNotFoundException {
+        // TODO [HIGH] implicite loading of resources into config when including
+        // an fragment
+        // de/j/mainLayout.xml will check for mainLayout.config.xml to load
+        // dependend config for this fragment
+        // relative path support .ui.comp1.comp2.val ->
+        // mainBody.ui.comp1.comp2.val
         final XMLInputFactory factory = XMLInputFactory.newInstance();
         factory.setProperty("javax.xml.stream.isCoalescing", true);
         // not supported by the reference implementation
@@ -231,7 +238,7 @@ public class UsecaseParser {
      */
     private static Controller[] parseControllers(final XMLStreamReader parser, final ClassLoader loader)
             throws XMLStreamException, ClassNotFoundException {
-        final List<Controller> controller = new ArrayList<Controller>();
+        final List<Controller> controller = new LinkedList<Controller>();
         while (parser.nextTag() == XMLStreamConstants.START_ELEMENT) {
             if (parser.getLocalName().equals("class")) {
                 controller.add(parseController(parser, loader));

@@ -17,9 +17,11 @@
 package net.xy.jcms.shared;
 
 /**
- * an interface for loose coupled type conversion from/to property strings. can be used for human readable configuration
+ * an interface for loose coupled type conversion from/to property strings. can
+ * be used for human readable configuration
  * mainly via xml.
- * Converter need the possibility to get instantiated by an parameterless constructor.
+ * Converter need the possibility to get instantiated by an parameterless
+ * constructor.
  * 
  * @author Xyan
  * 
@@ -40,4 +42,12 @@ public interface IConverter {
      * @return value
      */
     public Object convert(final String str);
+
+    /**
+     * method converts the object back to an value
+     * 
+     * @param obj
+     * @return string representation able to get parsed by this converter
+     */
+    public String convert(final Object obj);
 }

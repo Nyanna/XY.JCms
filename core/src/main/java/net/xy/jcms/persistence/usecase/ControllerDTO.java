@@ -3,6 +3,7 @@ package net.xy.jcms.persistence.usecase;
 import java.io.Serializable;
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -23,7 +24,7 @@ import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
 @XmlType(propOrder = { "controllerInstance", "obmitedConfigurations" })
 @Table(name = "usecase_controller")
 @Entity
-public class ControllerDTO implements Serializable {
+public class ControllerDTO implements Serializable, Comparable<ControllerDTO> {
     private static final long serialVersionUID = -5283033861736997720L;
 
     @Id
@@ -31,6 +32,8 @@ public class ControllerDTO implements Serializable {
     protected int id = 0;
     private String controllerInstance = null;
     private Set<ConfigurationType> obmitedConfigurations = null;
+    @Column(name = "ordering")
+    private int order = 0;
 
     @XmlAttribute(name = "path", required = true)
     public String getControllerInstance() {
@@ -48,6 +51,15 @@ public class ControllerDTO implements Serializable {
 
     public void setObmitedConfigurations(final Set<ConfigurationType> obmitedConfigurations) {
         this.obmitedConfigurations = obmitedConfigurations;
+    }
+
+    @XmlAttribute(name = "order")
+    public int getOrder() {
+        return order;
+    }
+
+    public void setOrder(final int order) {
+        this.order = order;
     }
 
     @Override
@@ -75,5 +87,10 @@ public class ControllerDTO implements Serializable {
             hash = hash * 3 + obmitedConfigurations.hashCode();
         }
         return hash;
+    }
+
+    @Override
+    public int compareTo(final ControllerDTO o) {
+        return Integer.valueOf(order).compareTo(o.order);
     }
 }

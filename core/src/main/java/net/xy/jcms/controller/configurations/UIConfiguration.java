@@ -22,7 +22,10 @@ import java.util.regex.Pattern;
 
 import net.xy.jcms.controller.configurations.ConfigurationIterationStrategy.ClimbUp;
 import net.xy.jcms.controller.configurations.pool.ConverterPool;
+import net.xy.jcms.persistence.usecase.ConfigurationDTO;
+import net.xy.jcms.persistence.usecase.UIEntryDTO;
 import net.xy.jcms.shared.DebugUtils;
+import net.xy.jcms.shared.IConverter;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -39,6 +42,11 @@ public class UIConfiguration extends Configuration<Map<String, Object>> {
     public static final ConfigurationType TYPE = ConfigurationType.UIConfiguration;
 
     /**
+     * these map saves used type converters for back translation of config
+     */
+    private final Map<Class<?>, IConverter> converterMap = new HashMap<Class<?>, IConverter>();
+
+    /**
      * default
      * 
      * @param configurationValue
@@ -48,7 +56,8 @@ public class UIConfiguration extends Configuration<Map<String, Object>> {
     }
 
     /**
-     * converts special string notation like true:Boolean, 22:Integer to native java types.
+     * converts special string notation like true:Boolean, 22:Integer to native
+     * java types.
      * 
      * @param loader
      *            needed for IConverter type converters
@@ -82,7 +91,10 @@ public class UIConfiguration extends Configuration<Map<String, Object>> {
                 final Matcher converter = Pattern.compile("\\[(.*)\\]:([a-zA-Z0-9.$]+)", Pattern.CASE_INSENSITIVE)
                         .matcher(val);
                 if (converter.matches()) {
-                    entry.setValue(ConverterPool.get(converter.group(2), loader).convert(converter.group(1)));
+                    final IConverter typeConverter = ConverterPool.get(converter.group(2), loader);
+                    final Object value = typeConverter.convert(converter.group(1));
+                    converterMap.put(value.getClass(), typeConverter);
+                    entry.setValue(value);
                     continue;
                 }
             }
@@ -141,7 +153,8 @@ public class UIConfiguration extends Configuration<Map<String, Object>> {
                     break;
                 }
                 if (found != null) {
-                    throw new IllegalArgumentException("An vital ui configuration is not the right object type!");
+                    throw new IllegalArgumentException("An vital ui configuration is not the right object type! "
+                            + DebugUtils.printFields(ui.getDefaultValue(), found));
                 }
             }
         } else {
@@ -149,7 +162,8 @@ public class UIConfiguration extends Configuration<Map<String, Object>> {
             retrievalStack.add(fullPathKey);
             // type check based on class parameter
             if (found != null && !rightType(ui, found)) {
-                throw new IllegalArgumentException("An vital ui configuration is not the right object type!");
+                throw new IllegalArgumentException("An vital ui configuration is not the right object type! "
+                        + DebugUtils.printFields(ui.getDefaultValue(), found));
             }
             value = new Match<String, Object>(fullPathKey, found);
         }
@@ -337,12 +351,18 @@ public class UIConfiguration extends Configuration<Map<String, Object>> {
 
     @Override
     public UIConfiguration mergeConfiguration(final Configuration<Map<String, Object>> otherConfig2) {
-        return mergeConfiguration(otherConfig2.getConfigurationValue());
+        final UIConfiguration newC = mergeConfiguration(otherConfig2.getConfigurationValue());
+        if (otherConfig2 instanceof UIConfiguration) {
+            newC.converterMap.putAll(((UIConfiguration) otherConfig2).converterMap);
+        }
+        return newC;
     }
 
     @Override
     public UIConfiguration mergeConfiguration(final Map<String, Object> otherConfig2) {
-        return new UIConfiguration(mergeConfiguration(getConfigurationValue(), otherConfig2));
+        final UIConfiguration newC = new UIConfiguration(mergeConfiguration(getConfigurationValue(), otherConfig2));
+        newC.converterMap.putAll(converterMap);
+        return newC;
     }
 
     /**
@@ -370,4 +390,49 @@ public class UIConfiguration extends Configuration<Map<String, Object>> {
         return getConfigurationValue().equals(object);
     }
 
+    /**
+     * converts this configuration into an dto
+     * 
+     * @return dto
+     */
+    public ConfigurationDTO toDTO() {
+        final ConfigurationDTO ret = new ConfigurationDTO();
+        ret.setConfigurationType(TYPE);
+        final List<UIEntryDTO> conf = new ArrayList<UIEntryDTO>();
+        for (final Entry<String, Object> entry : getConfigurationValue().entrySet()) {
+            final UIEntryDTO val = new UIEntryDTO();
+            val.setKey(entry.getKey());
+            if (entry.getValue() == null
+                    || entry.getValue() instanceof String && StringUtils.isBlank((String) entry.getValue())) {
+                // Do nothing
+            } else if (entry.getValue() instanceof String) {
+                val.setValue((String) entry.getValue());
+                val.setType("String");
+            } else if (entry.getValue() instanceof Integer) {
+                val.setValue(entry.getValue().toString());
+                val.setType("Integer");
+            } else if (entry.getValue() instanceof Long) {
+                val.setValue(entry.getValue().toString());
+                val.setType("Long");
+            } else if (entry.getValue() instanceof Double) {
+                val.setValue(entry.getValue().toString());
+                val.setType("Doulbe");
+            } else if (entry.getValue() instanceof Boolean) {
+                val.setValue(entry.getValue().toString());
+                val.setType("Boolean");
+            } else {
+                final IConverter converter = converterMap.get(entry.getValue().getClass());
+                if (converter != null) {
+                    val.setValue(converter.convert(entry.getValue()));
+                    val.setType(converter.getClass().getName());
+                } else {
+                    throw new IllegalArgumentException(
+                            "Cant destinguish the configuration type to convert into string representation.");
+                }
+            }
+            conf.add(val);
+        }
+        ret.setUiconfig(conf);
+        return ret;
+    }
 }

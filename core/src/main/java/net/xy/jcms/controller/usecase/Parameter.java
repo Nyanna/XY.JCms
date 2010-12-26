@@ -20,7 +20,7 @@ import net.xy.jcms.persistence.usecase.ParameterDTO;
  * @author Xyan
  * 
  */
-final public class Parameter {
+final public class Parameter implements Comparable<Parameter> {
     /**
      * id or key of the parameter
      */
@@ -40,6 +40,9 @@ final public class Parameter {
      * @param mendatory
      */
     public Parameter(final String parameterKey, final String parameterType) {
+        if (parameterKey == null || parameterType == null) {
+            throw new IllegalArgumentException("Parameters can't be null.");
+        }
         this.parameterKey = parameterKey;
         this.parameterType = parameterType;
     }
@@ -88,19 +91,20 @@ final public class Parameter {
             return false;
         }
         final Parameter oo = (Parameter) obj;
-        return (parameterKey == oo.parameterKey || parameterKey != null && parameterKey.equals(oo.parameterKey)) &&
-                   (parameterType == oo.parameterType || parameterType != null && parameterType.equals(oo.parameterType));
+        return parameterKey.equals(oo.parameterKey) &&
+                   parameterType.equals(oo.parameterType);
     }
 
     @Override
     public int hashCode() {
         int hash = 348;
-        if (parameterKey != null) {
-            hash = hash * 3 + parameterKey.hashCode();
-        }
-        if (parameterType != null) {
-            hash = hash * 3 + parameterType.hashCode();
-        }
+        hash = hash * 3 + parameterKey.hashCode();
+        hash = hash * 3 + parameterType.hashCode();
         return hash;
+    }
+
+    @Override
+    public int compareTo(final Parameter o) {
+        return parameterKey.compareTo(o.parameterKey);
     }
 }

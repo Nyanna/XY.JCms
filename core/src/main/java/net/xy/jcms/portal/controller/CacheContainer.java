@@ -29,16 +29,20 @@ import java.util.concurrent.TimeoutException;
  * 
  */
 public class CacheContainer<CONTENT> {
-    // TODO [HIGH] refactor to cachecontainer where possible
     /**
      * holds the cached and retrived content
      */
-    private final CONTENT content;
+    private CONTENT content;
 
     /**
      * holds the threaded future object
      */
     private final Future<CONTENT> future;
+
+    /**
+     * holds an optional callback
+     */
+    private ICallback<CONTENT> callback = null;
 
     /**
      * constructor by cache content
@@ -51,6 +55,17 @@ public class CacheContainer<CONTENT> {
     }
 
     /**
+     * simplyfieing constructor setting the callback
+     * 
+     * @param future
+     * @param callback
+     */
+    public CacheContainer(final Future<CONTENT> future, final ICallback<CONTENT> callback) {
+        this(future);
+        registerCallback(callback);
+    }
+
+    /**
      * constructor by future retrieval
      * 
      * @param future
@@ -58,6 +73,25 @@ public class CacheContainer<CONTENT> {
     public CacheContainer(final Future<CONTENT> future) {
         this.content = null;
         this.future = future;
+    }
+
+    /**
+     * registers an callback which got immidiately called if the content is
+     * already present or it got called when the
+     * content would be retrieved.
+     * 
+     * @param callback
+     */
+    public void registerCallback(final ICallback<CONTENT> callback) {
+        if (callback == null) {
+            throw new IllegalArgumentException("Callback can't be null.");
+        }
+        if (content != null) {
+            // content already ready
+            callback.persist(content);
+        } else {
+            this.callback = callback;
+        }
     }
 
     /**
@@ -73,7 +107,12 @@ public class CacheContainer<CONTENT> {
             return content;
         } else {
             try {
-                return future.get(timeout, unit);
+                content = future.get(timeout, unit);
+                if (callback != null) {
+                    // content already ready
+                    callback.persist(content);
+                }
+                return content;
             } catch (final InterruptedException e) {
                 throw new RetrievalFailure("Failure by interupted.", e);
             } catch (final ExecutionException e) {
@@ -82,6 +121,22 @@ public class CacheContainer<CONTENT> {
                 throw new RetrievalFailure("Failure on timeout.", e);
             }
         }
+    }
+
+    /**
+     * an callback to cache the content if it is retrieved
+     * 
+     * @author xyan
+     * 
+     */
+    public static interface ICallback<CONTENT> {
+
+        /**
+         * method that would be called if the content is ready to be persisted
+         * 
+         * @param content
+         */
+        public void persist(CONTENT content);
     }
 
     /**

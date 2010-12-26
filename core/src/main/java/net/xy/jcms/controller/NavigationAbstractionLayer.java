@@ -16,8 +16,8 @@
  */
 package net.xy.jcms.controller;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 
@@ -55,7 +55,7 @@ public class NavigationAbstractionLayer {
         /**
          * holds the parameter list
          */
-        Map<Object, Object> parameters = new HashMap<Object, Object>();
+        Map<Object, Object> parameters = new TreeMap<Object, Object>();
 
         /**
          * default constructor
@@ -74,7 +74,7 @@ public class NavigationAbstractionLayer {
          */
         public NALKey(final String id, final NALKey old) {
             this(id);
-            setParameters(new HashMap<Object, Object>(old.getParameters()));
+            setParameters(new TreeMap<Object, Object>(old.getParameters()));
         }
 
         /**
@@ -132,7 +132,7 @@ public class NavigationAbstractionLayer {
          */
         public void setParameters(final Map<Object, Object> parameters) {
             if (parameters == null) {
-                this.parameters = new HashMap<Object, Object>();
+                this.parameters = new TreeMap<Object, Object>();
             } else {
                 this.parameters = parameters;
             }

@@ -37,4 +37,9 @@ public class StringWrapper implements IConverter {
         return str;
     }
 
+    @Override
+    public String convert(final Object obj) {
+        return (String) obj;
+    }
+
 }

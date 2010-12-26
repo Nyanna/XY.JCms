@@ -14,11 +14,13 @@ package net.xy.jcms.persistence;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.TypedQuery;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -69,28 +71,105 @@ public class PersistenceHelper {
          * saves an translation rule to the db specified in persistence.xml
          * 
          * @param rule
+         * @return id of inserted dto
          */
-        public static void saveTranslation(final TranslationRule rule) {
+        public static int saveTranslation(final TranslationRule rule) {
             final EntityManager em = getEMF().createEntityManager();
             em.getTransaction().begin();
             final TranslationRuleDTO dto = rule.toDTO();
-            em.persist(dto);
+            em.merge(dto);
             em.getTransaction().commit();
             em.close();
+            return dto.id;
+        }
+
+        /**
+         * method for loading an translation by its id from db
+         * 
+         * @param id
+         * @param loader
+         *            for laoding converters and dependencies
+         * @return rule
+         * @throws ClassNotFoundException
+         */
+        public static TranslationRule loadTranslation(final int id, final ClassLoader loader) throws ClassNotFoundException {
+            final EntityManager em = getEMF().createEntityManager();
+            em.getTransaction().begin();
+            final TranslationRuleDTO result = em.find(TranslationRuleDTO.class, id);
+            em.close();
+            return TranslationConverter.convert(result, loader);
+        }
+
+        /**
+         * loads all translations from db
+         * 
+         * @param loader
+         *            to load converetrs and dependencies
+         * @return rulelist
+         * @throws ClassNotFoundException
+         */
+        public static List<TranslationRule> loadAllTranslation(final ClassLoader loader) throws ClassNotFoundException {
+            final EntityManager em = getEMF().createEntityManager();
+            final TypedQuery<TranslationRuleDTO> query = em.createQuery("SELECT r FROM TranslationRuleDTO r",
+                    TranslationRuleDTO.class);
+            final List<TranslationRule> result = new LinkedList<TranslationRule>();
+            for (final TranslationRuleDTO dto : query.getResultList()) {
+                result.add(TranslationConverter.convert(dto, loader));
+            }
+            em.close();
+            return result;
         }
 
         /**
          * saves an usecase in the db
          * 
          * @param acase
+         * @return id of the usecase
          */
-        public static void saveUsecase(final Usecase acase) {
+        public static int saveUsecase(final Usecase acase) {
             final EntityManager em = getEMF().createEntityManager();
             em.getTransaction().begin();
             final UsecaseDTO dto = acase.toDTO();
-            em.persist(dto);
+            em.merge(dto);
             em.getTransaction().commit();
             em.close();
+            return dto.getPrimaryKey();
+        }
+
+        /**
+         * method for loading an usecase by its id from db
+         * 
+         * @param id
+         * @param loader
+         *            for laoding converters and dependencies
+         * @return case
+         * @throws ClassNotFoundException
+         */
+        public static Usecase loadUsecase(final int id, final ClassLoader loader) throws ClassNotFoundException {
+            final EntityManager em = getEMF().createEntityManager();
+            em.getTransaction().begin();
+            final UsecaseDTO result = em.find(UsecaseDTO.class, id);
+            em.close();
+            return UsecaseConverter.convert(result, loader);
+        }
+
+        /**
+         * loads all usecases from db
+         * 
+         * @param loader
+         *            to load converetrs and dependencies
+         * @return case list
+         * @throws ClassNotFoundException
+         */
+        public static List<Usecase> loadAllUsecases(final ClassLoader loader) throws ClassNotFoundException {
+            final EntityManager em = getEMF().createEntityManager();
+            final TypedQuery<UsecaseDTO> query = em.createQuery("SELECT r FROM UsecaseDTO r", UsecaseDTO.class);
+            final List<Usecase> result = new ArrayList<Usecase>();
+            for (final UsecaseDTO dto : query.getResultList()) {
+                result.add(UsecaseConverter.convert(dto, loader));
+            }
+            em.close();
+            return result;
         }
     }
 

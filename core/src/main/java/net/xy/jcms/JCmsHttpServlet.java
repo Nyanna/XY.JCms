@@ -124,7 +124,10 @@ public class JCmsHttpServlet extends HttpServlet {
              * use client caching feature.
              */
             configs = usecase.getConfigurations(ConfigurationType.CONTROLLERAPPLICABLE);
-            forward = UsecaseAgent.executeController(usecase.getControllerList(), configs, dac, forward.getParameters());
+            final long time = System.currentTimeMillis();
+            forward = UsecaseAgent
+                    .executeController(usecase.getControllerList(), configs, dac, forward.getParameters());
+            LOG.info("Execution of controllers tok: " + (System.currentTimeMillis() - time) + " ms");
         } while (forward != null);
 
         // run the protocol response adapter, which fills for http as an example

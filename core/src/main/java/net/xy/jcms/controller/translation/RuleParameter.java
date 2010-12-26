@@ -12,7 +12,7 @@
  */
 package net.xy.jcms.controller.translation;
 
-import net.xy.jcms.persistence.XmlMapEntry;
+import net.xy.jcms.persistence.MapEntry;
 import net.xy.jcms.persistence.translation.RuleParameterDTO;
 import net.xy.jcms.shared.IConverter;
 import net.xy.jcms.shared.types.StringMap;
@@ -26,7 +26,7 @@ import org.apache.commons.lang.StringUtils;
  * @author Xyan
  * 
  */
-final public class RuleParameter {
+final public class RuleParameter implements Comparable<RuleParameter> {
     /**
      * holds the name of the parameter applied for
      */
@@ -98,7 +98,7 @@ final public class RuleParameter {
         dto.setAplicatesToGroup(aplicatesToGroup);
         dto.setConverter(converter.getClass().getName());
         if (converter instanceof StringMap) {
-            dto.setBuildInMap(XmlMapEntry.convert((StringMap) converter));
+            dto.setBuildInMap(MapEntry.convert((StringMap) converter));
         }
         dto.setParameterName(parameterName);
         return dto;
@@ -141,5 +141,10 @@ final public class RuleParameter {
             hash = hash * 3 + converter.getClass().getName().hashCode();
         }
         return hash;
+    }
+
+    @Override
+    public int compareTo(final RuleParameter o) {
+        return parameterName.compareTo(o.parameterName);
     }
 }

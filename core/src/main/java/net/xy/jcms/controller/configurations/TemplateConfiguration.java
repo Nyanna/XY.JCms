@@ -13,19 +13,25 @@
 package net.xy.jcms.controller.configurations;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringUtils;
 
 import net.xy.jcms.controller.configurations.ConfigurationIterationStrategy.ClimbUp;
 import net.xy.jcms.controller.configurations.parser.FragmentXMLParser;
 import net.xy.jcms.controller.configurations.pool.TemplatePool;
-import net.xy.jcms.persistence.XmlMapEntry;
+import net.xy.jcms.persistence.BodyEntry;
+import net.xy.jcms.persistence.MapEntry;
 import net.xy.jcms.persistence.usecase.ConfigurationDTO;
 import net.xy.jcms.shared.DebugUtils;
 import net.xy.jcms.shared.IFragment;
 import net.xy.jcms.shared.JCmsHelper;
+import net.xy.jcms.shared.compiler.DynamicFragment;
+import net.xy.jcms.shared.compiler.DynamicFragment.Element;
 
 /**
  * describes the connection of differend page components/fragements/templates.
@@ -182,7 +188,38 @@ public class TemplateConfiguration extends Configuration<Map<String, IFragment>>
     public ConfigurationDTO toDTO() {
         final ConfigurationDTO ret = new ConfigurationDTO();
         ret.setConfigurationType(TYPE);
-        ret.setMapping(XmlMapEntry.convert(getConfigurationValue()));
+        final List<MapEntry> mlist = new ArrayList<MapEntry>();
+        final List<BodyEntry> blist = new ArrayList<BodyEntry>();
+        for (final Entry<String, IFragment> entry : getConfigurationValue().entrySet()) {
+            if (entry.getValue() instanceof DynamicFragment) {
+                final BodyEntry ent = new BodyEntry();
+                ent.setKey(entry.getKey());
+                ent.setValue(entry.getValue().getClass().getName());
+                final StringBuilder contains = new StringBuilder();
+                for (final Element elem : ((DynamicFragment) entry.getValue()).getElementList()) {
+                    switch (elem.type) {
+                    case Child:
+                        contains.append(String.format(FragmentXMLParser.COMPONENTMASK, elem.value, elem.childComponent));
+                        break;
+                    case Static:
+                        contains.append(elem.value);
+                        break;
+                    case Template:
+                        contains.append(String.format(FragmentXMLParser.TEMPLATEMASK, elem.value));
+                        break;
+                    }
+                }
+                ent.setContent(contains.toString());
+                blist.add(ent);
+            } else {
+                final MapEntry ent = new MapEntry();
+                ent.setKey(entry.getKey());
+                ent.setValue(entry.getValue().getClass().getName());
+                mlist.add(ent);
+            }
+        }
+        ret.setMapping(mlist);
+        ret.setContainment(blist);
         return ret;
     }
 

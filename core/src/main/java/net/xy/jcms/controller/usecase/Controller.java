@@ -107,21 +107,15 @@ final public class Controller {
             return false;
         }
         final Controller oo = (Controller) obj;
-        return (controllerInstance == oo.controllerInstance || controllerInstance != null
-                && controllerInstance.equals(oo.controllerInstance))
-                && (obmitedConfigurations == oo.obmitedConfigurations || obmitedConfigurations != null
-                        && obmitedConfigurations.equals(oo.obmitedConfigurations));
+        return controllerInstance.equals(oo.controllerInstance)
+                && obmitedConfigurations.equals(oo.obmitedConfigurations);
     }
 
     @Override
     public int hashCode() {
         int hash = 578;
-        if (controllerInstance != null) {
-            hash = hash * 3 + controllerInstance.hashCode();
-        }
-        if (obmitedConfigurations != null) {
-            hash = hash * 3 + obmitedConfigurations.hashCode();
-        }
+        hash = hash * 3 + controllerInstance.hashCode();
+        hash = hash * 3 + obmitedConfigurations.hashCode();
         return hash;
     }
 }

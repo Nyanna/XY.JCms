@@ -14,15 +14,19 @@ package net.xy.jcms.controller.usecase;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 
 import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
+import net.xy.jcms.controller.configurations.ControllerConfiguration;
 import net.xy.jcms.controller.configurations.MessageConfiguration;
 import net.xy.jcms.controller.configurations.RenderKitConfiguration;
 import net.xy.jcms.controller.configurations.TemplateConfiguration;
+import net.xy.jcms.controller.configurations.UIConfiguration;
 import net.xy.jcms.persistence.usecase.ConfigurationDTO;
 import net.xy.jcms.persistence.usecase.ControllerDTO;
 import net.xy.jcms.persistence.usecase.ParameterDTO;
@@ -53,12 +57,12 @@ final public class Usecase {
      * the request/input parameters, KeyChain, Cookies, Post etc... All
      * these parameters are mendatory and will be validated.
      */
-    private final List<Parameter> parameterList;
+    private final List<Parameter> parameterList = new ArrayList<Parameter>();
 
     /**
      * an list of applied controllers
      */
-    private final List<Controller> controllerList;
+    private final List<Controller> controllerList = new LinkedList<Controller>();
 
     /**
      * an list of connected configurations. note: these list is the whole
@@ -78,15 +82,15 @@ final public class Usecase {
      */
     public Usecase(final String id, final String description, final Parameter[] parameterList,
             final Controller[] controllerList, final Configuration<?>[] configurationList) {
+        if (StringUtils.isBlank(id)) {
+            throw new IllegalArgumentException("Id can't be blank.");
+        }
         if (parameterList != null) {
-            this.parameterList = Arrays.asList(parameterList);
-        } else {
-            this.parameterList = new ArrayList<Parameter>();
+            this.parameterList.addAll(Arrays.asList(parameterList));
+            Collections.sort(this.parameterList);
         }
         if (controllerList != null) {
-            this.controllerList = Arrays.asList(controllerList);
-        } else {
-            this.controllerList = new ArrayList<Controller>();
+            this.controllerList.addAll(Arrays.asList(controllerList));
         }
         this.configurationList = mergeConfigurations(configurationList);
         if (StringUtils.isBlank(id) || StringUtils.isBlank(description)) {
@@ -216,9 +220,13 @@ final public class Usecase {
             params.add(param.toDTO());
         }
         dto.setParameterList(params);
-        final List<ControllerDTO> controller = new ArrayList<ControllerDTO>();
+        final List<ControllerDTO> controller = new LinkedList<ControllerDTO>();
+        int count = 0;
         for (final Controller ctrl : getControllerList()) {
-            controller.add(ctrl.toDTO());
+            final ControllerDTO dt = ctrl.toDTO();
+            dt.setOrder(count);
+            controller.add(dt);
+            ++count;
         }
         dto.setControllerList(controller);
         final List<ConfigurationDTO> configs = new ArrayList<ConfigurationDTO>();
@@ -234,15 +242,16 @@ final public class Usecase {
             case TemplateConfiguration:
                 cdto = ((TemplateConfiguration) conf.getValue()).toDTO();
                 break;
-            case ControllerConfiguration:
             case UIConfiguration:
-            default:
-                cdto = new ConfigurationDTO();
-                cdto.setConfigurationType(conf.getKey());
+                cdto = ((UIConfiguration) conf.getValue()).toDTO();
                 break;
+            case ControllerConfiguration:
+                cdto = ((ControllerConfiguration) conf.getValue()).toDTO();
+                break;
+            default:
+                throw new IllegalArgumentException("Configuration is not supported to be converted in an dto.");
             }
             configs.add(cdto);
-            // TODO [LOW] config dto model
         }
         dto.setConfigurationList(configs);
         return dto;
@@ -260,7 +269,7 @@ final public class Usecase {
             return false;
         }
         final Usecase oo = (Usecase) obj;
-        return (id == oo.id || id != null && id.equals(oo.id))
+        return id.equals(oo.id)
                 && (description == oo.description || description != null && description.equals(oo.description))
                 && (parameterList == oo.parameterList || parameterList != null && parameterList.equals(oo.parameterList))
                 && (controllerList == oo.controllerList || controllerList != null
@@ -273,9 +282,7 @@ final public class Usecase {
     @Override
     public int hashCode() {
         int hash = 246;
-        if (id != null) {
-            hash = hash * 3 + id.hashCode();
-        }
+        hash = hash * 3 + id.hashCode();
         if (description != null) {
             hash = hash * 3 + description.hashCode();
         }

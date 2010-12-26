@@ -21,7 +21,7 @@ import org.apache.commons.lang.StringUtils;
 
 import net.xy.jcms.controller.configurations.ConfigurationIterationStrategy.ClimbUp;
 import net.xy.jcms.controller.configurations.pool.RendererPool;
-import net.xy.jcms.persistence.XmlMapEntry;
+import net.xy.jcms.persistence.MapEntry;
 import net.xy.jcms.persistence.usecase.ConfigurationDTO;
 import net.xy.jcms.shared.DebugUtils;
 import net.xy.jcms.shared.IRenderer;
@@ -167,7 +167,7 @@ public class RenderKitConfiguration extends Configuration<Map<String, IRenderer>
     public ConfigurationDTO toDTO() {
         final ConfigurationDTO ret = new ConfigurationDTO();
         ret.setConfigurationType(TYPE);
-        ret.setMapping(XmlMapEntry.convert(getConfigurationValue()));
+        ret.setMapping(MapEntry.convert(getConfigurationValue()));
         return ret;
     }
 

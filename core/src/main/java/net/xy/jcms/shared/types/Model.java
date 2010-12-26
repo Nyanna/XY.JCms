@@ -16,7 +16,7 @@
  */
 package net.xy.jcms.shared.types;
 
-import java.util.HashMap;
+import java.util.TreeMap;
 
 import net.xy.jcms.controller.configurations.Configuration;
 import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
@@ -27,7 +27,7 @@ import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
  * @author Xyan
  * 
  */
-public class Model extends HashMap<ConfigurationType, Configuration<?>> {
+public class Model extends TreeMap<ConfigurationType, Configuration<?>> {
 
     private static final long serialVersionUID = 1335232176002098094L;
 

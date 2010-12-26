@@ -1,6 +1,7 @@
 package net.xy.jcms.controller.configurations.parser;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -69,8 +70,10 @@ public class UsecaseConverter {
         for (final ParameterDTO param : acase.getParameterList()) {
             params.add(new Parameter(param.getParameterKey(), param.getParameterType()));
         }
-        final List<Controller> controller = new ArrayList<Controller>();
-        for (final ControllerDTO ctrl : acase.getControllerList()) {
+        final List<Controller> controller = new LinkedList<Controller>();
+        final List<ControllerDTO> ctrlList = acase.getControllerList();
+        Collections.sort(ctrlList);
+        for (final ControllerDTO ctrl : ctrlList) {
             final EnumSet<ConfigurationType> set = EnumSet.noneOf(ConfigurationType.class);
             set.addAll(ctrl.getObmitedConfigurations());
             controller.add(new Controller(ControllerPool.get(ctrl.getControllerInstance(), loader), set));

@@ -36,4 +36,9 @@ public class Integer implements IConverter {
         return java.lang.Integer.valueOf(str);
     }
 
+    @Override
+    public String convert(final Object obj) {
+        return obj.toString();
+    }
+
 }

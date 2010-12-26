@@ -13,7 +13,10 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
+
+import org.eclipse.persistence.annotations.PrivateOwned;
 
 /**
  * dto for an usecase compatible with JPA & JAXB
@@ -22,7 +25,7 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlRootElement(name = "usecase")
-@XmlType(propOrder = { "description", "parameterList", "controllerList", "configurationList" })
+@XmlType(propOrder = { "id", "description", "parameterList", "controllerList", "configurationList" })
 @Table(name = "usecase")
 @Entity
 public class UsecaseDTO implements Serializable {
@@ -30,15 +33,23 @@ public class UsecaseDTO implements Serializable {
 
     // id consits of id and parameter hashcodes
     @Id
-    protected int id = 0;
+    private int id = 0;
     private String usecase = null;
     private String description = null;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @PrivateOwned
     private List<ParameterDTO> parameterList = null;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @PrivateOwned
     private List<ControllerDTO> controllerList = null;
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @PrivateOwned
     private List<ConfigurationDTO> configurationList = null;
+
+    @XmlTransient
+    public int getPrimaryKey() {
+        return id;
+    }
 
     @XmlAttribute(required = true)
     public String getId() {

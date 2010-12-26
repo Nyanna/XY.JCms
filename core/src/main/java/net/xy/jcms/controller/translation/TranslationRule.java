@@ -13,6 +13,7 @@
 package net.xy.jcms.controller.translation;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -46,7 +47,7 @@ final public class TranslationRule {
     /**
      * holds tha parameter list describing the parameter transformation
      */
-    private final List<RuleParameter> parameters;
+    private final List<RuleParameter> parameters = new ArrayList<RuleParameter>();
 
     /**
      * default constructor
@@ -66,10 +67,9 @@ final public class TranslationRule {
         }
         this.buildOff = buildOff;
         this.usecase = usecase;
-        if (parameters == null) {
-            this.parameters = new ArrayList<RuleParameter>();
-        } else {
-            this.parameters = parameters;
+        if (parameters != null) {
+            this.parameters.addAll(parameters);
+            Collections.sort(this.parameters);
         }
     }
 

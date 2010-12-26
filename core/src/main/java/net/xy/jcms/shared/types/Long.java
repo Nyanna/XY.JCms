@@ -36,4 +36,9 @@ public class Long implements IConverter {
         return new java.lang.Long(str);
     }
 
+    @Override
+    public String convert(final Object obj) {
+        return obj.toString();
+    }
+
 }

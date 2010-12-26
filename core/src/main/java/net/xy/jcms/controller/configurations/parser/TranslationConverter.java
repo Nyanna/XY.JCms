@@ -7,7 +7,7 @@ import java.util.List;
 import net.xy.jcms.controller.configurations.pool.ConverterPool;
 import net.xy.jcms.controller.translation.RuleParameter;
 import net.xy.jcms.controller.translation.TranslationRule;
-import net.xy.jcms.persistence.XmlMapEntry;
+import net.xy.jcms.persistence.MapEntry;
 import net.xy.jcms.persistence.translation.RuleParameterDTO;
 import net.xy.jcms.persistence.translation.TranslationRuleDTO;
 import net.xy.jcms.persistence.translation.TranslationRulesDTO;
@@ -70,7 +70,7 @@ public class TranslationConverter {
             for (final RuleParameterDTO param : rule.getParameters()) {
                 final IConverter convt;
                 if ("net.xy.jcms.shared.types.StringMap".equals(param.getConverter())) {
-                    convt = new StringMap(XmlMapEntry.convert(param.getBuildInMap()));
+                    convt = new StringMap(MapEntry.convert(param.getBuildInMap()));
                 } else {
                     convt = ConverterPool.get(param.getConverter(), loader);
                 }

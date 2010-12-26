@@ -17,7 +17,9 @@
 package net.xy.jcms.shared.types;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import net.xy.jcms.shared.IConverter;
 
@@ -33,7 +35,8 @@ public class StringMap extends HashMap<String, String> implements IConverter {
     /**
      * initializes an empty instance
      */
-    public StringMap() {}
+    public StringMap() {
+    }
 
     /**
      * accepts an map and copies it values
@@ -65,5 +68,20 @@ public class StringMap extends HashMap<String, String> implements IConverter {
     @Override
     public StringMap convert(final String str) {
         return new StringMap(str);
+    }
+
+    @Override
+    public String convert(final Object obj) {
+        final StringBuilder ret = new StringBuilder();
+        @SuppressWarnings("unchecked")
+        final Iterator<Entry<String, String>> i = ((Map<String, String>) obj).entrySet().iterator();
+        while (i.hasNext()) {
+            final Entry<String, String> entry = i.next();
+            ret.append(entry.getKey()).append(":").append(entry.getValue());
+            if (i.hasNext()) {
+                ret.append(",");
+            }
+        }
+        return ret.toString();
     }
 }

@@ -1,6 +1,7 @@
 package net.xy.jcms.portal.controller;
 
 import java.util.Map;
+import java.util.Map.Entry;
 
 import net.xy.jcms.controller.NavigationAbstractionLayer;
 import net.xy.jcms.controller.NavigationAbstractionLayer.NALKey;
@@ -101,6 +102,25 @@ abstract public class Controller implements IController {
         final String path = NavigationAbstractionLayer.translateKeyWithRule(key, rule);
         final String url = dac.buildUriWithParams(path, null);
         return url;
+    }
+
+    /**
+     * fills ? in an NALKey parameter list with its according obmitted replacement:
+     * -first ? maps to first replacement and so on
+     * 
+     * @param origin
+     * @param replacements
+     */
+    public static void fillReplacements(final NALKey origin, final Object... replacements) {
+        int counter = 0;
+        for (final Entry<Object, Object> param : origin.getParameters().entrySet()) {
+            if (param.getValue() instanceof String && ((String) param.getValue()).equals("?")) {
+                if (counter <= replacements.length) {
+                    param.setValue(replacements[counter]);
+                }
+                ++counter;
+            }
+        }
     }
 
     /**

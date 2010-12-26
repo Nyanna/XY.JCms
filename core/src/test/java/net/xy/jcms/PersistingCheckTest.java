@@ -15,6 +15,7 @@ package net.xy.jcms;
 import java.io.File;
 import java.net.ConnectException;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.persistence.PersistenceException;
 import javax.xml.bind.JAXBException;
@@ -39,7 +40,7 @@ import net.xy.jcms.persistence.PersistenceHelper;
  * @author Xyan
  * 
  */
-public class TranslationJAXB {
+public class PersistingCheckTest {
     protected String transConfig = "net/xy/jcms/ExampleTranslationRules.xml";
     protected String useConfig = "net/xy/jcms/ExampleUsecases.xml";
 
@@ -67,30 +68,6 @@ public class TranslationJAXB {
         all.deleteOnExit();
     }
 
-    // @Test
-    public void testTranslationDBTransfer() throws ClassNotFoundException {
-        TranslationRule[] rules = null;
-        try {
-            rules = TranslationParser.parse(Thread.currentThread().getContextClassLoader()
-                    .getResourceAsStream(transConfig), Thread.currentThread()
-                    .getContextClassLoader());
-        } catch (final XMLStreamException e) {
-            e.printStackTrace();
-        }
-        try {
-            for (final TranslationRule rule : rules) {
-                PersistenceHelper.DB.saveTranslation(rule);
-            }
-        } catch (final PersistenceException t) {
-            // catch no db present or can't connect
-            if (!(t.getCause() instanceof DatabaseException) ||
-                    !(t.getCause().getCause() instanceof CommunicationsException) ||
-                    !(t.getCause().getCause().getCause() instanceof ConnectException)) {
-                throw t;
-            }
-        }
-    }
-
     @Test
     public void testUsecaseXMLTransfer() throws ClassNotFoundException, JAXBException {
         Usecase[] cases = null;
@@ -108,13 +85,40 @@ public class TranslationJAXB {
             Assert.assertTrue(acase.equals(result));
             out.deleteOnExit();
         }
-        final File all = new File("All.xml");
+        final File all = new File("AllUse.xml");
         PersistenceHelper.XML.saveUsecases(all, Arrays.asList(cases));
         PersistenceHelper.XML.loadUsecases(all, Thread.currentThread().getContextClassLoader());
-        all.deleteOnExit();
+        // all.deleteOnExit();
     }
 
-    // @Test
+    @Test
+    public void testTranslationDBTransfer() throws ClassNotFoundException {
+        TranslationRule[] rules = null;
+        try {
+            rules = TranslationParser.parse(Thread.currentThread().getContextClassLoader()
+                    .getResourceAsStream(transConfig), Thread.currentThread()
+                    .getContextClassLoader());
+        } catch (final XMLStreamException e) {
+            e.printStackTrace();
+        }
+        try {
+            for (final TranslationRule rule : rules) {
+                final int id = PersistenceHelper.DB.saveTranslation(rule);
+                final TranslationRule back = PersistenceHelper.DB.loadTranslation(id, Thread.currentThread()
+                        .getContextClassLoader());
+                Assert.assertTrue("Rule is not the same " + rule.getReacton(), rule.equals(back));
+            }
+        } catch (final PersistenceException t) {
+            // catch no db present or can't connect
+            if (!(t.getCause() instanceof DatabaseException) ||
+                    !(t.getCause().getCause() instanceof CommunicationsException) ||
+                    !(t.getCause().getCause().getCause() instanceof ConnectException)) {
+                throw t;
+            }
+        }
+    }
+
+    @Test
     public void testUsecaseDBTransfer() throws ClassNotFoundException {
         Usecase[] cases = null;
         try {
@@ -126,7 +130,10 @@ public class TranslationJAXB {
         }
         try {
             for (final Usecase acase : cases) {
-                PersistenceHelper.DB.saveUsecase(acase);
+                final int id = PersistenceHelper.DB.saveUsecase(acase);
+                final Usecase back = PersistenceHelper.DB.loadUsecase(id, Thread.currentThread()
+                        .getContextClassLoader());
+                Assert.assertTrue("Usecase is not the same " + acase.getId(), acase.equals(back));
             }
         } catch (final PersistenceException t) {
             // catch no db present or can't connect
@@ -135,6 +142,22 @@ public class TranslationJAXB {
                     !(t.getCause().getCause().getCause() instanceof ConnectException)) {
                 throw t;
             }
+        }
+    }
+
+    @Test
+    public void testDBLoadAll() {
+        try {
+            final List<TranslationRule> back = PersistenceHelper.DB.loadAllTranslation(Thread.currentThread()
+                    .getContextClassLoader());
+            Assert.assertNotNull(back);
+            Assert.assertTrue(!back.isEmpty());
+            final List<Usecase> back2 = PersistenceHelper.DB.loadAllUsecases(Thread.currentThread()
+                    .getContextClassLoader());
+            Assert.assertNotNull(back2);
+            Assert.assertTrue(!back2.isEmpty());
+        } catch (final ClassNotFoundException e) {
+            // in case db is polluted wwith foreign data
         }
     }
 }
