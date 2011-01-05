@@ -82,12 +82,13 @@ public class TranslationParser {
      * 
      * @param in
      * @param loader
-     * @return
+     * @return value
      * @throws XMLStreamException
      * @throws ClassNotFoundException
      *             in case there are problems with an params type converter
      */
-    public static TranslationRule parseSingle(final InputStream in, final ClassLoader loader) throws XMLStreamException,
+    public static TranslationRule parseSingle(final InputStream in, final ClassLoader loader)
+            throws XMLStreamException,
             ClassNotFoundException {
         @SuppressWarnings("deprecation")
         final XMLInputFactory factory = XMLInputFactory.newInstance("com.sun.xml.internal.stream.XMLInputFactoryImpl",

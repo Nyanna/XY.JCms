@@ -16,12 +16,16 @@
  */
 package net.xy.jcms.controller.configurations.parser;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.xml.stream.XMLInputFactory;
@@ -38,6 +42,7 @@ import net.xy.jcms.controller.configurations.pool.ControllerPool;
 import net.xy.jcms.controller.usecase.Controller;
 import net.xy.jcms.controller.usecase.Parameter;
 import net.xy.jcms.controller.usecase.Usecase;
+import net.xy.jcms.shared.JCmsHelper;
 
 /**
  * parses an usecase xml configuration file
@@ -46,6 +51,18 @@ import net.xy.jcms.controller.usecase.Usecase;
  * 
  */
 public class UsecaseParser {
+    /**
+     * implicite referenced laoding mechanism for template linking.
+     */
+    private static final Map<ConfigurationType, String> CONFIG_POSTFIXES = new EnumMap<ConfigurationType, String>(
+            ConfigurationType.class);
+    static {
+        CONFIG_POSTFIXES.put(ConfigurationType.ControllerConfiguration, ".controller.properties");
+        CONFIG_POSTFIXES.put(ConfigurationType.MessageConfiguration, ".messages.properties");
+        CONFIG_POSTFIXES.put(ConfigurationType.RenderKitConfiguration, ".renderer.properties");
+        CONFIG_POSTFIXES.put(ConfigurationType.UIConfiguration, ".ui.properties");
+        CONFIG_POSTFIXES.put(ConfigurationType.TemplateConfiguration, ".templates.properties");
+    }
 
     /**
      * parses usecases out from an xml file
@@ -296,7 +313,16 @@ public class UsecaseParser {
                 if (config != null) {
                     configs.add(config);
                     if (config instanceof TemplateConfiguration) {
-                        configs.addAll(loadFragmentDependencies((TemplateConfiguration) config, loader));
+                        try {
+                            configs.addAll(loadFragmentDependencies((TemplateConfiguration) config, loader));
+                        } catch (final IOException e) {
+                            throw new IllegalArgumentException(
+                                    "An implicite referenced config couldn't be loaded pls have a look.", e);
+                        } catch (final Exception e) {
+                            throw new IllegalArgumentException(
+                                    "An implicite referenced config has caused some error please verify format and parsing",
+                                    e);
+                        }
                     }
                 }
             } else {
@@ -314,38 +340,20 @@ public class UsecaseParser {
      * @param config
      * @param loader
      * @return list of additional configs
+     * @throws IOException
+     *             in case of loading an resource failed
      */
     private static Collection<? extends Configuration<?>> loadFragmentDependencies(final TemplateConfiguration config,
-            final ClassLoader loader) {
+            final ClassLoader loader) throws IOException {
         final List<Configuration<?>> configs = new ArrayList<Configuration<?>>();
         for (final Entry<String, String> e : config.getSources().entrySet()) {
-            final List<Configuration<?>> frags = new ArrayList<Configuration<?>>();
-            if (loader.getResource(e.getValue() + ".controller.properties") != null) {
-                configs.add(Configuration.initConfigurationByInclude(ConfigurationType.ControllerConfiguration, "class://"
-                        + e.getValue() + ".controller.properties", loader));
+            for (final Entry<ConfigurationType, String> resConf : CONFIG_POSTFIXES.entrySet()) {
+                final URL url = loader.getResource(e.getValue().trim() + resConf.getValue().trim());
+                if (url != null) {
+                    configs.add(Configuration.initByStream(resConf.getKey(), JCmsHelper.loadResource(url, loader),
+                            loader, e.getKey()));
+                }
             }
-            if (loader.getResource(e.getValue() + ".messages.properties") != null) {
-                configs.add(Configuration.initConfigurationByInclude(ConfigurationType.MessageConfiguration,
-                        "class://" + e.getValue() + ".controller.properties", loader));
-            }
-            if (loader.getResource(e.getValue() + ".renderer.properties") != null) {
-                configs.add(Configuration.initConfigurationByInclude(ConfigurationType.RenderKitConfiguration, "class://"
-                        + e.getValue() + ".controller.properties", loader));
-            }
-            if (loader.getResource(e.getValue() + ".ui.properties") != null) {
-                configs.add(Configuration.initConfigurationByInclude(ConfigurationType.UIConfiguration,
-                        "class://" + e.getValue() + ".controller.properties", loader));
-            }
-            if (loader.getResource(e.getValue() + ".templates.properties") != null) {
-                configs.add(Configuration.initConfigurationByInclude(ConfigurationType.TemplateConfiguration,
-                        "class://" + e.getValue() + ".controller.properties", loader));
-            }
-            for (final Configuration<?> configuration : frags) {
-                // TODO [LOW] prefix .comp3.comp4 with fragment prefix via
-                // genric configuration method
-                // configuration.prependRelatives()
-            }
-            configs.addAll(frags);
         }
         return configs;
     }

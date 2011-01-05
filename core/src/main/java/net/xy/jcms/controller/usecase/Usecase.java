@@ -271,7 +271,8 @@ final public class Usecase {
         final Usecase oo = (Usecase) obj;
         return id.equals(oo.id)
                 && (description == oo.description || description != null && description.equals(oo.description))
-                && (parameterList == oo.parameterList || parameterList != null && parameterList.equals(oo.parameterList))
+                && (parameterList == oo.parameterList || parameterList != null
+                        && parameterList.equals(oo.parameterList))
                 && (controllerList == oo.controllerList || controllerList != null
                         && controllerList.equals(oo.controllerList));
     }

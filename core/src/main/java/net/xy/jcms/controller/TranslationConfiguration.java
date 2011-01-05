@@ -23,6 +23,7 @@ import net.xy.jcms.controller.NavigationAbstractionLayer.NALKey;
 import net.xy.jcms.controller.configurations.ITranslationConfigurationAdapter;
 import net.xy.jcms.controller.translation.RuleParameter;
 import net.xy.jcms.controller.translation.TranslationRule;
+import net.xy.jcms.shared.DebugUtils;
 import net.xy.jcms.shared.IConverter;
 import net.xy.jcms.shared.IDataAccessContext;
 import net.xy.jcms.shared.types.StringMap;
@@ -108,7 +109,8 @@ public abstract class TranslationConfiguration {
                                 // refilled param has an invalid param it will
                                 // not more recognized
                                 throw new GroupCouldNotBeFilled(
-                                        "an refilled parameter contains an invalid value and get not more recognized");
+                                        "an refilled parameter contains an invalid value and get not more recognized"
+                                                + DebugUtils.printFields(rule, key));
                             }
                             // don't process an group twice
                             alreadyFilled.add(group);
@@ -117,12 +119,14 @@ public abstract class TranslationConfiguration {
                         // in case group is not defined or found
                         LOG.error(e);
                         throw new GroupCouldNotBeFilled(
-                                "An mendatory group could not be filled with parameters from key, rule describes an invalid group or group was not found in buildKey");
+                                "An mendatory group could not be filled with parameters from key, rule describes an invalid group or group was not found in buildKey"
+                                        + DebugUtils.printFields(rule, key));
                     }
                 } else {
                     // param is not set in key
                     throw new GroupCouldNotBeFilled(
-                            "An mendatory group could not be filled with parameters from key, param doesn't exist in key");
+                            "An mendatory group could not be filled with parameters from key, param doesn't exist in key"
+                                    + DebugUtils.printFields(rule, key));
                 }
                 // proceed to next parameter
             }
@@ -224,11 +228,9 @@ public abstract class TranslationConfiguration {
      */
     private static int countMatchingParams(final List<RuleParameter> ruleParameters, final NALKey struct) {
         int counter = 0;
-        for (final Entry<Object, Object> param : struct.getParameters().entrySet()) {
-            for (final RuleParameter ruleParam : ruleParameters) {
-                if (ruleParam.getParameterName().equals(param.getKey())) {
-                    counter++;
-                }
+        for (final RuleParameter ruleParam : ruleParameters) {
+            if (struct.getParameters().containsKey(ruleParam.getParameterName())) {
+                counter++;
             }
         }
         return counter;

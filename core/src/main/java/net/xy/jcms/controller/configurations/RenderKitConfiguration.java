@@ -133,9 +133,13 @@ public class RenderKitConfiguration extends Configuration<Map<String, IRenderer>
      * creates an config based on parsing an string
      * 
      * @param configString
+     * @param mounted
+     *            where this configuration was inserted e.g. root.fragmentOne adjusts relative pathes of the form
+     *            .comp4.comp5 with the given mountpoint to comp1.comp4.comp5
      * @return value
      */
-    public static RenderKitConfiguration initByString(final String configString, final ClassLoader loader) {
+    public static RenderKitConfiguration initByString(final String configString, final ClassLoader loader,
+            final String mount) {
         final Map<String, IRenderer> result = new HashMap<String, IRenderer>();
         final String[] lines = configString.split("\n");
         for (final String line : lines) {
@@ -144,9 +148,13 @@ public class RenderKitConfiguration extends Configuration<Map<String, IRenderer>
             }
             final String[] parsed = line.trim().split("=", 2);
             try {
-                final String iface = parsed[0];
+                String iface = parsed[0].trim();
+                if (iface.startsWith(ComponentConfiguration.COMPONENT_PATH_SEPARATOR)) {
+                    // prepend relative path with mount
+                    iface = mount + iface;
+                }
                 final String classPath = parsed[1];
-                result.put(iface.trim(), RendererPool.get(classPath.trim(), loader));
+                result.put(iface, RendererPool.get(classPath.trim(), loader));
             } catch (final IndexOutOfBoundsException ex) {
                 throw new IllegalArgumentException(
                         "Error by parsing body configuration line for the template configuration. "

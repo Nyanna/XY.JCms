@@ -29,16 +29,6 @@ import org.junit.Assert;
 public class MockController implements IController {
 
     @Override
-    public NALKey invoke(final IDataAccessContext dac, final Model configuration) {
-        Assert.assertTrue(configuration.get(MessageConfiguration.TYPE) instanceof MessageConfiguration);
-        final MessageConfiguration mess = (MessageConfiguration) configuration.get(MessageConfiguration.TYPE);
-        if (mess != null) {
-
-        }
-        return new NALKey("subcategory");
-    }
-
-    @Override
     public NALKey invoke(final IDataAccessContext dac, final Model configuration,
             final Map<Object, Object> parameters) {
         Assert.assertTrue(configuration.get(MessageConfiguration.TYPE) instanceof MessageConfiguration);

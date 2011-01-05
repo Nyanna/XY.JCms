@@ -210,13 +210,16 @@ public class UIConfiguration extends Configuration<Map<String, Object>> {
      * creates an config based on parsing an string
      * 
      * @param configString
+     * @param mounted
+     *            where this configuration was inserted e.g. root.fragmentOne adjusts relative pathes of the form
+     *            .comp4.comp5 with the given mountpoint to comp1.comp4.comp5
      * @return value
      * @throws ClassNotFoundException
      */
-    public static UIConfiguration initByString(final String configString, final ClassLoader loader) {
+    public static UIConfiguration initByString(final String configString, final ClassLoader loader, final String mount) {
         @SuppressWarnings({ "unchecked", "rawtypes" })
         final UIConfiguration config = new UIConfiguration(
-                (Map) AbstractPropertyBasedConfiguration.initMapByString(configString));
+                (Map) AbstractPropertyBasedConfiguration.initMapByString(configString, mount));
         try {
             config.stringTypeConversion(loader);
         } catch (final ClassNotFoundException e) {
@@ -440,7 +443,7 @@ public class UIConfiguration extends Configuration<Map<String, Object>> {
      * method for converting an entry list back to an usable config
      * 
      * @param entries
-     * @return
+     * @return value
      * @throws ClassNotFoundException
      */
     public static UIConfiguration fromEntryList(final List<UIEntryDTO> entries, final ClassLoader loader)

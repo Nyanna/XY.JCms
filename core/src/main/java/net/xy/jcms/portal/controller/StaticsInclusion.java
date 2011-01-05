@@ -21,7 +21,8 @@ import org.apache.commons.lang.StringUtils;
 
 import net.xy.jcms.controller.NavigationAbstractionLayer.NALKey;
 import net.xy.jcms.controller.configurations.ContentRepository;
-import net.xy.jcms.controller.configurations.ControllerConfiguration;
+import net.xy.jcms.portal.controller.ControllerConfiguration.Config;
+import net.xy.jcms.portal.controller.ControllerConfiguration.Item;
 import net.xy.jcms.shared.IDataAccessContext;
 import net.xy.jcms.shared.types.Model;
 import net.xy.jcms.shared.types.StringList;
@@ -40,20 +41,28 @@ abstract public class StaticsInclusion extends Controller {
      */
     private static final String INSTRUCTION_SECTION = "include";
 
-    @Override
-    public NALKey invoke(final IDataAccessContext dac, final Model configuration) {
-        return invoke(dac, configuration, new HashMap<Object, Object>());
-    }
+    /**
+     * configuration item usable in section and as global
+     */
+    protected static Item DOMAIN = new Item("domain", "Domain which got prefixed.", null);
+
+    /**
+     * configuration item usable in section and as global
+     */
+    protected static Item PREFIX = new Item("prefix", "Additional path prefix", null);
+
+    /**
+     * configuration item usable in section and as global
+     */
+    protected static Item TYPE = new Item("type", "Type on which processing decidement is taken", null);
 
     @Override
-    public NALKey invoke(final IDataAccessContext dac, final Model configuration,
-            final Map<Object, Object> parameters) {
-        final ControllerConfiguration configK = (ControllerConfiguration) configuration.get(ControllerConfiguration.TYPE);
+    public NALKey invoke(final IDataAccessContext dac, final Model configuration, final Config config) {
         final ContentRepository configC = (ContentRepository) configuration.get(ContentRepository.TYPE);
-        if (configC == null || configK == null) {
+        if (configC == null) {
             throw new IllegalArgumentException("Missing configurations");
         }
-        proccess(configK, configC, configuration, dac);
+        proccess(config, configC, configuration, dac);
         return null;
     }
 
@@ -64,23 +73,22 @@ abstract public class StaticsInclusion extends Controller {
      * @param configC
      */
     @SuppressWarnings("unchecked")
-    private void proccess(final ControllerConfiguration configK, final ContentRepository configC,
-            final Model configuration, final IDataAccessContext dac) {
+    private void proccess(final Config config, final ContentRepository configC, final Model configuration,
+            final IDataAccessContext dac) {
         final Map<String, Object> aggregatedContent = new HashMap<String, Object>();
-        final Map<String, Object> ownC = getControllerConfig(configK);
-        if (ownC.get(INSTRUCTION_SECTION) instanceof List) {
-            for (final Map<Object, String> instruction : (List<Map<Object, String>>) ownC.get(INSTRUCTION_SECTION)) {
+        if (config.getGlobal(INSTRUCTION_SECTION) instanceof List) {
+            for (final Map<Object, String> instruction : (List<Map<Object, String>>) config.getGlobal(INSTRUCTION_SECTION)) {
                 // get domain in case of one exists
-                final String domain = (String) getPreciseOrGlobal("domain", ownC, instruction);
+                final String domain = (String) config.get(DOMAIN, instruction);
                 // get path prefix
                 final String prefix;
                 if (domain != null) {
-                    prefix = domain + (String) getPreciseOrGlobal("prefix", ownC, instruction);
+                    prefix = domain + (String) config.get(PREFIX, instruction);
                 } else {
-                    prefix = (String) getPreciseOrGlobal("prefix", ownC, instruction);
+                    prefix = (String) config.get(PREFIX, instruction);
                 }
                 // get type
-                final String type = (String) getPreciseOrGlobal("type", ownC, instruction);
+                final String type = (String) config.get(TYPE, instruction);
 
                 Object finalContent = null;
                 final Object firstContent = instruction.get("content");
@@ -105,7 +113,7 @@ abstract public class StaticsInclusion extends Controller {
                         finalContent = prefix + strContent;
                     } else {
                         // call abstract
-                        finalContent = processType(type, instruction, ownC, prefix, dac);
+                        finalContent = processType(type, instruction, config.globals, prefix, dac);
                     }
                 } else {
                     finalContent = firstContent;
@@ -122,6 +130,7 @@ abstract public class StaticsInclusion extends Controller {
         configuration.put(ContentRepository.TYPE, configC.mergeConfiguration(aggregatedContent));
     }
 
+    // TODO [LOW] refactor to use ControllerConfig
     /**
      * processes one to the StaticInclusion unknown portal dependent type
      * 

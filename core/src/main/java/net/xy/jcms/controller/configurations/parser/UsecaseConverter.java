@@ -136,6 +136,7 @@ public class UsecaseConverter {
             }
         }
         return new Usecase(acase.getId(), acase.getDescription(), params.toArray(new Parameter[params.size()]),
-                controller.toArray(new Controller[controller.size()]), configs.toArray(new Configuration<?>[configs.size()]));
+                controller.toArray(new Controller[controller.size()]), configs.toArray(new Configuration<?>[configs
+                        .size()]));
     }
 }

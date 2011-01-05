@@ -147,9 +147,13 @@ public class TemplateConfiguration extends Configuration<Map<String, IFragment>>
      * creates an config based on parsing an string
      * 
      * @param configString
+     * @param mounted
+     *            where this configuration was inserted e.g. root.fragmentOne adjusts relative pathes of the form
+     *            .comp4.comp5 with the given mountpoint to comp1.comp4.comp5
      * @return value
      */
-    public static TemplateConfiguration initByString(final String configString, final ClassLoader loader) {
+    public static TemplateConfiguration initByString(final String configString, final ClassLoader loader,
+            final String mount) {
         final Map<String, IFragment> result = new HashMap<String, IFragment>();
         final String[] lines = configString.split("\n");
         for (final String line : lines) {
@@ -158,21 +162,26 @@ public class TemplateConfiguration extends Configuration<Map<String, IFragment>>
             }
             final String[] parsed = line.trim().split("=", 2);
             try {
-                final String name = parsed[0];
+                String name = parsed[0].trim();
+                if (name.startsWith(ComponentConfiguration.COMPONENT_PATH_SEPARATOR)) {
+                    // prepend relative path with mount
+                    name = mount + name;
+                }
                 final String classPath = parsed[1];
                 if (classPath.toLowerCase().endsWith(".xml")) {
                     // init template by parsing an xml
-                    result.put(name.trim(), FragmentXMLParser.parse(classPath, loader));
+                    result.put(name, FragmentXMLParser.parse(classPath, loader));
                 } else {
                     // init template by precompiled class
-                    result.put(name.trim(), TemplatePool.get(classPath.trim(), loader));
+                    result.put(name, TemplatePool.get(classPath.trim(), loader));
                 }
             } catch (final IndexOutOfBoundsException ex) {
                 throw new IllegalArgumentException(
                         "Error by parsing body configuration line for the template configuration. "
                                 + DebugUtils.printFields(line));
             } catch (final ClassNotFoundException e) {
-                throw new IllegalArgumentException("Fragment class couldn't be found. " + DebugUtils.printFields(line), e);
+                throw new IllegalArgumentException("Fragment class couldn't be found. " + DebugUtils.printFields(line),
+                        e);
             } catch (final IOException e) {
                 throw new IllegalArgumentException("Fragment xml couldn't be found. " + DebugUtils.printFields(line), e);
             }
@@ -239,8 +248,8 @@ public class TemplateConfiguration extends Configuration<Map<String, IFragment>>
                 }
                 srcs.put(entry.getKey(), path);
             } else {
-                srcs.put(entry.getKey(), entry.getValue().getClass().getPackage().getName().replace(".", File.pathSeparator)
-                        + File.pathSeparator + entry.getValue().getClass().getSimpleName());
+                srcs.put(entry.getKey(), entry.getValue().getClass().getPackage().getName()
+                        .replace(".", File.separator) + File.separator + entry.getValue().getClass().getSimpleName());
             }
         }
         return srcs;

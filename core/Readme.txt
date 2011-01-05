@@ -28,9 +28,9 @@
 -mvn plugin to commit and convert simple xml <> JAXB xml <> jpa context
 
 #
-# Phase 2 will cover (~40 MH +/-50%)
+# Phase 2 will cover
 #
--usecase templating esp. inheritance for mainlayout
+-usecase templating esp. inheritance for mainlayout, inheritance for usecases ?
 -partial component tree rendering & caching - think about rendering only subcomponents pathes, or init without an use case an litle component tree an render an asingle content list
 ?single usecase controller example
 -Local Test coverage
@@ -39,7 +39,19 @@
 ?fully functional jj order
 
 #TODO
--xml cdata für fragmente ausserdem attribute sortierung (http://jaxb.java.net/faq/JaxbCDATASample.java), inline fragments via resource laden, obmitted config  bug for enumset db
+-xml cdata fÃ¼r fragmente ausserdem attribute sortierung (http://jaxb.java.net/faq/JaxbCDATASample.java), inline fragments via resource laden, obmitted config  bug for enumset db
+-performance optimizations for live db system and loading, caching and flush needed
+-weighted textscaling in lib
+-typeconverters should support valueOf type Object
+-automated unittest for each specified usecase
+-access model from controller to the configs inclusive caching, and proccessing caching like setting messages ad append content, something like an result closure from content method not just one content, configuration manager
+-config item with factory, declare staticly Item(key,default,hint), ControllerConfig.get(itemList) factory gets instance, than set globals,params,binding, c.get("service"); in progress
+-tomcat reload memleak on threads check shutdown
+#jj
+-highlight current nalkey for navigation flag
+-when cat contains sublevel make lvl1 page else lvl2
+-hotlist auslagern specials auslaggern specials navi auslagern
+-componentless fw-web deploy with db only, with mvn excclusion?
 
 #
 # Phase 3 will cover
@@ -51,3 +63,17 @@
 ?an browser based usecase configurator
 
 
+Caused by: java.lang.IllegalArgumentException: Cant destinguish the converter type to convert into string representation
+.
+        at net.xy.jcms.controller.configurations.UIConfiguration.toDTO(UIConfiguration.java:429)
+        at net.xy.jcms.controller.usecase.Usecase.toDTO(Usecase.java:246)
+        at net.xy.jcms.persistence.PersistenceHelper$DB.saveUsecase(PersistenceHelper.java:149)
+        at net.xy.jcms.mvn.ConfigExporter.execute(ConfigExporter.java:271)
+        ... 21 more
+[ERROR]
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR]
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/PluginExecutionException
+L:\Matrice\fw-web>cls && mvn exporter:export -Dexporter.in.usecase.dir=uc -Dexporter.out.usecase.jpa=fw-web -Dexporter.s
+impleXml=false -e

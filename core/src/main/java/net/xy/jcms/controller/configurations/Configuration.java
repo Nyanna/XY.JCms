@@ -23,6 +23,7 @@ import java.util.HashMap;
 import net.xy.jcms.shared.DebugUtils;
 import net.xy.jcms.shared.JCmsHelper;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 /**
@@ -193,7 +194,7 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
      * implements joining of an config and an other config object
      * 
      * @param configObject
-     * @return
+     * @return value
      */
     public abstract Configuration<CONFIGURATION_OBJECT> mergeConfiguration(final CONFIGURATION_OBJECT configObject);
 
@@ -241,20 +242,27 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
      * @param loader
      *            needed to load configuration components like typeconverters,
      *            renderer and fragments
+     * @param mount
+     *            specifies the mountpoint on which relative component pathes should be resolved
      * @return value
      */
-    public static Configuration<?> initByString(final ConfigurationType type, final String in, final ClassLoader loader) {
+    public static Configuration<?> initByString(final ConfigurationType type, final String in,
+            final ClassLoader loader, String mount) {
+        if (StringUtils.isBlank(mount)) {
+            mount = StringUtils.EMPTY;
+        }
         switch (type) {
         case TemplateConfiguration:
-            return TemplateConfiguration.initByString(in, loader);
+            return TemplateConfiguration.initByString(in, loader, mount);
         case UIConfiguration:
-            return UIConfiguration.initByString(in, loader);
+            return UIConfiguration.initByString(in, loader, mount);
         case MessageConfiguration:
-            return MessageConfiguration.initByString(in);
+            return MessageConfiguration.initByString(in, mount);
         case RenderKitConfiguration:
-            return RenderKitConfiguration.initByString(in, loader);
+            return RenderKitConfiguration.initByString(in, loader, mount);
         case ControllerConfiguration:
             return ControllerConfiguration.initByString(in);
+            // TODO [LOW] relative component path supoort in fragments including controller configs
         case ContentRepository:
             return new ContentRepository(new HashMap<String, Object>());
         default:
@@ -265,15 +273,27 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
     }
 
     /**
+     * just an delegeate without mount param
+     * 
+     * @see most param method
+     */
+    public static Configuration<?> initByString(final ConfigurationType type, final String in,
+            final ClassLoader loader) {
+        return initByString(type, in, loader, null);
+    }
+
+    /**
      * initializes an configuration with an input stream resource. only for
      * certain configuration available.
      * 
      * @param type
      * @param stream
+     * @param mount
+     *            specifies the mountpoint on which relative component pathes should be resolved
      * @return value
      */
     public static Configuration<?> initByStream(final ConfigurationType type, final InputStream stream,
-            final ClassLoader loader) {
+            final ClassLoader loader, final String mount) {
         final StringBuilder writer = new StringBuilder();
         BufferedReader reader;
         try {
@@ -289,7 +309,17 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
             }
         } catch (final IOException e) {
         }
-        return initByString(type, writer.toString(), loader);
+        return initByString(type, writer.toString(), loader, mount);
+    }
+
+    /**
+     * just an delegeate without mount param
+     * 
+     * @see most param method
+     */
+    public static Configuration<?> initByStream(final ConfigurationType type, final InputStream stream,
+            final ClassLoader loader) {
+        return initByStream(type, stream, loader, null);
     }
 
     /**
@@ -298,22 +328,34 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
      * @param type
      * @param include
      *            pseudo uri specifieing an resource e.g. class://lang.java.test
-     * @return
+     * @param mount
+     *            specifies the mountpoint on which relative component pathes should be resolved
+     * @return value
      */
     public static Configuration<?> initConfigurationByInclude(final ConfigurationType type, final String include,
-            final ClassLoader loader) {
+            final ClassLoader loader, final String mount) {
         if (include.startsWith("class://")) {
             final String classpath = include.replaceFirst("^class://", "");
             InputStream st;
             try {
                 st = JCmsHelper.loadResource(classpath, loader);
                 if (st != null) {
-                    return Configuration.initByStream(type, st, loader);
+                    return Configuration.initByStream(type, st, loader, mount);
                 }
             } catch (final IOException e) {
             }
         }
         throw new IllegalArgumentException("Include reffers to an invalid location!");
+    }
+
+    /**
+     * just an delegeate without mount param
+     * 
+     * @see most param method
+     */
+    public static Configuration<?> initConfigurationByInclude(final ConfigurationType type, final String include,
+            final ClassLoader loader) {
+        return initConfigurationByInclude(type, include, loader, null);
     }
 
     /**

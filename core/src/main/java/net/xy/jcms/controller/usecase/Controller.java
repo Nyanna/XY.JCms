@@ -73,11 +73,7 @@ final public class Controller {
      */
     public NALKey invoke(final IDataAccessContext dac, final Model configuration,
             final Map<Object, Object> parameters) {
-        if (parameters != null) {
-            return controllerInstance.invoke(dac, configuration, parameters);
-        } else {
-            return controllerInstance.invoke(dac, configuration);
-        }
+        return controllerInstance.invoke(dac, configuration, parameters);
     }
 
     @Override

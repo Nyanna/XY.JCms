@@ -30,16 +30,6 @@ import net.xy.jcms.shared.types.Model;
 public interface IController {
 
     /**
-     * main funtion of an controller. will be invoked when no parameters are
-     * obmitted.
-     * 
-     * @param dac
-     * @param configuration
-     * @return value
-     */
-    NALKey invoke(final IDataAccessContext dac, final Model configuration);
-
-    /**
      * if obmited configuration parameters are specified in the usecase config
      * this method will be called instead.
      * 

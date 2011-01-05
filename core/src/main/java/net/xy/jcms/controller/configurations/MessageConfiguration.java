@@ -120,10 +120,13 @@ public class MessageConfiguration extends AbstractPropertyBasedConfiguration {
      * creates an config based on parsing an string
      * 
      * @param configString
+     * @param mounted
+     *            where this configuration was inserted e.g. root.fragmentOne adjusts relative pathes of the form
+     *            .comp4.comp5 with the given mountpoint to comp1.comp4.comp5
      * @return value
      */
-    public static MessageConfiguration initByString(final String configString) {
-        return new MessageConfiguration(AbstractPropertyBasedConfiguration.initPropertiesByString(configString));
+    public static MessageConfiguration initByString(final String configString, final String mount) {
+        return new MessageConfiguration(AbstractPropertyBasedConfiguration.initPropertiesByString(configString, mount));
     }
 
     @Override

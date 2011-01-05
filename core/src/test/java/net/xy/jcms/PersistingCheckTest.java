@@ -14,6 +14,9 @@ package net.xy.jcms;
 
 import java.io.File;
 import java.net.ConnectException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -25,6 +28,7 @@ import junit.framework.Assert;
 
 import org.eclipse.persistence.exceptions.DatabaseException;
 import org.junit.Test;
+import org.junit.Before;
 
 import com.mysql.jdbc.exceptions.jdbc4.CommunicationsException;
 
@@ -43,6 +47,24 @@ import net.xy.jcms.persistence.PersistenceHelper;
 public class PersistingCheckTest {
     protected String transConfig = "net/xy/jcms/ExampleTranslationRules.xml";
     protected String useConfig = "net/xy/jcms/ExampleUsecases.xml";
+
+    /**
+     * disables tests if no server could be found
+     */
+    private boolean serverAvailable = false;
+
+    @Before
+    public void setup() throws SQLException {
+        Connection connection = null;
+        try {
+            connection = DriverManager.getConnection("jdbc:mysql://localhost/fw-web", "fw-web", "none");
+        } catch (final Throwable ex) {
+        }
+        if (connection != null) {
+            serverAvailable = true;
+            connection.close();
+        }
+    }
 
     @Test
     public void testTranslationXMLTransfer() throws ClassNotFoundException, JAXBException {
@@ -81,7 +103,8 @@ public class PersistingCheckTest {
         for (final Usecase acase : cases) {
             final File out = new File(acase.getId() + "_" + acase.getParameterList().length + ".xml");
             PersistenceHelper.XML.saveUsecase(out, acase);
-            final Usecase result = PersistenceHelper.XML.loadUsecase(out, Thread.currentThread().getContextClassLoader());
+            final Usecase result = PersistenceHelper.XML.loadUsecase(out, Thread.currentThread()
+                    .getContextClassLoader());
             Assert.assertTrue(acase.equals(result));
             out.deleteOnExit();
         }
@@ -93,6 +116,9 @@ public class PersistingCheckTest {
 
     @Test
     public void testTranslationDBTransfer() throws ClassNotFoundException {
+        if (!serverAvailable) {
+            return;
+        }
         TranslationRule[] rules = null;
         try {
             rules = TranslationParser.parse(Thread.currentThread().getContextClassLoader()
@@ -120,6 +146,9 @@ public class PersistingCheckTest {
 
     @Test
     public void testUsecaseDBTransfer() throws ClassNotFoundException {
+        if (!serverAvailable) {
+            return;
+        }
         Usecase[] cases = null;
         try {
             cases = UsecaseParser.parse(Thread.currentThread().getContextClassLoader()
@@ -147,6 +176,9 @@ public class PersistingCheckTest {
 
     @Test
     public void testDBLoadAll() {
+        if (!serverAvailable) {
+            return;
+        }
         try {
             final List<TranslationRule> back = PersistenceHelper.DB.loadAllTranslation(Thread.currentThread()
                     .getContextClassLoader());

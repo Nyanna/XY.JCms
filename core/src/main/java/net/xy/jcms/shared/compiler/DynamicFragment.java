@@ -222,7 +222,7 @@ public class DynamicFragment extends AbstractFragment {
     /**
      * returns the source path from which this template was build
      * 
-     * @return
+     * @return value
      */
     public String getSource() {
         return source;

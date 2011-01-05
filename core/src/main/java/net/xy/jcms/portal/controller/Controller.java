@@ -1,3 +1,15 @@
+/**
+ * This file is part of XY.JCms, Copyright 2010 (C) Xyan Kruse, Xyan@gmx.net, Xyan.kilu.de
+ * 
+ * XY.JCms is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ * 
+ * XY.JCms is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License along with XY.JCms. If not, see
+ * <http://www.gnu.org/licenses/>.
+ */
 package net.xy.jcms.portal.controller;
 
 import java.util.Map;
@@ -7,11 +19,12 @@ import net.xy.jcms.controller.NavigationAbstractionLayer;
 import net.xy.jcms.controller.NavigationAbstractionLayer.NALKey;
 import net.xy.jcms.controller.TranslationConfiguration.GroupCouldNotBeFilled;
 import net.xy.jcms.controller.TranslationConfiguration.InvalidBuildRule;
-import net.xy.jcms.controller.configurations.ControllerConfiguration;
 import net.xy.jcms.controller.translation.TranslationRule;
+import net.xy.jcms.portal.controller.ControllerConfiguration.Config;
 import net.xy.jcms.shared.DebugUtils;
 import net.xy.jcms.shared.IController;
 import net.xy.jcms.shared.IDataAccessContext;
+import net.xy.jcms.shared.types.Model;
 
 /**
  * abstract controller to share common code
@@ -21,25 +34,21 @@ import net.xy.jcms.shared.IDataAccessContext;
  */
 abstract public class Controller implements IController {
 
-    /**
-     * gets an config either from the section or instruction config or from the
-     * controller globals
-     * 
-     * @param key
-     * @param globals
-     *            an map of the global properties
-     * @param section
-     *            an map of the section properties
-     * @return value can be null
-     */
-    protected static Object getPreciseOrGlobal(final Object key, final Map<String, Object> globals,
-            final Map<Object, String> section) {
-        final Object fromSection = section.get(key);
-        if (fromSection != null) {
-            return fromSection;
-        }
-        return globals.get(key);
+    @Override
+    public NALKey invoke(final IDataAccessContext dac, final Model configuration, final Map<Object, Object> parameters) {
+        return invoke(dac, configuration, ControllerConfiguration.build(this, configuration, parameters));
     }
+
+    /**
+     * instead of raw parameters u get and config object ready to retrieve item
+     * from it.
+     * 
+     * @param dac
+     * @param configuration
+     * @param config
+     * @return same as invoke by IController
+     */
+    protected abstract NALKey invoke(IDataAccessContext dac, Model configuration, Config config);
 
     /**
      * parses an NALKey definition from string in form usecaseid[param = value,
@@ -105,7 +114,8 @@ abstract public class Controller implements IController {
     }
 
     /**
-     * fills ? in an NALKey parameter list with its according obmitted replacement:
+     * fills ? in an NALKey parameter list with its according obmitted
+     * replacement:
      * -first ? maps to first replacement and so on
      * 
      * @param origin
@@ -121,40 +131,5 @@ abstract public class Controller implements IController {
                 ++counter;
             }
         }
-    }
-
-    /**
-     * provides a way to get the final class's config object. gets also an way
-     * to hook in the config
-     * 
-     * @param configK
-     * @return
-     */
-    protected abstract Map<String, Object> getControllerConfig(final ControllerConfiguration configK);
-
-    /**
-     * helper method to get config
-     * always returns an object and never null if the default was not null
-     * 
-     * @param indentifier
-     * @param binding
-     *            can be null
-     * @param parameters
-     *            can be null
-     * @param def
-     *            default if not found in configs
-     * @return value
-     */
-    static public Object getConfig(final String indentifier, final Map<String, String> binding,
-            final Map<Object, Object> parameters, final Object def) {
-        Object ret;
-        if (binding != null && binding.containsKey(indentifier)) {
-            ret = binding.get(indentifier);
-        } else if (parameters != null && parameters.containsKey(indentifier)) {
-            ret = parameters.get(indentifier);
-        } else {
-            ret = def;
-        }
-        return ret;
     }
 }

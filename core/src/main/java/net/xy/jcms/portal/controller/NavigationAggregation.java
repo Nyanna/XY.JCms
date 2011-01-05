@@ -22,6 +22,7 @@ import net.xy.jcms.controller.TranslationConfiguration.GroupCouldNotBeFilled;
 import net.xy.jcms.controller.TranslationConfiguration.InvalidBuildRule;
 import net.xy.jcms.controller.configurations.ContentRepository;
 import net.xy.jcms.controller.configurations.ControllerConfiguration;
+import net.xy.jcms.portal.controller.ControllerConfiguration.Config;
 import net.xy.jcms.shared.IDataAccessContext;
 import net.xy.jcms.shared.types.Model;
 import net.xy.jcms.shared.types.StringList;
@@ -40,15 +41,10 @@ public abstract class NavigationAggregation<LINKOBJECT> extends Controller {
     private static final String INSTRUCTION_SECTION = "navigation";
 
     @Override
-    public NALKey invoke(final IDataAccessContext dac, final Model configuration) {
-        return invoke(dac, configuration, null);
-    }
-
-    @Override
     public NALKey invoke(final IDataAccessContext dac, final Model configuration,
-            final Map<Object, Object> parameters) {
+            final Config config) {
         try {
-            proccess(dac, configuration, parameters);
+            proccess(dac, configuration, config);
         } catch (final GroupCouldNotBeFilled e) {
             throw new IllegalArgumentException(
                     "NavigationAggregationController configuration is invalid. Parameter replacement failure.", e);
@@ -68,8 +64,7 @@ public abstract class NavigationAggregation<LINKOBJECT> extends Controller {
      * @throws GroupCouldNotBeFilled
      */
     @SuppressWarnings("unchecked")
-    private void proccess(final IDataAccessContext dac, final Model configuration,
-            final Map<Object, Object> parameters)
+    private void proccess(final IDataAccessContext dac, final Model configuration, final Config config)
             throws GroupCouldNotBeFilled, InvalidBuildRule {
 
         final ControllerConfiguration configK = (ControllerConfiguration) configuration.get(ControllerConfiguration.TYPE);
@@ -79,9 +74,8 @@ public abstract class NavigationAggregation<LINKOBJECT> extends Controller {
             throw new IllegalArgumentException("Missing configurations");
         }
 
-        final Map<String, Object> ownC = getControllerConfig(configK);
-        if (ownC.get(INSTRUCTION_SECTION) instanceof List) {
-            for (final Map<String, String> instruction : (List<Map<String, String>>) ownC.get(INSTRUCTION_SECTION)) {
+        if (config.getGlobal(INSTRUCTION_SECTION) instanceof List) {
+            for (final Map<String, String> instruction : (List<Map<String, String>>) config.getGlobal(INSTRUCTION_SECTION)) {
                 final List<LINKOBJECT> contents = new LinkedList<LINKOBJECT>();
                 for (final Entry<String, String> navItem : instruction.entrySet()) {
                     if (navItem.getKey().startsWith("key")) {
@@ -93,15 +87,15 @@ public abstract class NavigationAggregation<LINKOBJECT> extends Controller {
                             messageKey = split[1];
                         }
                         final String url = buildUriForUsecase(targetUsecase, dac);
-                        contents.add(getLinkDTO(url, messageKey, configuration, parameters));
+                        contents.add(getLinkDTO(url, messageKey, configuration, config));
                     } else if (navItem.getKey().startsWith("url")) {
                         String url = navItem.getValue().trim();
                         url = dac.buildUriWithParams(url, null);
-                        contents.add(getLinkDTO(url, navItem.getKey(), configuration, parameters));
+                        contents.add(getLinkDTO(url, navItem.getKey(), configuration, config));
                     }
                 }
                 final StringList targets = new StringList(instruction.get("target"));
-                saveLinkDTOs(targets, contents, configuration, parameters);
+                saveLinkDTOs(targets, contents, configuration, config);
             }
         }
     }
@@ -114,8 +108,7 @@ public abstract class NavigationAggregation<LINKOBJECT> extends Controller {
      * @return
      */
     protected abstract LINKOBJECT getLinkDTO(final String href, final String usecaseId,
-            final Model configuration,
-            final Map<Object, Object> parameters);
+            final Model configuration, final Config config);
 
     /**
      * provides an way to store the links in an domain container
@@ -125,6 +118,6 @@ public abstract class NavigationAggregation<LINKOBJECT> extends Controller {
      * @param dtos
      */
     protected abstract void saveLinkDTOs(final StringList targets, final List<LINKOBJECT> dtos,
-            final Model configuration, final Map<Object, Object> parameters);
+            final Model configuration, final Config config);
 
 }

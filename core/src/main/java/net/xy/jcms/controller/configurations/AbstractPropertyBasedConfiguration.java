@@ -67,11 +67,14 @@ public abstract class AbstractPropertyBasedConfiguration extends Configuration<P
      * parses an string to an property object
      * 
      * @param configString
+     * @param mounted
+     *            where this configuration was inserted e.g. root.fragmentOne adjusts relative pathes of the form
+     *            .comp4.comp5 with the given mountpoint to comp1.comp4.comp5
      * @return value
      */
-    protected static Properties initPropertiesByString(final String configString) {
+    protected static Properties initPropertiesByString(final String configString, final String mount) {
         final Properties prop = new Properties();
-        prop.putAll(initMapByString(configString));
+        prop.putAll(initMapByString(configString, mount));
         return prop;
     }
 
@@ -79,9 +82,12 @@ public abstract class AbstractPropertyBasedConfiguration extends Configuration<P
      * parses an map out of the string in property style
      * 
      * @param configString
+     * @param mounted
+     *            where this configuration was inserted e.g. root.fragmentOne adjusts relative pathes of the form
+     *            .comp4.comp5 with the given mountpoint to comp1.comp4.comp5
      * @return value
      */
-    protected static Map<String, String> initMapByString(final String configString) {
+    protected static Map<String, String> initMapByString(final String configString, final String mount) {
         final Map<String, String> properties = new HashMap<String, String>();
         final String[] lines = configString.split("\n");
         String lastValue = null; // to append additional data
@@ -99,6 +105,10 @@ public abstract class AbstractPropertyBasedConfiguration extends Configuration<P
                 final String[] parsed = line.trim().split("=", 2);
                 try {
                     lastKey = parsed[0].trim();
+                    if (lastKey.startsWith(ComponentConfiguration.COMPONENT_PATH_SEPARATOR)) {
+                        // prepend relative path with mount
+                        lastKey = mount + lastKey;
+                    }
                     lastValue = parsed[1].trim();
                     properties.put(lastKey, lastValue);
                 } catch (final IndexOutOfBoundsException ex) {

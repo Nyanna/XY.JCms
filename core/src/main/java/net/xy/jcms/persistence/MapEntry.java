@@ -70,7 +70,7 @@ public class MapEntry implements Serializable {
      * converts an XmlMapEntry list
      * 
      * @param value
-     * @return
+     * @return value
      */
     public static Map<String, String> convert(final List<MapEntry> value) {
         if (value == null) {
@@ -87,7 +87,7 @@ public class MapEntry implements Serializable {
      * converts back to an string map
      * 
      * @param value
-     * @return
+     * @return value
      */
     public static List<MapEntry> convert(final Map<?, ?> value) {
         if (value == null) {

@@ -1,0 +1,39 @@
+#Create and drop base schema
+CREATE SCHEMA `fw-web`;
+DROP SCHEMA `fw-web`;
+
+#user management, init
+USE `mysql`;
+select * from mysql.user;
+CREATE USER 'fw-web'@'localhost' IDENTIFIED BY 'none';
+GRANT ALL ON `fw-web`.* TO 'fw-web'@'localhost';
+DROP USER 'fw-web'@'localhost';
+
+#fw exemplary statements
+USE `fw-web`;
+SELECT * from `fw-web`.translation;
+SELECT * from mapentry where mkey like 'usecase.group_ringtones%';
+UPDATE mapentry SET mval = 'Klingeltöne' where mkey like 'usecase.group_ringtones%';
+
+#complete translation view
+CREATE OR REPLACE VIEW TranslationRules AS
+SELECT translation.USECASE AS Usecase, translation.BUILDOFF AS Example, translation.REACTON AS Pattern,
+parameter.PARAMETERNAME AS Param, parameter.APLICATESTOGROUP AS 'Group', parameter.CONVERTER AS Type,
+map.mkey AS 'From', map.mval AS 'To'
+FROM translation LEFT JOIN (translation_translation_parameter AS p2t,translation_parameter AS parameter, translation_parameter_mapentry AS p2v, mapentry AS map)
+ON (translation.ID = p2t.TranslationRuleDTO_ID AND parameter.ID = p2t.parameters_ID AND parameter.ID = p2v.RuleParameterDTO_ID AND map.ID = p2v.buildInMap_ID)
+ORDER BY Usecase;
+
+#Update and view the translations
+SELECT * FROM TranslationRules;
+UPDATE TranslationRules SET Pattern = '^Hold dir jetzt Produkt Nr. ([0-9]+)' WHERE Pattern = '^Hold dir jetzt Produkt Nr. ([0-9]+)1';
+
+#Usecase overview
+SELECT usecase.USECASE AS UCName, usecase.DESCRIPTION AS Description, ctrl.CONTROLLERINSTANCE AS Ctrl
+FROM usecase LEFT JOIN (usecase_controller AS ctrl,usecase_usecase_controller AS u2c)
+ON (usecase.ID = u2c.UsecaseDTO_ID AND ctrl.ID = u2c.controllerList_ID)
+ORDER BY UCName;
+
+SELECT  usecase.USECASE AS UCname, ctrl.CONTROLLERINSTANCE FROM usecase,usecase_controller AS ctrl,usecase_usecase_controller AS u2c
+WHERE ( usecase.USECASE = 'features' AND usecase.ID = u2c.UsecaseDTO_ID AND ctrl.ID = u2c.controllerList_ID)
+ORDER BY UCName;

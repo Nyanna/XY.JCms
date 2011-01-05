@@ -107,7 +107,8 @@ public class PersistenceHelper {
          * @return rule
          * @throws ClassNotFoundException
          */
-        public static TranslationRule loadTranslation(final int id, final ClassLoader loader) throws ClassNotFoundException {
+        public static TranslationRule loadTranslation(final int id, final ClassLoader loader)
+                throws ClassNotFoundException {
             final EntityManager em = getEMF().createEntityManager();
             em.getTransaction().begin();
             final TranslationRuleDTO result = em.find(TranslationRuleDTO.class, id);
@@ -257,7 +258,8 @@ public class PersistenceHelper {
          * @throws ClassNotFoundException
          *             in case of an type converter couldn't be loaded
          */
-        public static TranslationRule loadTranslation(final File infile, final ClassLoader loader) throws JAXBException,
+        public static TranslationRule loadTranslation(final File infile, final ClassLoader loader)
+                throws JAXBException,
                 ClassNotFoundException {
             final Unmarshaller m = getContext().createUnmarshaller();
             return TranslationConverter.convert((TranslationRuleDTO) m.unmarshal(infile), loader);
@@ -284,7 +286,7 @@ public class PersistenceHelper {
          * loads an complete translation set from an single xml file
          * 
          * @param infile
-         * @return
+         * @return value
          * @throws JAXBException
          * @throws ClassNotFoundException
          *             in case of an type converter couldn't be loaded

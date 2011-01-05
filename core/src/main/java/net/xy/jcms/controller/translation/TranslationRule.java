@@ -112,7 +112,7 @@ final public class TranslationRule {
     /**
      * method converting this rule to an transfer struct
      * 
-     * @return
+     * @return value
      */
     public TranslationRuleDTO toDTO() {
         final TranslationRuleDTO dto = new TranslationRuleDTO();
@@ -158,5 +158,11 @@ final public class TranslationRule {
             hash = hash * 3 + parameters.hashCode();
         }
         return hash;
+    }
+
+    @Override
+    public String toString() {
+        return new StringBuilder("TranslationRule[usecase=").append(usecase).append(",buildOff=").append(buildOff)
+                .append(",reactOn=").append(reactOn).append("]").toString();
     }
 }

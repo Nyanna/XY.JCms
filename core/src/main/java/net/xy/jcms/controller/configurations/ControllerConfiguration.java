@@ -66,6 +66,7 @@ public class ControllerConfiguration extends Configuration<Map<String, Map<Strin
                 if (!List.class.isInstance(ctrItem.getValue())) {
                     // simple overwrite
                     own.get(ctrlName).put(ctrItem.getKey(), ctrItem.getValue());
+                    continue;
                 }
                 // when list append, warning two different listtypes cant be
                 // merged
@@ -272,7 +273,8 @@ public class ControllerConfiguration extends Configuration<Map<String, Map<Strin
                             conf.append("\t}\n");
                         }
                     } else {
-                        conf.append("\t").append(ctrlVal.getKey()).append(" = ").append(ctrlVal.getValue()).append("\n");
+                        conf.append("\t").append(ctrlVal.getKey()).append(" = ").append(ctrlVal.getValue())
+                                .append("\n");
                     }
                 }
                 conf.append("}\n");
