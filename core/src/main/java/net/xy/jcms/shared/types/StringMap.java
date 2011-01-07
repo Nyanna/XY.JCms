@@ -29,14 +29,13 @@ import net.xy.jcms.shared.IConverter;
  * @author xyan
  * 
  */
-public class StringMap extends HashMap<String, String> implements IConverter {
+public class StringMap extends HashMap<String, String> implements IConverter<StringMap> {
     private static final long serialVersionUID = 6126913995340768165L;
 
     /**
      * initializes an empty instance
      */
-    public StringMap() {
-    }
+    public StringMap() {}
 
     /**
      * accepts an map and copies it values
@@ -83,5 +82,22 @@ public class StringMap extends HashMap<String, String> implements IConverter {
             }
         }
         return ret.toString();
+    }
+
+    @SuppressWarnings({ "unchecked" })
+    @Override
+    public StringMap valueOf(final Object obj) {
+        if (obj instanceof StringMap) {
+            return (StringMap) obj;
+        } else if (obj instanceof String) {
+            return convert((String) obj);
+        } else if (obj instanceof Map) {
+            final StringMap ret = new StringMap();
+            for (final Entry<Object, Object> entry : ((Map<Object, Object>) obj).entrySet()) {
+                ret.put(entry.getKey().toString(), entry.getValue().toString());
+            }
+            return ret;
+        }
+        return null;
     }
 }

@@ -44,17 +44,17 @@ abstract public class StaticsInclusion extends Controller {
     /**
      * configuration item usable in section and as global
      */
-    protected static Item DOMAIN = new Item("domain", "Domain which got prefixed.", null);
+    protected static Item<String> DOMAIN = new Item<String>("domain", "Domain which got prefixed.", null);
 
     /**
      * configuration item usable in section and as global
      */
-    protected static Item PREFIX = new Item("prefix", "Additional path prefix", null);
+    protected static Item<String> PREFIX = new Item<String>("prefix", "Additional path prefix", null);
 
     /**
      * configuration item usable in section and as global
      */
-    protected static Item TYPE = new Item("type", "Type on which processing decidement is taken", null);
+    protected static Item<String> TYPE = new Item<String>("type", "Type on which processing decidement is taken", null);
 
     @Override
     public NALKey invoke(final IDataAccessContext dac, final Model configuration, final Config config) {
@@ -77,18 +77,19 @@ abstract public class StaticsInclusion extends Controller {
             final IDataAccessContext dac) {
         final Map<String, Object> aggregatedContent = new HashMap<String, Object>();
         if (config.getGlobal(INSTRUCTION_SECTION) instanceof List) {
-            for (final Map<Object, String> instruction : (List<Map<Object, String>>) config.getGlobal(INSTRUCTION_SECTION)) {
+            for (final Map<Object, String> instruction : (List<Map<Object, String>>) config
+                    .getGlobal(INSTRUCTION_SECTION)) {
                 // get domain in case of one exists
-                final String domain = (String) config.get(DOMAIN, instruction);
+                final String domain = config.get(DOMAIN, instruction);
                 // get path prefix
                 final String prefix;
                 if (domain != null) {
-                    prefix = domain + (String) config.get(PREFIX, instruction);
+                    prefix = domain + config.get(PREFIX, instruction);
                 } else {
-                    prefix = (String) config.get(PREFIX, instruction);
+                    prefix = config.get(PREFIX, instruction);
                 }
                 // get type
-                final String type = (String) config.get(TYPE, instruction);
+                final String type = config.get(TYPE, instruction);
 
                 Object finalContent = null;
                 final Object firstContent = instruction.get("content");
@@ -113,7 +114,7 @@ abstract public class StaticsInclusion extends Controller {
                         finalContent = prefix + strContent;
                     } else {
                         // call abstract
-                        finalContent = processType(type, instruction, config.globals, prefix, dac);
+                        finalContent = processType(type, instruction, config, prefix, dac);
                     }
                 } else {
                     finalContent = firstContent;
@@ -130,21 +131,20 @@ abstract public class StaticsInclusion extends Controller {
         configuration.put(ContentRepository.TYPE, configC.mergeConfiguration(aggregatedContent));
     }
 
-    // TODO [LOW] refactor to use ControllerConfig
     /**
      * processes one to the StaticInclusion unknown portal dependent type
      * 
      * @param type
      *            an string representing the type like StringMap, FlashTeaser
-     * @param sectionParams
-     * @param globals
+     * @param instruction
+     * @param config
      * @param prefix
      *            path prefix, can be null
      * @param domain
      *            an domain to set, can be null
      * @return
      */
-    protected abstract Object processType(final String type, final Map<Object, String> sectionParams,
-            final Map<String, Object> globals, final String prefix, final IDataAccessContext dac);
+    protected abstract Object processType(final String type, final Map<Object, String> instruction,
+            final Config config, final String prefix, final IDataAccessContext dac);
 
 }

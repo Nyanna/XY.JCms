@@ -1,18 +1,18 @@
 /**
- *  This file is part of XY.JCms, Copyright 2010 (C) Xyan Kruse, Xyan@gmx.net, Xyan.kilu.de
- *
- *  XY.JCms is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  XY.JCms is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with XY.JCms.  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of XY.JCms, Copyright 2010 (C) Xyan Kruse, Xyan@gmx.net, Xyan.kilu.de
+ * 
+ * XY.JCms is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * XY.JCms is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with XY.JCms. If not, see <http://www.gnu.org/licenses/>.
  */
 package net.xy.jcms.controller.configurations.pool;
 
@@ -39,7 +39,7 @@ public class ConverterPool {
     /**
      * cache pool
      */
-    private final static Map<String, IConverter> converterPool = new HashMap<String, IConverter>();
+    private final static Map<String, IConverter<?>> converterPool = new HashMap<String, IConverter<?>>();
 
     /**
      * manages an cached pool of loaded converter instances
@@ -50,7 +50,7 @@ public class ConverterPool {
      * @throws IllegalAccessException
      * @throws ClassNotFoundException
      */
-    public static IConverter get(final String classPath, final ClassLoader loader)
+    public static IConverter<?> get(final String classPath, final ClassLoader loader)
             throws ClassNotFoundException {
         if (converterPool.containsKey(classPath)) {
             if (LOG.isDebugEnabled()) {
@@ -73,8 +73,8 @@ public class ConverterPool {
                     // only log infor when debug
                     LOG.info("Converter new instantiated. " + DebugUtils.printFields(classPath));
                 }
-                converterPool.put(classPath, (IConverter) converter);
-                return (IConverter) converter;
+                converterPool.put(classPath, (IConverter<?>) converter);
+                return (IConverter<?>) converter;
             } else {
                 throw new IllegalArgumentException("Converter class don't implements IConverter.");
             }

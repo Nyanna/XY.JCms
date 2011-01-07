@@ -39,17 +39,14 @@
 ?fully functional jj order
 
 #TODO
--xml cdata für fragmente ausserdem attribute sortierung (http://jaxb.java.net/faq/JaxbCDATASample.java), inline fragments via resource laden, obmitted config  bug for enumset db
--performance optimizations for live db system and loading, caching and flush needed
--weighted textscaling in lib
--typeconverters should support valueOf type Object
--automated unittest for each specified usecase
--access model from controller to the configs inclusive caching, and proccessing caching like setting messages ad append content, something like an result closure from content method not just one content, configuration manager
--config item with factory, declare staticly Item(key,default,hint), ControllerConfig.get(itemList) factory gets instance, than set globals,params,binding, c.get("service"); in progress
--tomcat reload memleak on threads check shutdown
+-[LOW] xml cdata für fragmente ausserdem attribute sortierung (http://jaxb.java.net/faq/JaxbCDATASample.java), inline fragments via resource laden, obmitted config  bug for enumset db
+-[LOW] performance optimizations for live db system and loading, caching and flush needed
+-[HIGH] weighted textscaling in lib
+-[LOW] automated unittest for each specified usecase
+-[HIGH] access model from controller to the configs inclusive caching, and proccessing caching like setting messages ad append content, something like an result closure from content method not just one content, configuration manager
+-[HIGH] tomcat reload memleak on threads check shutdown
 #jj
 -highlight current nalkey for navigation flag
--when cat contains sublevel make lvl1 page else lvl2
 -hotlist auslagern specials auslaggern specials navi auslagern
 -componentless fw-web deploy with db only, with mvn excclusion?
 
@@ -77,3 +74,9 @@ Caused by: java.lang.IllegalArgumentException: Cant destinguish the converter ty
 [ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/PluginExecutionException
 L:\Matrice\fw-web>cls && mvn exporter:export -Dexporter.in.usecase.dir=uc -Dexporter.out.usecase.jpa=fw-web -Dexporter.s
 impleXml=false -e
+
+
+-preproccess
+-check cache
+-get content
+-persist

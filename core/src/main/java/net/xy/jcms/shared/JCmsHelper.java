@@ -291,4 +291,18 @@ public class JCmsHelper {
             return t;
         }
     }
+
+    /**
+     * helper to generate cachekeys from various objects
+     * 
+     * @param obj
+     * @return
+     */
+    public static StringBuilder cacheKey(final Object... obj) {
+        final StringBuilder result = new StringBuilder();
+        for (final Object object : obj) {
+            result.append(object);
+        }
+        return result;
+    }
 }

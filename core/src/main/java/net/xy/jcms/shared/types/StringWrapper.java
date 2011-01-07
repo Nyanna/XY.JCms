@@ -24,7 +24,7 @@ import net.xy.jcms.shared.IConverter;
  * @author xyan
  * 
  */
-public class StringWrapper implements IConverter {
+public class StringWrapper implements IConverter<String> {
 
     @Override
     public void fromString(final java.lang.String str) {
@@ -40,6 +40,14 @@ public class StringWrapper implements IConverter {
     @Override
     public String convert(final Object obj) {
         return (String) obj;
+    }
+
+    @Override
+    public String valueOf(final Object obj) {
+        if (obj instanceof String) {
+            return (String) obj;
+        }
+        return obj.toString();
     }
 
 }

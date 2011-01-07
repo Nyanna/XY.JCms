@@ -68,7 +68,7 @@ public class TranslationConverter {
         final List<RuleParameter> params = new ArrayList<RuleParameter>();
         if (rule.getParameters() != null) {
             for (final RuleParameterDTO param : rule.getParameters()) {
-                final IConverter convt;
+                final IConverter<?> convt;
                 if ("net.xy.jcms.shared.types.StringMap".equals(param.getConverter())) {
                     convt = new StringMap(MapEntry.convert(param.getBuildInMap()));
                 } else {

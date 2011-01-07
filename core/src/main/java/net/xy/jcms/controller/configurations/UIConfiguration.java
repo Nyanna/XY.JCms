@@ -44,7 +44,7 @@ public class UIConfiguration extends Configuration<Map<String, Object>> {
     /**
      * these map saves used type converters for back translation of config
      */
-    private final Map<Class<?>, IConverter> converterMap = new HashMap<Class<?>, IConverter>();
+    private final Map<Class<?>, IConverter<?>> converterMap = new HashMap<Class<?>, IConverter<?>>();
 
     /**
      * default
@@ -91,7 +91,7 @@ public class UIConfiguration extends Configuration<Map<String, Object>> {
                 final Matcher converter = Pattern.compile("\\[(.*)\\]:([a-zA-Z0-9.$]+)", Pattern.CASE_INSENSITIVE)
                         .matcher(val);
                 if (converter.matches()) {
-                    final IConverter typeConverter = ConverterPool.get(converter.group(2), loader);
+                    final IConverter<?> typeConverter = ConverterPool.get(converter.group(2), loader);
                     final Object value = typeConverter.convert(converter.group(1));
                     converterMap.put(value.getClass(), typeConverter);
                     entry.setValue(value);
@@ -424,7 +424,7 @@ public class UIConfiguration extends Configuration<Map<String, Object>> {
                 val.setValue(entry.getValue().toString());
                 val.setType("Double");
             } else {
-                final IConverter converter = converterMap.get(entry.getValue().getClass());
+                final IConverter<?> converter = converterMap.get(entry.getValue().getClass());
                 if (converter != null) {
                     val.setValue(converter.convert(entry.getValue()));
                     val.setType(converter.getClass().getName());
@@ -461,7 +461,7 @@ public class UIConfiguration extends Configuration<Map<String, Object>> {
             } else if (entry.getType().equalsIgnoreCase("Double")) {
                 ret.getConfigurationValue().put(entry.getKey(), Double.valueOf(entry.getValue()));
             } else {
-                final IConverter converter = ConverterPool.get(entry.getType(), loader);
+                final IConverter<?> converter = ConverterPool.get(entry.getType(), loader);
                 if (converter != null) {
                     ret.converterMap.put(converter.getClass(), converter);
                     ret.getConfigurationValue().put(entry.getKey(), converter.convert(entry.getValue()));

@@ -266,7 +266,7 @@ public abstract class TranslationConfiguration {
         final NALKey key = new NALKey(rule.getUsecase());
         for (final RuleParameter parameterRule : rule.getParameters()) {
             final String paramValue = matcher.group(parameterRule.getAplicatesToGroup());
-            final IConverter type = parameterRule.getConverter();
+            final IConverter<?> type = parameterRule.getConverter();
             key.addParameter(parameterRule.getParameterName(),
                     convertParam2Type(paramValue, type));
         }
@@ -282,7 +282,7 @@ public abstract class TranslationConfiguration {
      * @param simpleMapping
      * @return never null
      */
-    private static Object convertParam2Type(final String paramValue, final IConverter type) {
+    private static Object convertParam2Type(final String paramValue, final IConverter<?> type) {
         Object converted = null; // aka final
         if (type instanceof StringMap) {
             final StringMap strMap = (StringMap) type;
@@ -310,7 +310,7 @@ public abstract class TranslationConfiguration {
      * @param simpleMapping
      * @return is null when paramType is null
      */
-    private static String convertType2String(final Object paramType, final IConverter type) {
+    private static String convertType2String(final Object paramType, final IConverter<?> type) {
         if (paramType == null) {
             return null;
         }

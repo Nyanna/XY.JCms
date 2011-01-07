@@ -42,7 +42,7 @@ final public class RuleParameter implements Comparable<RuleParameter> {
      * hold the typeconverter which converts the string value to an
      * programatic type
      */
-    private final IConverter converter;
+    private final IConverter<?> converter;
 
     /**
      * default constructor
@@ -51,7 +51,7 @@ final public class RuleParameter implements Comparable<RuleParameter> {
      * @param aplicatesToGroup
      * @param converter
      */
-    public RuleParameter(final String parameterName, final int aplicatesToGroup, final IConverter converter) {
+    public RuleParameter(final String parameterName, final int aplicatesToGroup, final IConverter<?> converter) {
         if (StringUtils.isBlank(parameterName)) {
             throw new IllegalArgumentException("Parameter name can't be blank.");
         }
@@ -84,7 +84,7 @@ final public class RuleParameter implements Comparable<RuleParameter> {
      * 
      * @return value
      */
-    public IConverter getConverter() {
+    public IConverter<?> getConverter() {
         return converter;
     }
 

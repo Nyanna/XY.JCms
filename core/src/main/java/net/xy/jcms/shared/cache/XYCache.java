@@ -21,8 +21,10 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 /**
- * Main cache implementation. Smart and simple without any type of synchronization.
- * Read access is always possible write access gots asynchronously proccessed by an management thread. At the moment in
+ * Main cache implementation. Smart and simple without any type of
+ * synchronization.
+ * Read access is always possible write access gots asynchronously proccessed by
+ * an management thread. At the moment in
  * memory cache only.
  * 
  * @author Xyan
@@ -45,7 +47,8 @@ public class XYCache {
     // Access part
 
     /**
-     * instance mount map, to hold cache instances each cache has its own manager.
+     * instance mount map, to hold cache instances each cache has its own
+     * manager.
      */
     final static Map<String, XYCache> instanceMounts = new HashMap<String, XYCache>();
 
@@ -114,9 +117,11 @@ public class XYCache {
      * @return value
      */
     public Object get(final String region, final String key) {
-        if (base.containsKey(region)) {
-            if (base.get(region).containsKey(key)) {
-                return base.get(region).get(key).getObj();
+        final Map<String, CacheObj> reg = base.get(region);
+        if (reg != null) {
+            final CacheObj cacheObject = reg.get(key);
+            if (cacheObject != null) {
+                return cacheObject.getObj();
             }
         }
         return null;
@@ -132,12 +137,13 @@ public class XYCache {
      * @return value
      */
     public Object get(final String region, final String key, final long maxAge) {
-        if (base.containsKey(region)) {
-            if (base.get(region).containsKey(key)) {
+        final Map<String, CacheObj> reg = base.get(region);
+        if (reg != null) {
+            final CacheObj cacheObject = reg.get(key);
+            if (cacheObject != null) {
                 final long maxOld = System.currentTimeMillis() - maxAge * TIMEBASE_MULTIPLICATOR;
-                final CacheObj obj = base.get(region).get(key);
-                if (obj != null && obj.getTimeStamp() > maxOld) {
-                    return obj.getObj();
+                if (cacheObject.getTimeStamp() > maxOld) {
+                    return cacheObject.getObj();
                 }
                 LOG.info("[NULL] Object was to old: " + region + "." + key);
             }
@@ -301,18 +307,21 @@ public class XYCache {
          * @param req
          */
         private void proccessRequest(final Request req) {
-            if (!base.containsKey(req.getRegion())) {
+            Map<String, CacheObj> region = base.get(req.getRegion());
+            if (region == null) {
                 // create region if not exists
-                base.put(req.getRegion(), new HashMap<String, CacheObj>());
+                region = new HashMap<String, CacheObj>();
+                base.put(req.getRegion(), region);
             }
             boolean isUpdate = true; // default update
-            if (base.get(req.getRegion()).containsKey(req.getKey())) {
+            final CacheObj cacheObject = region.get(req.getKey());
+            if (cacheObject != null) {
                 // update only if request is newer
                 // to old requests get droped
-                isUpdate = req.getTimestamp() > base.get(req.getRegion()).get(req.getKey()).getTimeStamp();
+                isUpdate = req.getTimestamp() > cacheObject.getTimeStamp();
             }
             if (isUpdate) {
-                base.get(req.getRegion()).put(req.getKey(), new CacheObj(req.getTimestamp(), req.getObj()));
+                region.put(req.getKey(), new CacheObj(req.getTimestamp(), req.getObj()));
             }
             return;
         }

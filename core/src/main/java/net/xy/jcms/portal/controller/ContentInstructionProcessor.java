@@ -45,7 +45,7 @@ public class ContentInstructionProcessor {
     /**
      * an dynamic threadpool is used to fullfill requests
      */
-    private static final ExecutorService THREADPOOL = JCmsHelper.getThreadPool(50, 1000, 1200l);
+    private static final ExecutorService THREADPOOL = JCmsHelper.getThreadPool(20, 1000, 1200l);
 
     /**
      * usual entry method which preconstructs three lists:
@@ -72,7 +72,8 @@ public class ContentInstructionProcessor {
         final List<Instruction> nonDepInstrs = new ArrayList<ContentInstructionProcessor.Instruction>();
         // map representing dependencies a => c,d,e
         final Map<String, List<String>> depInstrs = new HashMap<String, List<String>>();
-        // overall list of all instruction for better performance stored in an RAM struct
+        // overall list of all instruction for better performance stored in an
+        // RAM struct
         final Map<String, Instruction> instructionSet = new HashMap<String, ContentInstructionProcessor.Instruction>();
 
         // fill the instructions
@@ -159,7 +160,8 @@ public class ContentInstructionProcessor {
     }
 
     /**
-     * removes all dependencies and dispatches instruction which have nore more dependencies left
+     * removes all dependencies and dispatches instruction which have nore more
+     * dependencies left
      * 
      * @param id
      * @param dependencys
@@ -184,7 +186,8 @@ public class ContentInstructionProcessor {
     }
 
     /**
-     * method decides if an new thread should dispatched or if the task is ready and can be removed from depList
+     * method decides if an new thread should dispatched or if the task is ready
+     * and can be removed from depList
      * 
      * @param instruction
      * @param depInstrs
@@ -223,7 +226,8 @@ public class ContentInstructionProcessor {
     }
 
     /**
-     * removes an dependency (more an id) from an dependency list (Stringlist). This method is internally synchronized
+     * removes an dependency (more an id) from an dependency list (Stringlist).
+     * This method is internally synchronized
      * only the last thread gets an true.
      * 
      * @param upon
@@ -400,7 +404,8 @@ public class ContentInstructionProcessor {
         }
 
         /**
-         * overwrites future result handling with concrete object mostly from cache
+         * overwrites future result handling with concrete object mostly from
+         * cache
          * 
          * @param content
          */
@@ -430,7 +435,8 @@ public class ContentInstructionProcessor {
         public Object call(final Instruction instruction, final Map<String, Instruction> resultSet) throws Exception;
 
         /**
-         * this method should return the content from cache only if not cached it should return null
+         * this method should return the content from cache only if not cached
+         * it should return null
          * 
          * @param instruction
          * @param resultSet

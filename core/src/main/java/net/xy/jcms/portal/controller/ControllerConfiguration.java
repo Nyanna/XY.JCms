@@ -17,6 +17,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.xy.jcms.shared.DebugUtils;
+import net.xy.jcms.shared.IConverter;
 import net.xy.jcms.shared.types.Model;
 
 /**
@@ -31,8 +32,7 @@ public class ControllerConfiguration {
     /**
      * factory class no instance allowed
      */
-    private ControllerConfiguration() {
-    }
+    private ControllerConfiguration() {}
 
     /**
      * build an config instance for an desired controller with the desired
@@ -107,7 +107,6 @@ public class ControllerConfiguration {
             }
         }
 
-        // TODO [HIGH] use parameterized to autoconvert config values
         /**
          * helper method to get config
          * always returns an object and never null if the default was not null
@@ -116,9 +115,10 @@ public class ControllerConfiguration {
          * 
          * @param item
          * @param binding
-         * @return
+         * @return value of item type or null
          */
-        public Object get(final Item item, final Map<? extends Object, ? extends Object> binding) {
+        @SuppressWarnings("unchecked")
+        public <T> T get(final Item<T> item, final Map<? extends Object, ? extends Object> binding) {
             Object ret = null;
             if (binding != null) {
                 ret = binding.get(item.key);
@@ -132,14 +132,41 @@ public class ControllerConfiguration {
             if (ret == null) {
                 ret = item.def;
             }
-            return replaceParams(ret);
+            ret = replaceParams(ret);
+            if (item.converter != null) {
+                return item.converter.valueOf(ret);
+            } else if (item.def != null) {
+                if (item.def instanceof String) {
+                    return (T) ret.toString();
+                } else if (item.def instanceof Integer) {
+                    return (T) net.xy.jcms.shared.types.Integer.valueOfObject(ret);
+                } else if (item.def instanceof Long) {
+                    return (T) net.xy.jcms.shared.types.Long.valueOfObject(ret);
+                } else {
+                    return (T) ret;
+                }
+            } else {
+                return (T) ret;
+            }
+        }
+
+        /**
+         * helper method to get config
+         * always returns an object and never null if the default was not null
+         * -replaces $ctrlparam$ in string values
+         * 
+         * @param item
+         * @return value of type or null
+         */
+        public <T> T get(final Item<T> item) {
+            return get(item, null);
         }
 
         /**
          * gets an raw value from globals or null
          * 
          * @param key
-         * @return
+         * @return global value or null
          */
         public Object getGlobal(final String key) {
             if (globals != null) {
@@ -154,7 +181,7 @@ public class ControllerConfiguration {
          * @param ret
          * @return original value or replaced one
          */
-        private Object replaceParams(final Object ret) {
+        public Object replaceParams(final Object ret) {
             // replacements
             if (parameters != null && !parameters.isEmpty() && ret instanceof String) {
                 final Matcher m = PARAMETER_PATTERN.matcher(((String) ret).trim());
@@ -182,18 +209,6 @@ public class ControllerConfiguration {
             }
             return ret;
         }
-
-        /**
-         * helper method to get config
-         * always returns an object and never null if the default was not null
-         * -replaces $ctrlparam$ in string values
-         * 
-         * @param item
-         * @return
-         */
-        public Object get(final Item item) {
-            return get(item, null);
-        }
     }
 
     /**
@@ -202,7 +217,7 @@ public class ControllerConfiguration {
      * @author Xyan
      * 
      */
-    public static class Item {
+    public static class Item<T> {
         /**
          * the items key
          */
@@ -211,7 +226,7 @@ public class ControllerConfiguration {
         /**
          * items default value if no other could be found
          */
-        private final Object def;
+        private final T def;
 
         /**
          * description to get read by humans with ussage instructions
@@ -220,16 +235,38 @@ public class ControllerConfiguration {
         private final String description;
 
         /**
-         * default constructor to build item
+         * converter used for type conversion of multisource params
+         */
+        private final IConverter<T> converter;
+
+        /**
+         * default constructor to build item. if def supports converter it will be used as fallback.
          * 
          * @param key
          * @param description
          * @param def
          */
-        public Item(final String key, final String description, final Object def) {
+        public Item(final String key, final String description, final T def) {
+            this(key, description, def, null);
+        }
+
+        /**
+         * constructor with type converter support. if def supports converter it will be used as fallback.
+         * 
+         * @param key
+         * @param description
+         * @param def
+         */
+        @SuppressWarnings("unchecked")
+        public Item(final String key, final String description, final T def, final IConverter<T> converter) {
             this.key = key;
             this.description = description;
             this.def = def;
+            if (converter == null && def instanceof IConverter) {
+                this.converter = (IConverter<T>) def;
+            } else {
+                this.converter = converter;
+            }
         }
     }
 }

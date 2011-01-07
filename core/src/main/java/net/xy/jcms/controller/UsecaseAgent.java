@@ -138,6 +138,7 @@ public class UsecaseAgent {
      */
     public static NALKey executeController(final Controller[] ctrlList, final Model configurations,
             final IDataAccessContext dac, final Map<Object, Object> parameters) {
+        final long time = System.currentTimeMillis();
         NALKey next = null;
         for (final Controller controller : ctrlList) {
             final EnumSet<ConfigurationType> types = controller.getObmitedConfigurations().clone();
@@ -161,6 +162,7 @@ public class UsecaseAgent {
                 break;
             }
         }
+        LOG.info("Execution of controllers tok: " + (System.currentTimeMillis() - time) + " ms");
         return next;
     }
 

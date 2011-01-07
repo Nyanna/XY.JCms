@@ -24,7 +24,7 @@ import net.xy.jcms.shared.IConverter;
  * @author xyan
  * 
  */
-public class Long implements IConverter {
+public class Long implements IConverter<java.lang.Long> {
 
     @Override
     public void fromString(final String str) {
@@ -33,6 +33,16 @@ public class Long implements IConverter {
 
     @Override
     public java.lang.Long convert(final String str) {
+        return convertString(str);
+    }
+
+    /**
+     * static access to method
+     * 
+     * @param str
+     * @return converted value
+     */
+    public static java.lang.Long convertString(final String str) {
         return new java.lang.Long(str);
     }
 
@@ -41,4 +51,24 @@ public class Long implements IConverter {
         return obj.toString();
     }
 
+    @Override
+    public java.lang.Long valueOf(final Object obj) {
+        return valueOfObject(obj);
+    }
+
+    /**
+     * static access to method
+     * 
+     * @param obj
+     * @return converted value
+     */
+    public static java.lang.Long valueOfObject(final Object obj) {
+        if (obj instanceof String) {
+            return convertString((String) obj);
+        } else if (obj instanceof java.lang.Long) {
+            return (java.lang.Long) obj;
+        } else {
+            return null;
+        }
+    }
 }

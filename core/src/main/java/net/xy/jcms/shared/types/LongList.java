@@ -26,7 +26,7 @@ import net.xy.jcms.shared.IConverter;
  * @author xyan
  * 
  */
-public class LongList extends LinkedList<java.lang.Long> implements IConverter {
+public class LongList extends LinkedList<java.lang.Long> implements IConverter<LongList> {
     private static final long serialVersionUID = -2982736336731356218L;
 
     @Override
@@ -46,6 +46,11 @@ public class LongList extends LinkedList<java.lang.Long> implements IConverter {
         fromString(str);
     }
 
+    /**
+     * sole constructor
+     */
+    public LongList() {}
+
     @Override
     public LongList convert(final String str) {
         return new LongList(str);
@@ -63,5 +68,33 @@ public class LongList extends LinkedList<java.lang.Long> implements IConverter {
             }
         }
         return ret.toString();
+    }
+
+    @SuppressWarnings("rawtypes")
+    @Override
+    public LongList valueOf(final Object obj) {
+        if (obj instanceof LongList) {
+            return (LongList) obj;
+        } else if (obj instanceof String) {
+            return convert((String) obj);
+        } else if (obj instanceof List) {
+            // converts list of long,numeric string,integer,double
+            final LongList ret = new LongList();
+            for (final Object ob : (List) obj) {
+                if (ob instanceof java.lang.Long) {
+                    ret.add((java.lang.Long) ob);
+                } else if (ob instanceof String) {
+                    if (StringUtils.isNumeric((String) ob)) {
+                        ret.add(java.lang.Long.valueOf((String) obj));
+                    }
+                } else if (ob instanceof java.lang.Integer) {
+                    ret.add(((java.lang.Integer) ob).longValue());
+                } else if (ob instanceof java.lang.Double) {
+                    ret.add(((java.lang.Double) ob).longValue());
+                }
+            }
+            return ret;
+        }
+        return null;
     }
 }

@@ -113,16 +113,6 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
     private final CONFIGURATION_OBJECT configurationValue;
 
     /**
-     * alternatively an source can be specified to load an already existing
-     * configuration.
-     */
-    private final String configurationSource;
-
-    // TODO [LOW] write source from extern configuration in config i forgot, hm
-    // think
-    // about merging strategy
-
-    /**
      * constructor with obmited config object
      * 
      * @param configurationType
@@ -134,7 +124,6 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
         }
         this.configurationType = configurationType;
         this.configurationValue = configurationValue;
-        configurationSource = null;
     }
 
     /**
@@ -152,7 +141,6 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
         }
         this.configurationType = configurationType;
         this.configurationValue = configurationValue;
-        this.configurationSource = configurationSource;
     }
 
     /**
@@ -171,15 +159,6 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
      */
     protected CONFIGURATION_OBJECT getConfigurationValue() {
         return configurationValue;
-    }
-
-    /**
-     * return the configurations origin
-     * 
-     * @return value
-     */
-    public String getConfigurationSource() {
-        return configurationSource;
     }
 
     /**
@@ -230,7 +209,7 @@ public abstract class Configuration<CONFIGURATION_OBJECT> {
 
     @Override
     public String toString() {
-        return "type=" + getConfigurationType() + " source=" + getConfigurationSource();
+        return "type=" + getConfigurationType();
     }
 
     /**

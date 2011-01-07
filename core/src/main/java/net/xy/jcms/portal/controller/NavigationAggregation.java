@@ -67,7 +67,8 @@ public abstract class NavigationAggregation<LINKOBJECT> extends Controller {
     private void proccess(final IDataAccessContext dac, final Model configuration, final Config config)
             throws GroupCouldNotBeFilled, InvalidBuildRule {
 
-        final ControllerConfiguration configK = (ControllerConfiguration) configuration.get(ControllerConfiguration.TYPE);
+        final ControllerConfiguration configK = (ControllerConfiguration) configuration
+                .get(ControllerConfiguration.TYPE);
         final ContentRepository configC = (ContentRepository) configuration.get(ContentRepository.TYPE);
 
         if (configC == null || configK == null) {
@@ -75,11 +76,12 @@ public abstract class NavigationAggregation<LINKOBJECT> extends Controller {
         }
 
         if (config.getGlobal(INSTRUCTION_SECTION) instanceof List) {
-            for (final Map<String, String> instruction : (List<Map<String, String>>) config.getGlobal(INSTRUCTION_SECTION)) {
+            for (final Map<String, String> instruction : (List<Map<String, String>>) config
+                    .getGlobal(INSTRUCTION_SECTION)) {
                 final List<LINKOBJECT> contents = new LinkedList<LINKOBJECT>();
                 for (final Entry<String, String> navItem : instruction.entrySet()) {
                     if (navItem.getKey().startsWith("key")) {
-                        String targetUsecase = navItem.getValue().trim();
+                        String targetUsecase = (String) config.replaceParams(navItem.getValue().trim());
                         String messageKey = targetUsecase;
                         if (targetUsecase.contains(":")) {
                             final String[] split = targetUsecase.split(":", 2);

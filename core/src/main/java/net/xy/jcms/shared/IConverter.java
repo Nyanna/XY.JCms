@@ -26,7 +26,7 @@ package net.xy.jcms.shared;
  * @author Xyan
  * 
  */
-public interface IConverter {
+public interface IConverter<T> {
 
     /**
      * must implement an method accepting an string which converts int this
@@ -41,7 +41,7 @@ public interface IConverter {
      * 
      * @return value
      */
-    public Object convert(final String str);
+    public T convert(final String str);
 
     /**
      * method converts the object back to an value
@@ -50,4 +50,12 @@ public interface IConverter {
      * @return string representation able to get parsed by this converter
      */
     public String convert(final Object obj);
+
+    /**
+     * tries to convert any object type to this object type
+     * 
+     * @param obj
+     * @return object of this type
+     */
+    public T valueOf(final Object obj);
 }

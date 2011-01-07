@@ -24,7 +24,7 @@ import net.xy.jcms.shared.IConverter;
  * @author xyan
  * 
  */
-public class Integer implements IConverter {
+public class Integer implements IConverter<java.lang.Integer> {
 
     @Override
     public void fromString(final String str) {
@@ -33,6 +33,16 @@ public class Integer implements IConverter {
 
     @Override
     public java.lang.Integer convert(final String str) {
+        return convertString(str);
+    }
+
+    /**
+     * static access to method
+     * 
+     * @param str
+     * @return converted value
+     */
+    public static java.lang.Integer convertString(final String str) {
         return java.lang.Integer.valueOf(str);
     }
 
@@ -41,4 +51,24 @@ public class Integer implements IConverter {
         return obj.toString();
     }
 
+    @Override
+    public java.lang.Integer valueOf(final Object obj) {
+        return valueOfObject(obj);
+    }
+
+    /**
+     * static access to method
+     * 
+     * @param obj
+     * @return converted value
+     */
+    public static java.lang.Integer valueOfObject(final Object obj) {
+        if (obj instanceof String) {
+            return convertString((String) obj);
+        } else if (obj instanceof java.lang.Integer) {
+            return (java.lang.Integer) obj;
+        } else {
+            return null;
+        }
+    }
 }

@@ -31,7 +31,7 @@ import net.xy.jcms.shared.IConverter;
  * @author xyan
  * 
  */
-public class StringList extends ArrayList<String> implements IConverter {
+public class StringList extends ArrayList<String> implements IConverter<StringList> {
 
     private static final long serialVersionUID = -8117979043461375581L;
 
@@ -52,6 +52,13 @@ public class StringList extends ArrayList<String> implements IConverter {
         fromString(str);
     }
 
+    /**
+     * sole constructor
+     */
+    public StringList() {
+
+    }
+
     @Override
     public StringList convert(final String str) {
         return new StringList(str);
@@ -69,5 +76,26 @@ public class StringList extends ArrayList<String> implements IConverter {
             }
         }
         return ret.toString();
+    }
+
+    @SuppressWarnings("rawtypes")
+    @Override
+    public StringList valueOf(final Object obj) {
+        if (obj instanceof StringList) {
+            return (StringList) obj;
+        } else if (obj instanceof String) {
+            return convert((String) obj);
+        } else if (obj instanceof List) {
+            final StringList ret = new StringList();
+            for (final Object ob : (List) obj) {
+                if (ob instanceof String) {
+                    ret.add((String) ob);
+                } else {
+                    ret.add(ob.toString());
+                }
+            }
+            return ret;
+        }
+        return null;
     }
 }
