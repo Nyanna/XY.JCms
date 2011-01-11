@@ -68,7 +68,7 @@ public class BoxComponent extends AbstractComponent {
 
     @Override
     public void render(final IOutWriter out, final ComponentConfiguration config) {
-        final IBoxRenderer boxr = (IBoxRenderer) config.getRenderer(IBoxRenderer.class);
+        final IBoxRenderer boxr = config.getRenderer(IBoxRenderer.class);
         out.append(boxr.renderBegin((String) config.getUIConfig("styleClass")));
         config.renderChilds(out);
         out.append(boxr.renderEnd());

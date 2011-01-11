@@ -69,7 +69,7 @@ public class TextComponent extends AbstractComponent {
 
     @Override
     public void render(final IOutWriter out, final ComponentConfiguration config) {
-        final ITextRenderer r = (ITextRenderer) config.getRenderer(ITextRenderer.class);
+        final ITextRenderer r = config.getRenderer(ITextRenderer.class);
         final String text = config.getMessage("text");
         final String container = (String) config.getUIConfig("container");
         final String style = (String) config.getUIConfig("styleClass");

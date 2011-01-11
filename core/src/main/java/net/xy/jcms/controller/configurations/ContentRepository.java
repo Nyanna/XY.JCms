@@ -146,6 +146,26 @@ public class ContentRepository extends Configuration<Map<String, Object>> {
         return mFound;
     }
 
+    /**
+     * methopd usually used from the controllers throws an exception if the content was not found
+     * 
+     * @param <T>
+     *            of the exspected type
+     * @param path
+     * @param type
+     * @return value of exspected type
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T getContent(final String path, final Class<T> type) {
+        final Object found = getConfigurationValue().get(path);
+        if (found != null && !type.isInstance(found)) {
+            throw new IllegalArgumentException(
+                    "An mendatory content object was not found or hasn't the exspected type."
+                            + DebugUtils.printFields(path, found != null ? found.getClass() : "null"));
+        }
+        return (T) found;
+    }
+
     @Override
     public int hashCode() {
         return getConfigurationValue().hashCode();

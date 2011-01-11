@@ -34,7 +34,7 @@ import org.apache.log4j.Logger;
 import net.xy.jcms.controller.configurations.pool.ConverterPool;
 import net.xy.jcms.controller.translation.RuleParameter;
 import net.xy.jcms.controller.translation.TranslationRule;
-import net.xy.jcms.shared.types.StringMap;
+import net.xy.jcms.shared.InitializableController;
 
 /**
  * parser for translation rules xml configuration files
@@ -205,7 +205,6 @@ public class TranslationParser {
             if (parser.next() == XMLStreamConstants.CHARACTERS) {
                 final String mappingStr = parser.getText();
                 // get integrated mapping body
-                converter = "net.xy.jcms.shared.types.StringMap";
                 if (StringUtils.isNotBlank(mappingStr)) {
                     mappings = new HashMap<String, String>();
                     final String[] lines = mappingStr.split("\n");
@@ -231,7 +230,8 @@ public class TranslationParser {
             } else {
                 if (mappings != null) {
                     // get special mapping converter
-                    params.add(new RuleParameter(parameterName, aplicatesToGroup, new StringMap(mappings)));
+                    params.add(new RuleParameter(parameterName, aplicatesToGroup,
+                            ((InitializableController<?>) ConverterPool.get(converter, loader)).initialize(mappings)));
                 } else {
                     // get normal converter
                     params.add(new RuleParameter(parameterName, aplicatesToGroup, ConverterPool.get(converter, loader)));

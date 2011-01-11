@@ -58,6 +58,11 @@ public class NavigationAbstractionLayer {
         Map<Object, Object> parameters = new TreeMap<Object, Object>();
 
         /**
+         * parameter name used to store the actual requested key
+         */
+        public static final String ACTUAL_KEY_PARAM = "net.xy.jcms.actual.NALKey";
+
+        /**
          * default constructor
          * 
          * @param id
@@ -183,7 +188,11 @@ public class NavigationAbstractionLayer {
      * @return Key[Subcategory]
      */
     public static NALKey translatePathToKey(final IDataAccessContext dac) {
-        return TranslationConfiguration.find(dac.getRequestPath(), dac);
+        final NALKey res = TranslationConfiguration.find(dac.getRequestPath(), dac);
+        if (res != null) {
+            res.addParameter(NALKey.ACTUAL_KEY_PARAM, new NALKey(res));
+        }
+        return res;
     }
 
     /**
@@ -200,8 +209,7 @@ public class NavigationAbstractionLayer {
      *             in case the buildrule can't be applied
      */
     public static String translateKeyWithRule(final NALKey key, final TranslationRule rule)
-            throws GroupCouldNotBeFilled,
-            InvalidBuildRule {
+            throws GroupCouldNotBeFilled, InvalidBuildRule {
         return TranslationConfiguration.translateKeyWithRule(key, rule);
     }
 

@@ -561,8 +561,9 @@ public abstract class ComponentConfiguration {
      * @param rIface
      * @return value
      */
-    public Object getRenderer(final Class<? extends IRenderer> rIface) {
-        final Object renderer = renderers.get(rIface);
+    public <R extends IRenderer> R getRenderer(final Class<R> rIface) {
+        @SuppressWarnings("unchecked")
+        final R renderer = (R) renderers.get(rIface);
         if (renderer == null) {
             throw new IllegalArgumentException("An not configured rendererwere requested!");
         }

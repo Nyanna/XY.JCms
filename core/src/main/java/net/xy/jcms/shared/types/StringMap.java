@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import net.xy.jcms.shared.IConverter;
+import net.xy.jcms.shared.InitializableController;
 
 /**
  * simple typesation of an stringmap
@@ -29,7 +30,7 @@ import net.xy.jcms.shared.IConverter;
  * @author xyan
  * 
  */
-public class StringMap extends HashMap<String, String> implements IConverter<StringMap> {
+public class StringMap extends HashMap<String, String> implements InitializableController<StringMap> {
     private static final long serialVersionUID = 6126913995340768165L;
 
     /**
@@ -99,5 +100,15 @@ public class StringMap extends HashMap<String, String> implements IConverter<Str
             return ret;
         }
         return null;
+    }
+
+    @Override
+    public IConverter<StringMap> initialize(final Map<String, String> options) {
+        return new StringMap(options);
+    }
+
+    @Override
+    public Map<String, String> store() {
+        return this;
     }
 }

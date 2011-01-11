@@ -49,6 +49,8 @@ public class HttpProtocolRequestAdapter {
         for (final Entry<String, String[]> entry : ((Map<String, String[]>) request.getParameterMap()).entrySet()) {
             if (entry.getValue() == null || entry.getValue().length < 1) {
                 params.put(entry.getKey(), null);
+            } else if (entry.getValue().length == 1) {
+                params.put(entry.getKey(), entry.getValue()[0]);
             } else {
                 params.put(entry.getKey(), Arrays.asList(entry.getValue()));
             }

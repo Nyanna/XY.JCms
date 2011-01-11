@@ -15,7 +15,7 @@ package net.xy.jcms.controller.translation;
 import net.xy.jcms.persistence.MapEntry;
 import net.xy.jcms.persistence.translation.RuleParameterDTO;
 import net.xy.jcms.shared.IConverter;
-import net.xy.jcms.shared.types.StringMap;
+import net.xy.jcms.shared.InitializableController;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -97,8 +97,8 @@ final public class RuleParameter implements Comparable<RuleParameter> {
         final RuleParameterDTO dto = new RuleParameterDTO();
         dto.setAplicatesToGroup(aplicatesToGroup);
         dto.setConverter(converter.getClass().getName());
-        if (converter instanceof StringMap) {
-            dto.setBuildInMap(MapEntry.convert((StringMap) converter));
+        if (converter instanceof InitializableController) {
+            dto.setBuildInMap(MapEntry.convert(((InitializableController<?>) converter).store()));
         }
         dto.setParameterName(parameterName);
         return dto;

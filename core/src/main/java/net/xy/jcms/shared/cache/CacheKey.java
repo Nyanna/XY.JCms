@@ -45,8 +45,7 @@ public class CacheKey {
     /**
      * default, initializes empty
      */
-    public CacheKey() {
-    }
+    public CacheKey() {}
 
     /**
      * sets start components of cache key
@@ -140,7 +139,12 @@ public class CacheKey {
         @SuppressWarnings({ "unchecked", "rawtypes" })
         @Override
         public int compare(final Object o1, final Object o2) {
-            if (o1 instanceof Comparable) {
+            if (o1 == null) {
+                return -1;
+            } else if (o2 == null) {
+                return 1;
+            }
+            if (o1 instanceof Comparable && o1.getClass().isInstance(o2)) {
                 return ((Comparable) o1).compareTo(o2);
             } else {
                 return o1.toString().compareTo(o2.toString());

@@ -70,6 +70,7 @@ public abstract class TranslationConfiguration {
      * 
      * @param key
      * @param rule
+     * @param dac
      * @return the ready translated path elsewhere it rises an
      *         GroupCouldNotBeFilled
      * @throws GroupCouldNotBeFilled
@@ -78,8 +79,7 @@ public abstract class TranslationConfiguration {
      *             in case the buildrule can't be applied
      */
     protected static String translateKeyWithRule(final NALKey key, final TranslationRule rule)
-            throws GroupCouldNotBeFilled,
-            InvalidBuildRule {
+            throws GroupCouldNotBeFilled, InvalidBuildRule {
         String buildKey = rule.getBuildOff();
         Matcher matcher = rule.getReacton().matcher(buildKey);
         final List<Integer> alreadyFilled = new ArrayList<Integer>();
@@ -260,6 +260,7 @@ public abstract class TranslationConfiguration {
      * 
      * @param rule
      * @param matcher
+     * @param dac
      * @return value
      */
     private static NALKey createKey(final TranslationRule rule, final Matcher matcher) {
@@ -279,11 +280,14 @@ public abstract class TranslationConfiguration {
      * 
      * @param paramValue
      * @param type
+     * @param dac
      * @param simpleMapping
      * @return never null
      */
     private static Object convertParam2Type(final String paramValue, final IConverter<?> type) {
         Object converted = null; // aka final
+        // TODO [HIGH] check StringMap for conformance and the Converter contract, convert should get type back and not
+        // convert StringMap
         if (type instanceof StringMap) {
             final StringMap strMap = (StringMap) type;
             if (strMap.containsValue(paramValue)) {
@@ -307,7 +311,6 @@ public abstract class TranslationConfiguration {
      * 
      * @param paramType
      * @param type
-     * @param simpleMapping
      * @return is null when paramType is null
      */
     private static String convertType2String(final Object paramType, final IConverter<?> type) {

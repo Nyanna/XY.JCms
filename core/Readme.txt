@@ -26,6 +26,7 @@
 -DTO transfer of all configuration via JAXB and JPA(eclipselink)
 -an small configset gets expanded to an independent configbase so its easy to configure and rely on
 -mvn plugin to commit and convert simple xml <> JAXB xml <> jpa context
+-fast non service paging
 
 #
 # Phase 2 will cover

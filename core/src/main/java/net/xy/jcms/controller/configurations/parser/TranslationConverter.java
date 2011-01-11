@@ -1,3 +1,19 @@
+/**
+ * This file is part of XY.JCms, Copyright 2010 (C) Xyan Kruse, Xyan@gmx.net, Xyan.kilu.de
+ * 
+ * XY.JCms is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * XY.JCms is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with XY.JCms. If not, see <http://www.gnu.org/licenses/>.
+ */
 package net.xy.jcms.controller.configurations.parser;
 
 import java.util.ArrayList;
@@ -12,7 +28,7 @@ import net.xy.jcms.persistence.translation.RuleParameterDTO;
 import net.xy.jcms.persistence.translation.TranslationRuleDTO;
 import net.xy.jcms.persistence.translation.TranslationRulesDTO;
 import net.xy.jcms.shared.IConverter;
-import net.xy.jcms.shared.types.StringMap;
+import net.xy.jcms.shared.InitializableController;
 
 /**
  * these class helps to instanciates translation out from its DTO counterpart
@@ -68,11 +84,9 @@ public class TranslationConverter {
         final List<RuleParameter> params = new ArrayList<RuleParameter>();
         if (rule.getParameters() != null) {
             for (final RuleParameterDTO param : rule.getParameters()) {
-                final IConverter<?> convt;
-                if ("net.xy.jcms.shared.types.StringMap".equals(param.getConverter())) {
-                    convt = new StringMap(MapEntry.convert(param.getBuildInMap()));
-                } else {
-                    convt = ConverterPool.get(param.getConverter(), loader);
+                IConverter<?> convt = ConverterPool.get(param.getConverter(), loader);
+                if (convt instanceof InitializableController) {
+                    convt = ((InitializableController<?>) convt).initialize(MapEntry.convert(param.getBuildInMap()));
                 }
                 params.add(new RuleParameter(param.getParameterName(), param.getAplicatesToGroup(), convt));
             }

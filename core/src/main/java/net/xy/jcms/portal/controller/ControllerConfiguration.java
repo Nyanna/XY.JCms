@@ -16,6 +16,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.xy.jcms.controller.configurations.Configuration;
+import net.xy.jcms.controller.configurations.Configuration.ConfigurationType;
 import net.xy.jcms.shared.DebugUtils;
 import net.xy.jcms.shared.IConverter;
 import net.xy.jcms.shared.types.Model;
@@ -173,6 +175,29 @@ public class ControllerConfiguration {
                 return globals.get(key);
             }
             return null;
+        }
+
+        /**
+         * gets an config directly from the parameters
+         * 
+         * @param key
+         * @return param value
+         */
+        public Object getParameter(final Object key) {
+            if (parameters == null) {
+                return null;
+            }
+            return parameters.get(key);
+        }
+
+        /**
+         * pathThrough for the configurations from model
+         * 
+         * @param type
+         * @return config
+         */
+        public Configuration<?> getConfig(final ConfigurationType type) {
+            return model.get(type);
         }
 
         /**

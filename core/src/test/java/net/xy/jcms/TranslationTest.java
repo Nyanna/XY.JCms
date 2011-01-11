@@ -33,6 +33,7 @@ public class TranslationTest {
     public void testFind() {
         final NALKey exspected = new NALKey("contentgroup");
         exspected.addParameter("contentgroup", "Ringtones");
+        exspected.addParameter(NALKey.ACTUAL_KEY_PARAM, new NALKey(exspected));
         final NALKey result = NavigationAbstractionLayer.translatePathToKey(new CLIDataAccessContext(
                 "du willst wohl zu Ringtones"));
         assertEquals(exspected.toString(), result.toString());
@@ -42,6 +43,7 @@ public class TranslationTest {
     public void testFind1() {
         final NALKey exspected = new NALKey("contentgroup");
         exspected.addParameter("contentgroup", "Funsounds");
+        exspected.addParameter(NALKey.ACTUAL_KEY_PARAM, new NALKey(exspected));
         final NALKey result = NavigationAbstractionLayer.translatePathToKey(new CLIDataAccessContext(
                 "du willst wohl zu Funsounds"));
         assertEquals(exspected.toString(), result.toString());
